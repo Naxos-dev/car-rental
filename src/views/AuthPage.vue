@@ -273,6 +273,7 @@ async function handleRegister() {
 }
 .field-row .field {
   flex: 1;
+  min-width: 0;
 }
 
 .field {
