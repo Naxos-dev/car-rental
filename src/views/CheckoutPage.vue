@@ -127,7 +127,8 @@ async function handlePay() {
   paying.value = true;
   payError.value = "";
   try {
-    const res = await fetch(import.meta.env.VITE_CHECKOUT_FUNCTION_URL, {
+    const apiUrl = import.meta.env.VITE_CHECKOUT_FUNCTION_URL || "/api/create-checkout-session";
+    const res = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -138,7 +139,10 @@ async function handlePay() {
         cancelUrl: `${window.location.origin}/checkout`,
       }),
     });
-    if (!res.ok) throw new Error("Réponse invalide du serveur");
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Erreur serveur (${res.status})`);
+    }
     const data = await res.json();
     if (data.url) {
       // Persister les données avant le rechargement de page causé par la redirection Stripe
@@ -160,9 +164,9 @@ async function handlePay() {
     } else {
       throw new Error("URL de paiement non reçue");
     }
-  } catch {
-    payError.value =
-      "Une erreur est survenue. Vérifiez la configuration Stripe.";
+  } catch (err) {
+    console.error("[Checkout] Erreur paiement:", err);
+    payError.value = err.message || "Une erreur est survenue. Vérifiez la configuration Stripe.";
     paying.value = false;
   }
 }
