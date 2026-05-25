@@ -21,7 +21,9 @@ export default async function handler(req, res) {
   }
 
   if (!process.env.STRIPE_SECRET_KEY) {
-    return res.status(500).json({ error: "STRIPE_SECRET_KEY non configurée sur le serveur." });
+    return res
+      .status(500)
+      .json({ error: "STRIPE_SECRET_KEY non configurée sur le serveur." });
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

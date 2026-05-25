@@ -127,7 +127,9 @@ async function handlePay() {
   paying.value = true;
   payError.value = "";
   try {
-    const apiUrl = import.meta.env.VITE_CHECKOUT_FUNCTION_URL || "/api/create-checkout-session";
+    const apiUrl =
+      import.meta.env.VITE_CHECKOUT_FUNCTION_URL ||
+      "/api/create-checkout-session";
     const res = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -166,7 +168,8 @@ async function handlePay() {
     }
   } catch (err) {
     console.error("[Checkout] Erreur paiement:", err);
-    payError.value = err.message || "Une erreur est survenue. Vérifiez la configuration Stripe.";
+    payError.value =
+      "Une erreur est survenue lors du paiement. Veuillez réessayer.";
     paying.value = false;
   }
 }
