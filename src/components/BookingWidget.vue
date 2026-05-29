@@ -4,14 +4,20 @@
     <form class="widget-form" @submit.prevent="handleSearch">
       <!-- Localisation -->
       <div class="field">
-        <label for="location">📍 Lieu de prise en charge</label>
+        <label for="location">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Lieu de prise en charge
+        </label>
         <input id="location" value="Lille" type="text" readonly />
       </div>
 
       <!-- Début de réservation -->
       <div class="field-group">
         <div class="field">
-          <label for="startDate">📅 Date de début</label>
+          <label for="startDate">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Date de début
+          </label>
           <input
             id="startDate"
             v-model="searchStore.startDate"
@@ -21,7 +27,10 @@
           />
         </div>
         <div class="field">
-          <label for="startTime">⏰ Heure de début</label>
+          <label for="startTime">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Heure de début
+          </label>
           <input
             id="startTime"
             v-model="searchStore.startTime"
@@ -34,7 +43,10 @@
       <!-- Fin de réservation -->
       <div class="field-group">
         <div class="field">
-          <label for="endDate">📅 Date de fin</label>
+          <label for="endDate">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Date de fin
+          </label>
           <input
             id="endDate"
             v-model="searchStore.endDate"
@@ -44,7 +56,10 @@
           />
         </div>
         <div class="field">
-          <label for="endTime">⏰ Heure de fin</label>
+          <label for="endTime">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Heure de fin
+          </label>
           <input
             id="endTime"
             v-model="searchStore.endTime"
@@ -114,6 +129,15 @@ label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #444;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+label svg {
+  width: 14px;
+  height: 14px;
+  stroke: #e63946;
+  flex-shrink: 0;
 }
 input {
   border: 1.5px solid #e0e0e0;

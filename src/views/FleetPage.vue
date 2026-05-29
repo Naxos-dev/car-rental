@@ -28,14 +28,23 @@
               :alt="`${v.marque} ${v.modele}`"
               class="vehicle-img"
             />
-            <span class="dispo-badge dispo-badge--on">✅ Disponible</span>
+            <span class="dispo-badge dispo-badge--on">Disponible</span>
           </div>
           <div class="vehicle-info">
             <h3>{{ v.marque }} {{ v.modele }}</h3>
             <div class="vehicle-tags">
-              <span class="tag">⛽ {{ v.carburant }}</span>
-              <span class="tag">👥 {{ v.places }} places</span>
-              <span class="tag tag--price">💶 {{ v.prix }}€/jour</span>
+              <span class="tag">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                {{ v.carburant }}
+              </span>
+              <span class="tag">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                {{ v.places }} places
+              </span>
+              <span class="tag tag--price">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                {{ v.prix }}€/jour
+              </span>
             </div>
             <button class="btn-reserve" @click="openReservation(v)">
               Réserver
@@ -206,6 +215,14 @@ function openReservation(vehicle) {
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.tag svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 .tag--price {
   background: #fff3e0;
