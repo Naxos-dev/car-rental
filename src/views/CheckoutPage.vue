@@ -202,6 +202,26 @@ async function handlePay() {
   .checkout-grid {
     grid-template-columns: 1fr;
   }
+  .page-title {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+  }
+  .checkout-payment {
+    position: static;
+  }
+  .vehicle-recap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .vehicle-recap-img {
+    width: 100%;
+    height: 160px;
+  }
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
 }
 
 /* Summary */

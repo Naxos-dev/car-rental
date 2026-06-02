@@ -7,7 +7,15 @@
         </svg>
         <span class="logo-text">AutoLoc</span>
       </RouterLink>
-      <nav class="nav">
+
+      <!-- Burger -->
+      <button class="burger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'">
+        <span :class="['burger-line', { open: mobileOpen }]"></span>
+        <span :class="['burger-line', { open: mobileOpen }]"></span>
+        <span :class="['burger-line', { open: mobileOpen }]"></span>
+      </button>
+
+      <nav :class="['nav', { 'nav--open': mobileOpen }]" @click="mobileOpen = false">
         <RouterLink to="/" class="nav-link">Accueil</RouterLink>
         <RouterLink to="/fleet" class="nav-link">Notre flotte</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
@@ -89,6 +97,7 @@ const route = useRoute();
 const router = useRouter();
 const menuOpen = ref(false);
 const menuRef = ref(null);
+const mobileOpen = ref(false);
 
 const isAdminRoute = computed(() => route.path.startsWith("/admin"));
 const isFleetRoute = computed(() => route.path === "/fleet");
@@ -134,6 +143,7 @@ async function handleUserLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 .logo {
   display: flex;
@@ -154,6 +164,81 @@ async function handleUserLogout() {
 .nav {
   display: flex;
   gap: 1rem;
+  align-items: center;
+}
+
+/* Burger */
+.burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+.burger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #1a1a2e;
+  border-radius: 2px;
+  transition: all 0.25s;
+  transform-origin: center;
+}
+.burger-line:nth-child(1).open { transform: translateY(7px) rotate(45deg); }
+.burger-line:nth-child(2).open { opacity: 0; }
+.burger-line:nth-child(3).open { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  .burger {
+    display: flex;
+  }
+  .nav {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #e8ecf5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.5rem;
+    gap: 0.25rem;
+    z-index: 150;
+  }
+  .nav--open {
+    display: flex;
+  }
+  .nav-link {
+    padding: 0.7rem 0.8rem;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  .btn-signin {
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+  }
+  .btn-admin {
+    text-align: center;
+    padding: 0.75rem;
+  }
+  .btn-user {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .dropdown {
+    position: static;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-top: 0.25rem;
+  }
 }
 .nav-link {
   text-decoration: none;

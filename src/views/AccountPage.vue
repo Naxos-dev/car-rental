@@ -408,6 +408,26 @@ async function handleUpdatePassword() {
   .settings-grid {
     grid-template-columns: 1fr;
   }
+  .account-title {
+    font-size: 1.5rem;
+  }
+  .account-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .account-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    white-space: nowrap;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+  }
+  .res-details {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
 }
 .settings-card {
   background: #f8f9ff;

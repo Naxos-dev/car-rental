@@ -166,6 +166,7 @@ function formatDate(dateStr) {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .sep {

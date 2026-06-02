@@ -242,4 +242,23 @@ function openReservation(vehicle) {
 .btn-reserve:hover {
   background: #c1121f;
 }
+
+@media (max-width: 768px) {
+  .fleet-page {
+    padding: 2rem 0 4rem;
+  }
+  .page-title {
+    font-size: 1.5rem;
+  }
+  .fleet-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fleet-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
