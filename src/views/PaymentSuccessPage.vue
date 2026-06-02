@@ -2,7 +2,9 @@
   <div class="success-page">
     <div class="container">
       <div class="success-card">
-        <div class="success-icon">✅</div>
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
         <h1>Paiement confirmé !</h1>
         <p>
           Votre réservation a bien été enregistrée. Un récapitulatif vous sera
@@ -99,9 +101,30 @@ onMounted(async () => {
   text-align: center;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
+
+@media (max-width: 480px) {
+  .success-card {
+    padding: 2rem 1.25rem;
+    border-radius: 14px;
+  }
+  h1 {
+    font-size: 1.4rem;
+  }
+}
 .success-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.success-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: #16a34a;
 }
 h1 {
   font-size: 1.8rem;

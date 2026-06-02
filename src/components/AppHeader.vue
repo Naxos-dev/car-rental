@@ -2,20 +2,38 @@
   <header class="header">
     <div class="header-inner">
       <RouterLink to="/" class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22" stroke="#e63946" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="logo-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22"
+            stroke="#e63946"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         <span class="logo-text">AutoLoc</span>
       </RouterLink>
 
       <!-- Burger -->
-      <button class="burger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'">
+      <button
+        class="burger"
+        @click="mobileOpen = !mobileOpen"
+        :aria-label="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+      >
         <span :class="['burger-line', { open: mobileOpen }]"></span>
         <span :class="['burger-line', { open: mobileOpen }]"></span>
         <span :class="['burger-line', { open: mobileOpen }]"></span>
       </button>
 
-      <nav :class="['nav', { 'nav--open': mobileOpen }]" @click="mobileOpen = false">
+      <nav
+        :class="['nav', { 'nav--open': mobileOpen }]"
+        @click="mobileOpen = false"
+      >
         <RouterLink to="/" class="nav-link">Accueil</RouterLink>
         <RouterLink to="/fleet" class="nav-link">Notre flotte</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
@@ -87,7 +105,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { authStore } from "../store/auth.js";
 import { userAuthStore } from "../store/userAuth.js";
@@ -98,6 +116,10 @@ const router = useRouter();
 const menuOpen = ref(false);
 const menuRef = ref(null);
 const mobileOpen = ref(false);
+
+watch(() => route.path, () => {
+  mobileOpen.value = false;
+});
 
 const isAdminRoute = computed(() => route.path.startsWith("/admin"));
 const isFleetRoute = computed(() => route.path === "/fleet");
@@ -187,9 +209,15 @@ async function handleUserLogout() {
   transition: all 0.25s;
   transform-origin: center;
 }
-.burger-line:nth-child(1).open { transform: translateY(7px) rotate(45deg); }
-.burger-line:nth-child(2).open { opacity: 0; }
-.burger-line:nth-child(3).open { transform: translateY(-7px) rotate(-45deg); }
+.burger-line:nth-child(1).open {
+  transform: translateY(7px) rotate(45deg);
+}
+.burger-line:nth-child(2).open {
+  opacity: 0;
+}
+.burger-line:nth-child(3).open {
+  transform: translateY(-7px) rotate(-45deg);
+}
 
 @media (max-width: 768px) {
   .burger {

@@ -329,6 +329,7 @@ input:focus {
   gap: 0.8rem;
   justify-content: flex-end;
   margin-top: 0.5rem;
+  flex-wrap: wrap;
 }
 .btn-cancel {
   background: #eee;
@@ -338,6 +339,8 @@ input:focus {
   padding: 0.7rem 1.2rem;
   font-weight: 600;
   cursor: pointer;
+  flex: 1;
+  min-width: 100px;
 }
 .btn-confirm {
   background: #e63946;
@@ -348,6 +351,8 @@ input:focus {
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
+  flex: 2;
+  min-width: 140px;
 }
 .btn-confirm:hover:not(:disabled) {
   background: #c1121f;
@@ -355,5 +360,27 @@ input:focus {
 .btn-confirm:disabled {
   background: #f4a0a6;
   cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+  }
+  .vehicle-summary {
+    flex-direction: column;
+  }
+  .vehicle-thumb {
+    width: 100%;
+    height: 140px;
+  }
+  .modal-actions {
+    flex-direction: column;
+  }
+  .btn-cancel,
+  .btn-confirm {
+    width: 100%;
+    text-align: center;
+  }
 }
 </style>
