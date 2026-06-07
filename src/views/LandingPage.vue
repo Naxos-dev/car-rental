@@ -16,13 +16,13 @@
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          {{ t('hero.badge') }}
+          {{ t("hero.badge") }}
         </div>
         <h1 class="hero-title">
-          {{ t('hero.title') }}
+          {{ t("hero.title") }}
         </h1>
         <p class="hero-subtitle">
-          {{ t('hero.subtitle') }}
+          {{ t("hero.subtitle") }}
         </p>
         <BookingWidget />
       </div>
@@ -55,7 +55,7 @@
     <!-- Avantages -->
     <section class="features">
       <div class="container">
-        <h2 class="section-title">{{ t('features.title') }}</h2>
+        <h2 class="section-title">{{ t("features.title") }}</h2>
         <div class="features-grid">
           <div class="feature-card" v-for="feat in features" :key="feat.title">
             <div class="feat-icon-wrap" v-html="feat.svg"></div>
@@ -69,107 +69,21 @@
     <!-- Flotte -->
     <section class="fleet" id="fleet">
       <div class="container">
-        <h2 class="section-title">{{ t('fleet.title') }}</h2>
+        <h2 class="section-title">{{ t("fleet.title") }}</h2>
         <div v-if="vehicleStore.loading" class="fleet-loading">
-          {{ t('fleet.loading') }}
+          {{ t("fleet.loading") }}
         </div>
         <div v-else-if="vehicles.length === 0" class="fleet-empty">
-          {{ t('fleet.empty') }}
+          {{ t("fleet.empty") }}
         </div>
         <div class="fleet-grid" v-else>
-          <div class="vehicle-card" v-for="v in vehicles" :key="v.id">
-            <div class="vehicle-img-wrapper">
-              <img
-                :src="v.photoURL"
-                :alt="`${v.marque} ${v.modele}`"
-                class="vehicle-img"
-              />
-              <span
-                :class="[
-                  'dispo-badge',
-                  !v.disponible
-                    ? 'dispo-badge--off'
-                    : isDateBlocked(v.id)
-                      ? 'dispo-badge--reserved'
-                      : 'dispo-badge--on',
-                ]"
-              >
-                {{
-                  !v.disponible
-                    ? t('fleet.unavailable')
-                    : isDateBlocked(v.id)
-                      ? t('fleet.reserved')
-                      : t('fleet.available')
-                }}
-              </span>
-            </div>
-            <div class="vehicle-info">
-              <h3>{{ v.marque }} {{ v.modele }}</h3>
-              <div class="vehicle-tags">
-                <span class="tag">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                  </svg>
-                  {{ v.carburant }}
-                </span>
-                <span class="tag">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                  {{ v.places }} places
-                </span>
-                <span class="tag tag--price">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <line x1="12" y1="1" x2="12" y2="23" />
-                    <path
-                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                    />
-                  </svg>
-                  {{ v.prix }}€/jour
-                </span>
-              </div>
-              <button
-                class="btn-reserve"
-                :disabled="!v.disponible || isDateBlocked(v.id)"
-                @click="openReservation(v)"
-              >
-                {{
-                  !v.disponible
-                    ? t('fleet.unavailable')
-                    : isDateBlocked(v.id)
-                      ? t('fleet.alreadyReserved')
-                      : t('fleet.book')
-                }}
-              </button>
-            </div>
-          </div>
+          <VehicleCard
+            v-for="v in vehicles"
+            :key="v.id"
+            :vehicle="v"
+            :isBlocked="isDateBlocked(v.id)"
+            @reserve="openReservation"
+          />
         </div>
       </div>
     </section>
@@ -183,7 +97,7 @@
     <!-- Testimonials -->
     <section class="testimonials">
       <div class="container">
-        <h2 class="section-title">{{ t('testimonials.title') }}</h2>
+        <h2 class="section-title">{{ t("testimonials.title") }}</h2>
         <div class="testimonials-grid">
           <div class="testimonial-card" v-for="t in testimonials" :key="t.name">
             <div class="stars">
@@ -215,11 +129,9 @@
     <!-- CTA -->
     <section class="cta">
       <div class="container">
-        <h2>{{ t('cta.title') }}</h2>
-        <p>{{ t('cta.desc') }}</p>
-        <RouterLink to="/fleet" class="btn-cta"
-          >{{ t('cta.btn') }}</RouterLink
-        >
+        <h2>{{ t("cta.title") }}</h2>
+        <p>{{ t("cta.desc") }}</p>
+        <RouterLink to="/fleet" class="btn-cta">{{ t("cta.btn") }}</RouterLink>
       </div>
     </section>
   </div>
@@ -231,6 +143,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import BookingWidget from "../components/BookingWidget.vue";
 import ReservationModal from "../components/ReservationModal.vue";
+import VehicleCard from "../components/VehicleCard.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
@@ -271,54 +184,66 @@ function openReservation(vehicle) {
 
 const trustItems = computed(() => [
   {
-    label: t('trustStrip.securePayment'),
+    label: t("trustStrip.securePayment"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
   },
   {
-    label: t('trustStrip.insurance'),
+    label: t("trustStrip.insurance"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
   },
   {
-    label: t('trustStrip.noFees'),
+    label: t("trustStrip.noFees"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
   },
   {
-    label: t('trustStrip.support'),
+    label: t("trustStrip.support"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
   },
 ]);
 
 const stats = computed(() => [
-  { number: t('statsSection.clients.number'), label: t('statsSection.clients.label') },
-  { number: t('statsSection.vehicles.number'), label: t('statsSection.vehicles.label') },
-  { number: t('statsSection.experience.number'), label: t('statsSection.experience.label') },
-  { number: t('statsSection.rating.number'), label: t('statsSection.rating.label') },
+  {
+    number: t("statsSection.clients.number"),
+    label: t("statsSection.clients.label"),
+  },
+  {
+    number: t("statsSection.vehicles.number"),
+    label: t("statsSection.vehicles.label"),
+  },
+  {
+    number: t("statsSection.experience.number"),
+    label: t("statsSection.experience.label"),
+  },
+  {
+    number: t("statsSection.rating.number"),
+    label: t("statsSection.rating.label"),
+  },
 ]);
 
 const features = computed(() => [
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    title: t('featuresSection[0].title'),
-    desc: t('featuresSection[0].desc'),
+    title: t("featuresSection[0].title"),
+    desc: t("featuresSection[0].desc"),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6"/></svg>`,
-    title: t('featuresSection[1].title'),
-    desc: t('featuresSection[1].desc'),
+    title: t("featuresSection[1].title"),
+    desc: t("featuresSection[1].desc"),
   },
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-    title: t('featuresSection[2].title'),
-    desc: t('featuresSection[2].desc'),
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h12M19 6.5C17.5 4.5 15.3 3.5 13 3.5C8.9 3.5 5.5 7.1 5.5 12s3.4 8.5 7.5 8.5c2.3 0 4.5-1 6-3"/></svg>`,
+    title: t("featuresSection[2].title"),
+    desc: t("featuresSection[2].desc"),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-    title: t('featuresSection[3].title'),
-    desc: t('featuresSection[3].desc'),
+    title: t("featuresSection[3].title"),
+    desc: t("featuresSection[3].desc"),
   },
 ]);
 
-const testimonials = computed(() => tm('testimonialsData'));
+const testimonials = computed(() => tm("testimonialsData"));
 </script>
 
 <style scoped>
@@ -521,97 +446,6 @@ const testimonials = computed(() => tm('testimonialsData'));
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-}
-.vehicle-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s;
-}
-.vehicle-card:hover {
-  transform: translateY(-4px);
-}
-.vehicle-img-wrapper {
-  position: relative;
-}
-.vehicle-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  display: block;
-}
-.dispo-badge {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-.dispo-badge--on {
-  background: rgba(46, 125, 50, 0.9);
-  color: #fff;
-}
-.dispo-badge--off {
-  background: rgba(198, 40, 40, 0.85);
-  color: #fff;
-}
-.dispo-badge--reserved {
-  background: rgba(37, 99, 235, 0.85);
-  color: #fff;
-}
-.vehicle-info {
-  padding: 1.2rem;
-}
-.vehicle-info h3 {
-  margin: 0 0 0.6rem;
-  color: #1a1a2e;
-  font-size: 1.05rem;
-}
-.vehicle-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-.tag {
-  background: #f0f4ff;
-  color: #1a1a2e;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.tag svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-}
-.tag--price {
-  background: #fff3e0;
-  color: #e65100;
-}
-.btn-reserve {
-  width: 100%;
-  background: #e63946;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-reserve:hover:not(:disabled) {
-  background: #c1121f;
-}
-.btn-reserve:disabled {
-  background: #ccc;
-  cursor: not-allowed;
 }
 
 /* Hero Badge */
