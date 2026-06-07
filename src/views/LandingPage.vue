@@ -16,13 +16,13 @@
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          Partenaire de confiance depuis 2010
+          {{ t('hero.badge') }}
         </div>
         <h1 class="hero-title">
-          Louez votre véhicule<br />en toute simplicité
+          {{ t('hero.title') }}
         </h1>
         <p class="hero-subtitle">
-          Des centaines de véhicules disponibles partout en France
+          {{ t('hero.subtitle') }}
         </p>
         <BookingWidget />
       </div>
@@ -55,7 +55,7 @@
     <!-- Avantages -->
     <section class="features">
       <div class="container">
-        <h2 class="section-title">Pourquoi choisir AutoLoc ?</h2>
+        <h2 class="section-title">{{ t('features.title') }}</h2>
         <div class="features-grid">
           <div class="feature-card" v-for="feat in features" :key="feat.title">
             <div class="feat-icon-wrap" v-html="feat.svg"></div>
@@ -69,12 +69,12 @@
     <!-- Flotte -->
     <section class="fleet" id="fleet">
       <div class="container">
-        <h2 class="section-title">Notre flotte</h2>
+        <h2 class="section-title">{{ t('fleet.title') }}</h2>
         <div v-if="vehicleStore.loading" class="fleet-loading">
-          Chargement des véhicules...
+          {{ t('fleet.loading') }}
         </div>
         <div v-else-if="vehicles.length === 0" class="fleet-empty">
-          Aucun véhicule disponible pour le moment.
+          {{ t('fleet.empty') }}
         </div>
         <div class="fleet-grid" v-else>
           <div class="vehicle-card" v-for="v in vehicles" :key="v.id">
@@ -96,10 +96,10 @@
               >
                 {{
                   !v.disponible
-                    ? "Indisponible"
+                    ? t('fleet.unavailable')
                     : isDateBlocked(v.id)
-                      ? "Réservé"
-                      : "Disponible"
+                      ? t('fleet.reserved')
+                      : t('fleet.available')
                 }}
               </span>
             </div>
@@ -162,10 +162,10 @@
               >
                 {{
                   !v.disponible
-                    ? "Indisponible"
+                    ? t('fleet.unavailable')
                     : isDateBlocked(v.id)
-                      ? "Déjà réservé"
-                      : "Réserver"
+                      ? t('fleet.alreadyReserved')
+                      : t('fleet.book')
                 }}
               </button>
             </div>
@@ -183,7 +183,7 @@
     <!-- Testimonials -->
     <section class="testimonials">
       <div class="container">
-        <h2 class="section-title">Ce que disent nos clients</h2>
+        <h2 class="section-title">{{ t('testimonials.title') }}</h2>
         <div class="testimonials-grid">
           <div class="testimonial-card" v-for="t in testimonials" :key="t.name">
             <div class="stars">
@@ -215,10 +215,10 @@
     <!-- CTA -->
     <section class="cta">
       <div class="container">
-        <h2>Prêt à prendre la route ?</h2>
-        <p>Réservez en ligne en moins de 2 minutes, sans frais cachés.</p>
+        <h2>{{ t('cta.title') }}</h2>
+        <p>{{ t('cta.desc') }}</p>
         <RouterLink to="/fleet" class="btn-cta"
-          >Voir tous nos véhicules</RouterLink
+          >{{ t('cta.btn') }}</RouterLink
         >
       </div>
     </section>
@@ -228,6 +228,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import BookingWidget from "../components/BookingWidget.vue";
 import ReservationModal from "../components/ReservationModal.vue";
 import { vehicleStore } from "../store/vehicles.js";
@@ -235,6 +236,7 @@ import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
 import { userAuthStore } from "../store/userAuth.js";
 
+const { t, tm } = useI18n();
 const router = useRouter();
 const vehicles = computed(() => vehicleStore.vehicles);
 
@@ -267,75 +269,56 @@ function openReservation(vehicle) {
   selectedVehicle.value = vehicle;
 }
 
-const trustItems = [
+const trustItems = computed(() => [
   {
-    label: "Paiement 100% sécurisé",
+    label: t('trustStrip.securePayment'),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
   },
   {
-    label: "Assurance tous risques incluse",
+    label: t('trustStrip.insurance'),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
   },
   {
-    label: "Sans frais cachés",
+    label: t('trustStrip.noFees'),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
   },
   {
-    label: "Support 7j/7",
+    label: t('trustStrip.support'),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
   },
-];
+]);
 
-const stats = [
-  { number: "500+", label: "Clients satisfaits" },
-  { number: "50+", label: "Véhicules disponibles" },
-  { number: "15 ans", label: "D'expérience" },
-  { number: "4.9 / 5", label: "Note moyenne" },
-];
+const stats = computed(() => [
+  { number: t('statsSection.clients.number'), label: t('statsSection.clients.label') },
+  { number: t('statsSection.vehicles.number'), label: t('statsSection.vehicles.label') },
+  { number: t('statsSection.experience.number'), label: t('statsSection.experience.label') },
+  { number: t('statsSection.rating.number'), label: t('statsSection.rating.label') },
+]);
 
-const features = [
+const features = computed(() => [
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    title: "Réservation instantanée",
-    desc: "Confirmez votre réservation en quelques clics, 24h/24 et 7j/7.",
+    title: t('featuresSection[0].title'),
+    desc: t('featuresSection[0].desc'),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6"/></svg>`,
-    title: "Large choix de véhicules",
-    desc: "Citadines, SUV, électriques, utilitaires — nous avons le véhicule qu'il vous faut.",
+    title: t('featuresSection[1].title'),
+    desc: t('featuresSection[1].desc'),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-    title: "Prix transparents",
-    desc: "Aucun frais caché. Le prix affiché est le prix payé.",
+    title: t('featuresSection[2].title'),
+    desc: t('featuresSection[2].desc'),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-    title: "Assurance incluse",
-    desc: "Tous nos véhicules sont couverts par une assurance tous risques.",
+    title: t('featuresSection[3].title'),
+    desc: t('featuresSection[3].desc'),
   },
-];
+]);
 
-const testimonials = [
-  {
-    text: "Service impeccable, véhicule en parfait état. La réservation en ligne est très simple et le prix était exactement celui annoncé.",
-    name: "Sophie M.",
-    initials: "SM",
-    city: "Paris",
-  },
-  {
-    text: "J'utilise AutoLoc pour mes déplacements professionnels depuis 3 ans. Fiabilité et professionnalisme au rendez-vous à chaque fois.",
-    name: "Thomas B.",
-    initials: "TB",
-    city: "Lyon",
-  },
-  {
-    text: "Très bonne expérience. Véhicule propre, dépôt rapide et personnel accueillant. Je recommande vivement !",
-    name: "Marie L.",
-    initials: "ML",
-    city: "Bordeaux",
-  },
-];
+const testimonials = computed(() => tm('testimonialsData'));
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="auth-page">
     <div class="auth-card">
-      <RouterLink to="/" class="back-home">← Retour à l'accueil</RouterLink>
+      <RouterLink to="/" class="back-home">{{ t('auth.backHome') }}</RouterLink>
 
       <div class="auth-logo">
         <span class="logo-icon">🚗</span>
@@ -13,13 +13,13 @@
           :class="['tab-btn', { active: tab === 'login' }]"
           @click="switchTab('login')"
         >
-          Se connecter
+          {{ t('auth.login') }}
         </button>
         <button
           :class="['tab-btn', { active: tab === 'register' }]"
           @click="switchTab('register')"
         >
-          Créer un compte
+          {{ t('auth.register') }}
         </button>
       </div>
 
@@ -30,28 +30,28 @@
         @submit.prevent="handleLogin"
       >
         <div class="field">
-          <label>Email</label>
+          <label>{{ t('auth.email') }}</label>
           <input
             v-model="loginForm.email"
             type="email"
-            placeholder="jean@exemple.com"
+            :placeholder="t('auth.emailPlaceholder')"
             required
             autocomplete="email"
           />
         </div>
         <div class="field">
-          <label>Mot de passe</label>
+          <label>{{ t('auth.password') }}</label>
           <input
             v-model="loginForm.password"
             type="password"
-            placeholder="••••••••"
+            :placeholder="t('auth.passwordPlaceholder')"
             required
             autocomplete="current-password"
           />
         </div>
         <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
         <button type="submit" class="btn-auth" :disabled="loading">
-          {{ loading ? "Connexion en cours..." : "Se connecter" }}
+          {{ loading ? t('auth.loggingIn') : t('auth.login') }}
         </button>
       </form>
 
@@ -59,60 +59,60 @@
       <form v-else class="auth-form" @submit.prevent="handleRegister">
         <div class="field-row">
           <div class="field">
-            <label>Prénom</label>
+            <label>{{ t('auth.firstName') }}</label>
             <input
               v-model="registerForm.prenom"
               type="text"
-              placeholder="Jean"
+              :placeholder="t('auth.firstNamePlaceholder')"
               required
               autocomplete="given-name"
             />
           </div>
           <div class="field">
-            <label>Nom</label>
+            <label>{{ t('auth.lastName') }}</label>
             <input
               v-model="registerForm.nom"
               type="text"
-              placeholder="Dupont"
+              :placeholder="t('auth.lastNamePlaceholder')"
               required
               autocomplete="family-name"
             />
           </div>
         </div>
         <div class="field">
-          <label>Email</label>
+          <label>{{ t('auth.email') }}</label>
           <input
             v-model="registerForm.email"
             type="email"
-            placeholder="jean@exemple.com"
+            :placeholder="t('auth.emailPlaceholder')"
             required
             autocomplete="email"
           />
         </div>
         <div class="field">
-          <label>Mot de passe</label>
+          <label>{{ t('auth.password') }}</label>
           <input
             v-model="registerForm.password"
             type="password"
-            placeholder="Au moins 6 caractères"
+            :placeholder="t('auth.passwordHint')"
             required
             minlength="6"
             autocomplete="new-password"
           />
         </div>
         <div class="field">
-          <label>Confirmer le mot de passe</label>
+          <label>{{ t('auth.password') }} (confirm)</label>
           <input
             v-model="registerForm.confirm"
             type="password"
-            placeholder="••••••••"
+            :placeholder="t('auth.passwordPlaceholder')"
             required
             autocomplete="new-password"
           />
         </div>
         <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
         <button type="submit" class="btn-auth" :disabled="loading">
-          {{ loading ? "Création en cours..." : "Créer mon compte" }}
+          {{ loading ? t('auth.registering') : t('auth.registerBtn') }}
         </button>
       </form>
     </div>
@@ -122,8 +122,10 @@
 <script setup>
 import { reactive, ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { userAuthStore } from "../store/userAuth.js";
 
+const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 

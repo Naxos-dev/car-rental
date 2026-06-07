@@ -23,7 +23,7 @@
       <button
         class="burger"
         @click="mobileOpen = !mobileOpen"
-        :aria-label="mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+        :aria-label="mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')"
       >
         <span :class="['burger-line', { open: mobileOpen }]"></span>
         <span :class="['burger-line', { open: mobileOpen }]"></span>
@@ -34,8 +34,8 @@
         :class="['nav', { 'nav--open': mobileOpen }]"
         @click="mobileOpen = false"
       >
-        <RouterLink to="/" class="nav-link">Accueil</RouterLink>
-        <RouterLink to="/fleet" class="nav-link">Notre flotte</RouterLink>
+        <RouterLink to="/" class="nav-link">{{ t('nav.home') }}</RouterLink>
+        <RouterLink to="/fleet" class="nav-link">{{ t('nav.fleet') }}</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
           ⚙️ Admin
         </RouterLink>
@@ -44,7 +44,7 @@
         <template v-if="authStore.isAdmin && isAdminRoute">
           <span class="user-info">{{ authStore.user?.email }}</span>
           <button class="btn-logout" @click="handleAdminLogout">
-            Se déconnecter
+            {{ t('nav.logout') }}
           </button>
         </template>
 
@@ -81,7 +81,7 @@
                       d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
                     />
                   </svg>
-                  Mon compte
+                  {{ t('nav.myAccount') }}
                 </RouterLink>
                 <button class="dropdown-item danger" @click="handleUserLogout">
                   <svg viewBox="0 0 24 24" fill="currentColor">
@@ -89,15 +89,20 @@
                       d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
                     />
                   </svg>
-                  Se déconnecter
+                  {{ t('nav.logout') }}
                 </button>
               </div>
             </div>
           </template>
           <RouterLink v-else to="/auth" class="btn-signin">
-            Se connecter
+            {{ t('nav.login') }}
           </RouterLink>
         </template>
+
+        <!-- Switcher de langue -->
+        <button class="lang-switcher" @click.stop="toggleLocale">
+          {{ locale === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR' }}
+        </button>
       </nav>
     </div>
     <SearchBanner v-if="isFleetRoute" />
@@ -107,9 +112,17 @@
 <script setup>
 import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { authStore } from "../store/auth.js";
 import { userAuthStore } from "../store/userAuth.js";
 import SearchBanner from "./SearchBanner.vue";
+
+const { t, locale } = useI18n();
+
+function toggleLocale() {
+  locale.value = locale.value === 'fr' ? 'en' : 'fr';
+  localStorage.setItem('locale', locale.value);
+}
 
 const route = useRoute();
 const router = useRouter();
@@ -422,5 +435,30 @@ async function handleUserLogout() {
 }
 .dropdown-item.danger:hover {
   background: #fce4ec;
+}
+
+/* Language switcher */
+.lang-switcher {
+  background: none;
+  border: 1.5px solid #dde3f5;
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.lang-switcher:hover {
+  background: #f0f4ff;
+  border-color: #667eea;
+}
+@media (max-width: 768px) {
+  .lang-switcher {
+    margin-top: 0.25rem;
+    text-align: center;
+    padding: 0.7rem;
+  }
 }
 </style>

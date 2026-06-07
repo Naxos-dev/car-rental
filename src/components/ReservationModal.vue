@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-card">
-        <button class="modal-close" @click="$emit('close')" aria-label="Fermer">
+        <button class="modal-close" @click="$emit('close')" :aria-label="t('modal.close')">
           ✕
         </button>
 
@@ -24,15 +24,15 @@
 
         <form class="modal-form" @submit.prevent="handleSubmit">
           <!-- Détails de réservation -->
-          <div class="section-label">📅 Détails de la réservation</div>
+          <div class="section-label">{{ t('modal.reservationDetails') }}</div>
 
           <div class="field">
-            <label>📍 Lieu de prise en charge</label>
+            <label>{{ t('modal.location') }}</label>
             <input value="Lille" type="text" readonly />
           </div>
           <div class="field-row">
             <div class="field">
-              <label>Date de début</label>
+              <label>{{ t('modal.startDate') }}</label>
               <input
                 v-model="searchStore.startDate"
                 type="date"
@@ -41,13 +41,13 @@
               />
             </div>
             <div class="field">
-              <label>Heure de début</label>
+              <label>{{ t('modal.startTime') }}</label>
               <input v-model="searchStore.startTime" type="time" required />
             </div>
           </div>
           <div class="field-row">
             <div class="field">
-              <label>Date de fin</label>
+              <label>{{ t('modal.endDate') }}</label>
               <input
                 v-model="searchStore.endDate"
                 type="date"
@@ -56,50 +56,50 @@
               />
             </div>
             <div class="field">
-              <label>Heure de fin</label>
+              <label>{{ t('modal.endTime') }}</label>
               <input v-model="searchStore.endTime" type="time" required />
             </div>
           </div>
 
           <!-- Informations client -->
-          <div class="section-label">👤 Vos informations</div>
+          <div class="section-label">{{ t('modal.clientInfo') }}</div>
 
           <div class="field-row">
             <div class="field">
-              <label>Prénom *</label>
+              <label>{{ t('modal.firstName') }}</label>
               <input
                 v-model="customerForm.prenom"
                 type="text"
-                placeholder="Jean"
+                :placeholder="t('modal.firstNamePlaceholder')"
                 required
               />
             </div>
             <div class="field">
-              <label>Nom *</label>
+              <label>{{ t('modal.lastName') }}</label>
               <input
                 v-model="customerForm.nom"
                 type="text"
-                placeholder="Dupont"
+                :placeholder="t('modal.lastNamePlaceholder')"
                 required
               />
             </div>
           </div>
           <div class="field-row">
             <div class="field">
-              <label>Email *</label>
+              <label>{{ t('modal.email') }}</label>
               <input
                 v-model="customerForm.email"
                 type="email"
-                placeholder="jean@exemple.com"
+                :placeholder="t('modal.emailPlaceholder')"
                 required
               />
             </div>
             <div class="field">
-              <label>Téléphone</label>
+              <label>{{ t('modal.phone') }}</label>
               <input
                 v-model="customerForm.telephone"
                 type="tel"
-                placeholder="06 12 34 56 78"
+                :placeholder="t('modal.phonePlaceholder')"
               />
             </div>
           </div>
@@ -113,10 +113,10 @@
 
           <div class="modal-actions">
             <button type="button" class="btn-cancel" @click="$emit('close')">
-              Annuler
+              {{ t('searchBanner.cancel') }}
             </button>
             <button type="submit" class="btn-confirm">
-              Procéder au paiement →
+              {{ t('modal.proceed') }} →
             </button>
           </div>
         </form>
@@ -128,9 +128,12 @@
 <script setup>
 import { reactive, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 import { checkoutStore } from "../store/checkout.js";
 import { userAuthStore } from "../store/userAuth.js";
+
+const { t } = useI18n();
 
 const props = defineProps({ vehicle: Object, visible: Boolean });
 const emit = defineEmits(["close"]);

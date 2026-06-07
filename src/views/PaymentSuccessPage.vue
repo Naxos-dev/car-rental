@@ -16,10 +16,9 @@
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        <h1>Paiement confirmé !</h1>
+        <h1>{{ t('success.title') }}</h1>
         <p>
-          Votre réservation a bien été enregistrée. Un récapitulatif vous sera
-          envoyé à <strong>{{ email }}</strong
+          {{ t('success.desc') }} <strong>{{ email }}</strong
           >.
         </p>
 
@@ -31,7 +30,7 @@
           </div>
         </div>
 
-        <router-link to="/" class="btn-home">← Retour à l'accueil</router-link>
+        <router-link to="/" class="btn-home">{{ t('success.backHome') }}</router-link>
       </div>
     </div>
   </div>
@@ -39,9 +38,12 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { checkoutStore } from "../store/checkout.js";
 import { reservationStore } from "../store/reservations.js";
 import { userAuthStore } from "../store/userAuth.js";
+
+const { t } = useI18n();
 
 const email = ref("");
 const recap = ref(null);

@@ -6,31 +6,31 @@
           <path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22" stroke="#e63946" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="logo-text">AutoLoc</span>
-        <p>Votre partenaire de location de voiture depuis 2010.</p>
+        <p>{{ t('footer.tagline') }}</p>
       </div>
 
       <div class="footer-links">
-        <h4>Services</h4>
+        <h4>{{ t('footer.services') }}</h4>
         <ul>
-          <li><a href="#">Location courte durée</a></li>
-          <li><a href="#">Location longue durée</a></li>
-          <li><a href="#">Véhicules utilitaires</a></li>
-          <li><a href="#">Véhicules électriques</a></li>
+          <li><a href="#">{{ t('footer.shortRental') }}</a></li>
+          <li><a href="#">{{ t('footer.longRental') }}</a></li>
+          <li><a href="#">{{ t('footer.utility') }}</a></li>
+          <li><a href="#">{{ t('footer.electric') }}</a></li>
         </ul>
       </div>
 
       <div class="footer-links">
-        <h4>Informations</h4>
+        <h4>{{ t('footer.info') }}</h4>
         <ul>
-          <li><a href="#">À propos</a></li>
-          <li><a href="#">Conditions générales</a></li>
-          <li><a href="#">Politique de confidentialité</a></li>
-          <li><a href="#">FAQ</a></li>
+          <li><a href="#">{{ t('footer.about') }}</a></li>
+          <li><a href="#">{{ t('footer.terms') }}</a></li>
+          <li><a href="#">{{ t('footer.privacy') }}</a></li>
+          <li><a href="#">{{ t('footer.faq') }}</a></li>
         </ul>
       </div>
 
       <div class="footer-contact">
-        <h4>Contact</h4>
+        <h4>{{ t('footer.contact') }}</h4>
         <p class="contact-item">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           12 rue de la Paix, Paris
@@ -50,15 +50,15 @@
         <div class="trust-badges">
           <span class="trust-badge">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Site sécurisé SSL
+            {{ t('footer.ssl') }}
           </span>
           <span class="trust-badge">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Données protégées
+            {{ t('footer.dataProtected') }}
           </span>
         </div>
         <div class="payment-methods">
-          <span class="payment-label">Paiement accepté :</span>
+          <span class="payment-label">{{ t('footer.paymentLabel') }}</span>
           <span class="payment-chip">VISA</span>
           <span class="payment-chip">Mastercard</span>
           <span class="payment-chip stripe">stripe</span>
@@ -66,12 +66,15 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© {{ new Date().getFullYear() }} AutoLoc — Tous droits réservés</p>
+      <p>© {{ new Date().getFullYear() }} AutoLoc — {{ t('footer.rights') }}</p>
     </div>
   </footer>
 </template>
 
-<script setup></script>
+<script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+</script>
 
 <style scoped>
 .footer {

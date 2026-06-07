@@ -52,7 +52,7 @@
         <form class="edit-form" @submit.prevent="applyChanges">
           <div class="edit-row">
             <div class="edit-field">
-              <label>📅 Date de début</label>
+              <label>{{ t('searchBanner.startDate') }}</label>
               <input
                 v-model="draft.startDate"
                 type="date"
@@ -61,13 +61,13 @@
               />
             </div>
             <div class="edit-field">
-              <label>⏰ Heure de début</label>
+              <label>{{ t('searchBanner.startTime') }}</label>
               <input v-model="draft.startTime" type="time" required />
             </div>
           </div>
           <div class="edit-row">
             <div class="edit-field">
-              <label>📅 Date de fin</label>
+              <label>{{ t('searchBanner.endDate') }}</label>
               <input
                 v-model="draft.endDate"
                 type="date"
@@ -76,15 +76,15 @@
               />
             </div>
             <div class="edit-field">
-              <label>⏰ Heure de fin</label>
+              <label>{{ t('searchBanner.endTime') }}</label>
               <input v-model="draft.endTime" type="time" required />
             </div>
           </div>
           <div class="edit-actions">
             <button type="button" class="btn-cancel" @click="editOpen = false">
-              Annuler
+              {{ t('searchBanner.cancel') }}
             </button>
-            <button type="submit" class="btn-apply">Mettre à jour</button>
+            <button type="submit" class="btn-apply">{{ t('searchBanner.update') }}</button>
           </div>
         </form>
       </div>
@@ -94,8 +94,10 @@
 
 <script setup>
 import { ref, reactive, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 
+const { t } = useI18n();
 const editOpen = ref(false);
 
 const today = computed(() => new Date().toISOString().split("T")[0]);

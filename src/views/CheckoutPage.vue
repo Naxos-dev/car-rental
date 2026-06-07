@@ -1,14 +1,14 @@
 <template>
   <div class="checkout-page">
     <div class="container">
-      <h1 class="page-title">Récapitulatif de votre réservation</h1>
+      <h1 class="page-title">{{ t('checkout.title') }}</h1>
 
       <div class="checkout-grid">
         <!-- ── Colonne gauche : résumé ── -->
         <div class="checkout-summary">
           <!-- Véhicule -->
           <div class="summary-section">
-            <h2>🚗 Véhicule sélectionné</h2>
+            <h2>{{ t('checkout.vehicle') }}</h2>
             <div class="vehicle-recap">
               <img
                 :src="vehicle.photoURL"
@@ -30,38 +30,38 @@
 
           <!-- Dates -->
           <div class="summary-section">
-            <h2>📅 Détails de la réservation</h2>
+            <h2>{{ t('checkout.reservationDetails') }}</h2>
             <div class="detail-row">
-              <span>📍 Lieu</span>
+              <span>{{ t('checkout.location') }}</span>
               <strong>{{ store.location }}</strong>
             </div>
             <div class="detail-row">
-              <span>Début</span>
+              <span>{{ t('checkout.start') }}</span>
               <strong>{{ store.startDate }} à {{ store.startTime }}</strong>
             </div>
             <div class="detail-row">
-              <span>Fin</span>
+              <span>{{ t('checkout.end') }}</span>
               <strong>{{ store.endDate }} à {{ store.endTime }}</strong>
             </div>
             <div class="detail-row">
-              <span>⏱ Durée</span>
-              <strong>{{ nbJours }} jour{{ nbJours > 1 ? "s" : "" }}</strong>
+              <span>{{ t('checkout.duration') }}</span>
+              <strong>{{ nbJours }} {{ nbJours > 1 ? t('checkout.days') : t('checkout.day') }}</strong>
             </div>
           </div>
 
           <!-- Client -->
           <div class="summary-section">
-            <h2>👤 Vos informations</h2>
+            <h2>{{ t('checkout.clientInfo') }}</h2>
             <div class="detail-row">
-              <span>Nom</span>
+              <span>{{ t('checkout.name') }}</span>
               <strong>{{ store.nom }}</strong>
             </div>
             <div class="detail-row">
-              <span>Email</span>
+              <span>{{ t('checkout.email') }}</span>
               <strong>{{ store.email }}</strong>
             </div>
             <div v-if="store.telephone" class="detail-row">
-              <span>Téléphone</span>
+              <span>{{ t('checkout.phone') }}</span>
               <strong>{{ store.telephone }}</strong>
             </div>
           </div>
@@ -72,29 +72,27 @@
           <div class="price-box">
             <div class="price-row">
               <span
-                >{{ vehicle.prix }}€ × {{ nbJours }} jour{{
-                  nbJours > 1 ? "s" : ""
-                }}</span
+                >{{ vehicle.prix }}€ × {{ nbJours }} {{ nbJours > 1 ? t('checkout.days') : t('checkout.day') }}</span
               >
               <span>{{ store.total }}€</span>
             </div>
             <div class="price-total">
-              <span>Total TTC</span>
+              <span>{{ t('checkout.total') }}</span>
               <strong>{{ store.total }}€</strong>
             </div>
           </div>
 
           <button class="btn-pay" :disabled="paying" @click="handlePay">
-            <span v-if="paying">⏳ Redirection en cours...</span>
-            <span v-else>💳 Payer {{ store.total }}€ avec Stripe</span>
+            <span v-if="paying">{{ t('checkout.paying') }}</span>
+            <span v-else>{{ t('checkout.pay', { total: store.total }) }}</span>
           </button>
 
           <p v-if="payError" class="pay-error">⚠️ {{ payError }}</p>
 
-          <p class="secure-note">🔒 Paiement 100% sécurisé par Stripe</p>
+          <p class="secure-note">{{ t('checkout.secure') }}</p>
 
           <button class="btn-back" @click="router.back()">
-            ← Modifier la réservation
+            {{ t('checkout.back') }}
           </button>
         </div>
       </div>
@@ -105,8 +103,10 @@
 <script setup>
 import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { checkoutStore } from "../store/checkout.js";
 
+const { t } = useI18n();
 const router = useRouter();
 const store = checkoutStore;
 

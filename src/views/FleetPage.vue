@@ -2,23 +2,21 @@
   <div class="fleet-page">
     <div class="container">
       <div class="page-header">
-        <button class="btn-back" @click="router.back()">← Retour</button>
-        <h1 class="page-title">Véhicules disponibles</h1>
+        <button class="btn-back" @click="router.back()">{{ t('fleetPage.back') }}</button>
+        <h1 class="page-title">{{ t('fleetPage.title') }}</h1>
         <p
           class="page-subtitle"
           v-if="searchStore.startDate && searchStore.endDate"
         >
-          Du {{ formatDate(searchStore.startDate) }} au
-          {{ formatDate(searchStore.endDate) }} —
-          {{ searchStore.location }}
+          {{ t('fleetPage.subtitle', { start: formatDate(searchStore.startDate), end: formatDate(searchStore.endDate), location: searchStore.location }) }}
         </p>
       </div>
 
       <div v-if="vehicleStore.loading" class="fleet-loading">
-        Chargement des véhicules...
+        {{ t('fleetPage.loading') }}
       </div>
       <div v-else-if="availableVehicles.length === 0" class="fleet-empty">
-        Aucun véhicule disponible pour les dates sélectionnées.
+        {{ t('fleetPage.empty') }}
       </div>
       <div class="fleet-grid" v-else>
         <div class="vehicle-card" v-for="v in availableVehicles" :key="v.id">
@@ -28,7 +26,7 @@
               :alt="`${v.marque} ${v.modele}`"
               class="vehicle-img"
             />
-            <span class="dispo-badge dispo-badge--on">Disponible</span>
+            <span class="dispo-badge dispo-badge--on">{{ t('fleetPage.available') }}</span>
           </div>
           <div class="vehicle-info">
             <h3>{{ v.marque }} {{ v.modele }}</h3>
@@ -67,7 +65,7 @@
               <span class="tag tag--price"> {{ v.prix }}€ /jour </span>
             </div>
             <button class="btn-reserve" @click="openReservation(v)">
-              Réserver
+              {{ t('fleetPage.book') }}
             </button>
           </div>
         </div>
@@ -85,12 +83,14 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import ReservationModal from "../components/ReservationModal.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
 import { userAuthStore } from "../store/userAuth.js";
 
+const { t } = useI18n();
 const router = useRouter();
 const selectedVehicle = ref(null);
 
