@@ -1,7 +1,7 @@
 <template>
   <div class="auth-page">
     <div class="auth-card">
-      <RouterLink to="/" class="back-home">{{ t('auth.backHome') }}</RouterLink>
+      <RouterLink to="/" class="back-home">{{ t("auth.backHome") }}</RouterLink>
 
       <div class="auth-logo">
         <span class="logo-icon">🚗</span>
@@ -13,13 +13,13 @@
           :class="['tab-btn', { active: tab === 'login' }]"
           @click="switchTab('login')"
         >
-          {{ t('auth.login') }}
+          {{ t("auth.login") }}
         </button>
         <button
           :class="['tab-btn', { active: tab === 'register' }]"
           @click="switchTab('register')"
         >
-          {{ t('auth.register') }}
+          {{ t("auth.register") }}
         </button>
       </div>
 
@@ -30,7 +30,7 @@
         @submit.prevent="handleLogin"
       >
         <div class="field">
-          <label>{{ t('auth.email') }}</label>
+          <label>{{ t("auth.email") }}</label>
           <input
             v-model="loginForm.email"
             type="email"
@@ -40,7 +40,7 @@
           />
         </div>
         <div class="field">
-          <label>{{ t('auth.password') }}</label>
+          <label>{{ t("auth.password") }}</label>
           <input
             v-model="loginForm.password"
             type="password"
@@ -51,7 +51,7 @@
         </div>
         <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
         <button type="submit" class="btn-auth" :disabled="loading">
-          {{ loading ? t('auth.loggingIn') : t('auth.login') }}
+          {{ loading ? t("auth.loggingIn") : t("auth.login") }}
         </button>
       </form>
 
@@ -59,7 +59,7 @@
       <form v-else class="auth-form" @submit.prevent="handleRegister">
         <div class="field-row">
           <div class="field">
-            <label>{{ t('auth.firstName') }}</label>
+            <label>{{ t("auth.firstName") }}</label>
             <input
               v-model="registerForm.prenom"
               type="text"
@@ -69,7 +69,7 @@
             />
           </div>
           <div class="field">
-            <label>{{ t('auth.lastName') }}</label>
+            <label>{{ t("auth.lastName") }}</label>
             <input
               v-model="registerForm.nom"
               type="text"
@@ -80,7 +80,7 @@
           </div>
         </div>
         <div class="field">
-          <label>{{ t('auth.email') }}</label>
+          <label>{{ t("auth.email") }}</label>
           <input
             v-model="registerForm.email"
             type="email"
@@ -90,7 +90,7 @@
           />
         </div>
         <div class="field">
-          <label>{{ t('auth.password') }}</label>
+          <label>{{ t("auth.password") }}</label>
           <input
             v-model="registerForm.password"
             type="password"
@@ -101,7 +101,7 @@
           />
         </div>
         <div class="field">
-          <label>{{ t('auth.password') }} (confirm)</label>
+          <label>{{ t("auth.password") }} (confirm)</label>
           <input
             v-model="registerForm.confirm"
             type="password"
@@ -112,7 +112,7 @@
         </div>
         <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
         <button type="submit" class="btn-auth" :disabled="loading">
-          {{ loading ? t('auth.registering') : t('auth.registerBtn') }}
+          {{ loading ? t("auth.registering") : t("auth.registerBtn") }}
         </button>
       </form>
     </div>

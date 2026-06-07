@@ -34,8 +34,10 @@
         :class="['nav', { 'nav--open': mobileOpen }]"
         @click="mobileOpen = false"
       >
-        <RouterLink to="/" class="nav-link">{{ t('nav.home') }}</RouterLink>
-        <RouterLink to="/fleet" class="nav-link">{{ t('nav.fleet') }}</RouterLink>
+        <RouterLink to="/" class="nav-link">{{ t("nav.home") }}</RouterLink>
+        <RouterLink to="/fleet" class="nav-link">{{
+          t("nav.fleet")
+        }}</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
           ⚙️ Admin
         </RouterLink>
@@ -44,7 +46,7 @@
         <template v-if="authStore.isAdmin && isAdminRoute">
           <span class="user-info">{{ authStore.user?.email }}</span>
           <button class="btn-logout" @click="handleAdminLogout">
-            {{ t('nav.logout') }}
+            {{ t("nav.logout") }}
           </button>
         </template>
 
@@ -81,7 +83,7 @@
                       d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
                     />
                   </svg>
-                  {{ t('nav.myAccount') }}
+                  {{ t("nav.myAccount") }}
                 </RouterLink>
                 <button class="dropdown-item danger" @click="handleUserLogout">
                   <svg viewBox="0 0 24 24" fill="currentColor">
@@ -89,20 +91,27 @@
                       d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
                     />
                   </svg>
-                  {{ t('nav.logout') }}
+                  {{ t("nav.logout") }}
                 </button>
               </div>
             </div>
           </template>
           <RouterLink v-else to="/auth" class="btn-signin">
-            {{ t('nav.login') }}
+            {{ t("nav.login") }}
           </RouterLink>
         </template>
 
         <!-- Switcher de langue -->
-        <button class="lang-switcher" @click.stop="toggleLocale">
-          {{ locale === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR' }}
-        </button>
+        <div class="lang-toggle">
+          <button
+            v-for="lang in ['fr', 'en']"
+            :key="lang"
+            @click.stop="setLocale(lang)"
+            :class="['lang-btn', { 'lang-btn--active': locale === lang }]"
+          >
+            {{ lang.toUpperCase() }}
+          </button>
+        </div>
       </nav>
     </div>
     <SearchBanner v-if="isFleetRoute" />
@@ -119,9 +128,9 @@ import SearchBanner from "./SearchBanner.vue";
 
 const { t, locale } = useI18n();
 
-function toggleLocale() {
-  locale.value = locale.value === 'fr' ? 'en' : 'fr';
-  localStorage.setItem('locale', locale.value);
+function setLocale(lang) {
+  locale.value = lang;
+  localStorage.setItem("locale", lang);
 }
 
 const route = useRoute();
@@ -437,28 +446,44 @@ async function handleUserLogout() {
   background: #fce4ec;
 }
 
-/* Language switcher */
-.lang-switcher {
-  background: none;
-  border: 1.5px solid #dde3f5;
+/* Language toggle */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  background: #f0f2f8;
   border-radius: 8px;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #1a1a2e;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-  white-space: nowrap;
+  padding: 3px;
+  gap: 2px;
 }
-.lang-switcher:hover {
-  background: #f0f4ff;
-  border-color: #667eea;
+.lang-btn {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #8892b0;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    box-shadow 0.18s;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
+.lang-btn:hover {
+  color: #4a5568;
+}
+.lang-btn--active {
+  background: #fff;
+  color: #667eea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 @media (max-width: 768px) {
-  .lang-switcher {
+  .lang-toggle {
     margin-top: 0.25rem;
-    text-align: center;
-    padding: 0.7rem;
+    justify-content: center;
+    align-self: flex-start;
   }
 }
 </style>

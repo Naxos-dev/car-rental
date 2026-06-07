@@ -4,14 +4,16 @@
       <!-- En-tête -->
       <div class="account-header">
         <div>
-          <h1 class="account-title">{{ t('account.title') }}</h1>
+          <h1 class="account-title">{{ t("account.title") }}</h1>
           <p v-if="userAuthStore.userProfile" class="account-name">
             {{ userAuthStore.userProfile.prenom }}
             {{ userAuthStore.userProfile.nom }}
           </p>
           <p class="account-email">{{ userAuthStore.user?.email }}</p>
         </div>
-        <button class="btn-logout" @click="handleLogout">{{ t('account.logout') }}</button>
+        <button class="btn-logout" @click="handleLogout">
+          {{ t("account.logout") }}
+        </button>
       </div>
 
       <!-- Onglets -->
@@ -20,25 +22,25 @@
           :class="['tab-btn', { active: section === 'reservations' }]"
           @click="section = 'reservations'"
         >
-          {{ t('account.reservations') }}
+          {{ t("account.reservations") }}
         </button>
         <button
           :class="['tab-btn', { active: section === 'settings' }]"
           @click="section = 'settings'"
         >
-          {{ t('account.settings') }}
+          {{ t("account.settings") }}
         </button>
       </div>
 
       <!-- Section : Réservations -->
       <div v-if="section === 'reservations'" class="section-content">
         <div v-if="reservationStore.loading" class="empty-state">
-          {{ t('account.loading') }}
+          {{ t("account.loading") }}
         </div>
         <div v-else-if="myReservations.length === 0" class="empty-state">
-          <p>{{ t('account.noReservations') }}</p>
+          <p>{{ t("account.noReservations") }}</p>
           <RouterLink to="/" class="btn-cta-link">
-            {{ t('account.seeVehicles') }}
+            {{ t("account.seeVehicles") }}
           </RouterLink>
         </div>
         <div v-else class="reservations-list">
@@ -46,7 +48,7 @@
             <div class="res-header">
               <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
               <span :class="['res-badge', `badge--${r.statut}`]">
-              {{ STATUS_LABELS[r.statut] ?? r.statut }}
+                {{ STATUS_LABELS[r.statut] ?? r.statut }}
               </span>
             </div>
             <div class="res-details">
@@ -62,13 +64,14 @@
         <div class="settings-grid">
           <!-- Modifier l'email -->
           <div class="settings-card">
-            <h2>{{ t('account.updateEmail') }}</h2>
+            <h2>{{ t("account.updateEmail") }}</h2>
             <p class="current-val">
-              {{ t('account.currentEmail') }} <strong>{{ userAuthStore.user?.email }}</strong>
+              {{ t("account.currentEmail") }}
+              <strong>{{ userAuthStore.user?.email }}</strong>
             </p>
             <form @submit.prevent="handleUpdateEmail">
               <div class="field">
-                <label>{{ t('account.newEmail') }}</label>
+                <label>{{ t("account.newEmail") }}</label>
                 <input
                   v-model="emailForm.newEmail"
                   type="email"
@@ -77,7 +80,7 @@
                 />
               </div>
               <div class="field">
-                <label>{{ t('account.currentPassword') }}</label>
+                <label>{{ t("account.currentPassword") }}</label>
                 <input
                   v-model="emailForm.password"
                   type="password"
@@ -92,17 +95,21 @@
                 {{ emailMsg.text }}
               </p>
               <button type="submit" class="btn-save" :disabled="emailLoading">
-                {{ emailLoading ? t('account.updating') : t('account.updateEmailBtn') }}
+                {{
+                  emailLoading
+                    ? t("account.updating")
+                    : t("account.updateEmailBtn")
+                }}
               </button>
             </form>
           </div>
 
           <!-- Changer le mot de passe -->
           <div class="settings-card">
-            <h2>{{ t('account.changePassword') }}</h2>
+            <h2>{{ t("account.changePassword") }}</h2>
             <form @submit.prevent="handleUpdatePassword">
               <div class="field">
-                <label>{{ t('account.currentPassword') }}</label>
+                <label>{{ t("account.currentPassword") }}</label>
                 <input
                   v-model="passwordForm.current"
                   type="password"
@@ -111,7 +118,7 @@
                 />
               </div>
               <div class="field">
-                <label>{{ t('account.newPassword') }}</label>
+                <label>{{ t("account.newPassword") }}</label>
                 <input
                   v-model="passwordForm.new"
                   type="password"
@@ -121,7 +128,7 @@
                 />
               </div>
               <div class="field">
-                <label>{{ t('account.confirmPassword') }}</label>
+                <label>{{ t("account.confirmPassword") }}</label>
                 <input
                   v-model="passwordForm.confirm"
                   type="password"
@@ -141,7 +148,9 @@
                 :disabled="passwordLoading"
               >
                 {{
-                  passwordLoading ? t('account.updating') : t('account.changePasswordBtn')
+                  passwordLoading
+                    ? t("account.updating")
+                    : t("account.changePasswordBtn")
                 }}
               </button>
             </form>
@@ -164,10 +173,10 @@ const router = useRouter();
 const section = ref("reservations");
 
 const STATUS_LABELS = computed(() => ({
-  en_attente: `⏳ ${t('statusLabels.en_attente')}`,
-  payee: `💳 ${t('statusLabels.payee')}`,
-  confirmee: `✅ ${t('statusLabels.confirmee')}`,
-  annulee: `❌ ${t('statusLabels.annulee')}`,
+  en_attente: `⏳ ${t("statusLabels.en_attente")}`,
+  payee: `💳 ${t("statusLabels.payee")}`,
+  confirmee: `✅ ${t("statusLabels.confirmee")}`,
+  annulee: `❌ ${t("statusLabels.annulee")}`,
 }));
 
 const myReservations = computed(() =>

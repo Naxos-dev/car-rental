@@ -2,7 +2,11 @@
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-card">
-        <button class="modal-close" @click="$emit('close')" :aria-label="t('modal.close')">
+        <button
+          class="modal-close"
+          @click="$emit('close')"
+          :aria-label="t('modal.close')"
+        >
           ✕
         </button>
 
@@ -24,15 +28,15 @@
 
         <form class="modal-form" @submit.prevent="handleSubmit">
           <!-- Détails de réservation -->
-          <div class="section-label">{{ t('modal.reservationDetails') }}</div>
+          <div class="section-label">{{ t("modal.reservationDetails") }}</div>
 
           <div class="field">
-            <label>{{ t('modal.location') }}</label>
+            <label>{{ t("modal.location") }}</label>
             <input value="Lille" type="text" readonly />
           </div>
           <div class="field-row">
             <div class="field">
-              <label>{{ t('modal.startDate') }}</label>
+              <label>{{ t("modal.startDate") }}</label>
               <input
                 v-model="searchStore.startDate"
                 type="date"
@@ -41,13 +45,13 @@
               />
             </div>
             <div class="field">
-              <label>{{ t('modal.startTime') }}</label>
+              <label>{{ t("modal.startTime") }}</label>
               <input v-model="searchStore.startTime" type="time" required />
             </div>
           </div>
           <div class="field-row">
             <div class="field">
-              <label>{{ t('modal.endDate') }}</label>
+              <label>{{ t("modal.endDate") }}</label>
               <input
                 v-model="searchStore.endDate"
                 type="date"
@@ -56,17 +60,17 @@
               />
             </div>
             <div class="field">
-              <label>{{ t('modal.endTime') }}</label>
+              <label>{{ t("modal.endTime") }}</label>
               <input v-model="searchStore.endTime" type="time" required />
             </div>
           </div>
 
           <!-- Informations client -->
-          <div class="section-label">{{ t('modal.clientInfo') }}</div>
+          <div class="section-label">{{ t("modal.clientInfo") }}</div>
 
           <div class="field-row">
             <div class="field">
-              <label>{{ t('modal.firstName') }}</label>
+              <label>{{ t("modal.firstName") }}</label>
               <input
                 v-model="customerForm.prenom"
                 type="text"
@@ -75,7 +79,7 @@
               />
             </div>
             <div class="field">
-              <label>{{ t('modal.lastName') }}</label>
+              <label>{{ t("modal.lastName") }}</label>
               <input
                 v-model="customerForm.nom"
                 type="text"
@@ -86,7 +90,7 @@
           </div>
           <div class="field-row">
             <div class="field">
-              <label>{{ t('modal.email') }}</label>
+              <label>{{ t("modal.email") }}</label>
               <input
                 v-model="customerForm.email"
                 type="email"
@@ -95,7 +99,7 @@
               />
             </div>
             <div class="field">
-              <label>{{ t('modal.phone') }}</label>
+              <label>{{ t("modal.phone") }}</label>
               <input
                 v-model="customerForm.telephone"
                 type="tel"
@@ -113,10 +117,10 @@
 
           <div class="modal-actions">
             <button type="button" class="btn-cancel" @click="$emit('close')">
-              {{ t('searchBanner.cancel') }}
+              {{ t("searchBanner.cancel") }}
             </button>
             <button type="submit" class="btn-confirm">
-              {{ t('modal.proceed') }} →
+              {{ t("modal.proceed") }} →
             </button>
           </div>
         </form>

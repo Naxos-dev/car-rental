@@ -52,7 +52,7 @@
         <form class="edit-form" @submit.prevent="applyChanges">
           <div class="edit-row">
             <div class="edit-field">
-              <label>{{ t('searchBanner.startDate') }}</label>
+              <label>{{ t("searchBanner.startDate") }}</label>
               <input
                 v-model="draft.startDate"
                 type="date"
@@ -61,13 +61,13 @@
               />
             </div>
             <div class="edit-field">
-              <label>{{ t('searchBanner.startTime') }}</label>
+              <label>{{ t("searchBanner.startTime") }}</label>
               <input v-model="draft.startTime" type="time" required />
             </div>
           </div>
           <div class="edit-row">
             <div class="edit-field">
-              <label>{{ t('searchBanner.endDate') }}</label>
+              <label>{{ t("searchBanner.endDate") }}</label>
               <input
                 v-model="draft.endDate"
                 type="date"
@@ -76,15 +76,17 @@
               />
             </div>
             <div class="edit-field">
-              <label>{{ t('searchBanner.endTime') }}</label>
+              <label>{{ t("searchBanner.endTime") }}</label>
               <input v-model="draft.endTime" type="time" required />
             </div>
           </div>
           <div class="edit-actions">
             <button type="button" class="btn-cancel" @click="editOpen = false">
-              {{ t('searchBanner.cancel') }}
+              {{ t("searchBanner.cancel") }}
             </button>
-            <button type="submit" class="btn-apply">{{ t('searchBanner.update') }}</button>
+            <button type="submit" class="btn-apply">
+              {{ t("searchBanner.update") }}
+            </button>
           </div>
         </form>
       </div>

@@ -16,9 +16,9 @@
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        <h1>{{ t('success.title') }}</h1>
+        <h1>{{ t("success.title") }}</h1>
         <p>
-          {{ t('success.desc') }} <strong>{{ email }}</strong
+          {{ t("success.desc") }} <strong>{{ email }}</strong
           >.
         </p>
 
@@ -30,7 +30,9 @@
           </div>
         </div>
 
-        <router-link to="/" class="btn-home">{{ t('success.backHome') }}</router-link>
+        <router-link to="/" class="btn-home">{{
+          t("success.backHome")
+        }}</router-link>
       </div>
     </div>
   </div>
