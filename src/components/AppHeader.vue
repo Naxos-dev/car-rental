@@ -117,9 +117,12 @@ const menuOpen = ref(false);
 const menuRef = ref(null);
 const mobileOpen = ref(false);
 
-watch(() => route.path, () => {
-  mobileOpen.value = false;
-});
+watch(
+  () => route.path,
+  () => {
+    mobileOpen.value = false;
+  },
+);
 
 const isAdminRoute = computed(() => route.path.startsWith("/admin"));
 const isFleetRoute = computed(() => route.path === "/fleet");
