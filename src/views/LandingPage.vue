@@ -70,8 +70,8 @@
     <section class="fleet" id="fleet">
       <div class="container">
         <h2 class="section-title">{{ t("fleet.title") }}</h2>
-        <div v-if="vehicleStore.loading" class="fleet-loading">
-          {{ t("fleet.loading") }}
+        <div v-if="vehicleStore.loading" class="fleet-grid">
+          <VehicleCardSkeleton v-for="n in 6" :key="n" />
         </div>
         <div v-else-if="vehicles.length === 0" class="fleet-empty">
           {{ t("fleet.empty") }}
@@ -184,6 +184,7 @@ import { useI18n } from "vue-i18n";
 import BookingWidget from "../components/BookingWidget.vue";
 import ReservationModal from "../components/ReservationModal.vue";
 import VehicleCard from "../components/VehicleCard.vue";
+import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";

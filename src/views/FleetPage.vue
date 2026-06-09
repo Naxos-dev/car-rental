@@ -20,8 +20,8 @@
         </p>
       </div>
 
-      <div v-if="vehicleStore.loading" class="fleet-loading">
-        {{ t("fleetPage.loading") }}
+      <div v-if="vehicleStore.loading" class="fleet-grid">
+        <VehicleCardSkeleton v-for="n in 9" :key="n" />
       </div>
       <div v-else-if="availableVehicles.length === 0" class="fleet-empty">
         {{ t("fleetPage.empty") }}
@@ -50,6 +50,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReservationModal from "../components/ReservationModal.vue";
 import VehicleCard from "../components/VehicleCard.vue";
+import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
