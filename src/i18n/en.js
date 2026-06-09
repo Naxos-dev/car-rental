@@ -65,7 +65,7 @@ export default {
   fuel: {
     Essence: "Petrol",
     Diesel: "Diesel",
-    "Électrique": "Electric",
+    Électrique: "Electric",
     Electrique: "Electric",
     Hybride: "Hybrid",
     "Hybride rechargeable": "Plug-in Hybrid",
@@ -227,6 +227,112 @@ export default {
     dataProtected: "Data protected",
     paymentLabel: "Accepted payments:",
     rights: "All rights reserved",
+  },
+
+  legal: {
+    backHome: "Back to home",
+    lastUpdated: "Last updated",
+    terms: {
+      title: "Terms and Conditions of Use",
+      s1: {
+        title: "Purpose",
+        content:
+          "These Terms and Conditions of Use govern access to and use of the AutoLoc website and vehicle rental services. By using our site, you unreservedly accept these Terms.",
+      },
+      s2: {
+        title: "Access to the service",
+        content:
+          "Access to the rental service is reserved for adults (18 years or older) holding a valid driving licence. AutoLoc reserves the right to refuse access to any person who does not meet these conditions.",
+      },
+      s3: {
+        title: "Booking and payment",
+        content:
+          "All bookings are subject to vehicle availability and full payment of the amount due at the time of confirmation. Payment is secured via Stripe. The booking is confirmed by email after payment validation.",
+      },
+      s4: {
+        title: "Cancellation and refund",
+        content:
+          "Any cancellation made more than 48 hours before the start of the rental will be fully refunded. Within this period, no refund will be made. Cancellation requests must be sent by email to contact{'@'}autoloc.fr.",
+      },
+      s5: {
+        title: "Tenant responsibility",
+        content:
+          "The tenant agrees to use the vehicle with care and in compliance with road traffic regulations. They are responsible for any damage caused to the vehicle during the rental period, within the limits provided by the included insurance contract.",
+      },
+      s6: {
+        title: "Applicable law",
+        content:
+          "These Terms are governed by French law. In the event of a dispute, the competent courts of the Paris jurisdiction shall have exclusive jurisdiction.",
+      },
+    },
+    privacy: {
+      title: "Privacy Policy",
+      s1: {
+        title: "Data controller",
+        content:
+          "AutoLoc, headquartered at 12 rue de la Paix, Paris, is responsible for processing personal data collected through this website.",
+      },
+      s2: {
+        title: "Data collected",
+        content:
+          "When using the service, we collect the following data: first name, last name, email address, phone number, payment data (processed exclusively by Stripe), as well as browsing data (cookies, IP address).",
+      },
+      s3: {
+        title: "Processing purposes",
+        content:
+          "Your data is used for: managing bookings and payments, communication relating to your rentals, improving our services, and complying with our legal obligations.",
+      },
+      s4: {
+        title: "Data retention",
+        content:
+          "Your personal data is retained for the duration necessary for the performance of the contract, plus the applicable legal limitation periods (5 years for contractual data).",
+      },
+      s5: {
+        title: "Your rights",
+        content:
+          "In accordance with the GDPR, you have the right to access, rectify, erase, restrict, port and object to your data. To exercise these rights, contact us at: contact{'@'}autoloc.fr.",
+      },
+      s6: {
+        title: "Cookies",
+        content:
+          "Our site uses cookies strictly necessary for its operation (authentication, session) and anonymised analytical cookies. You can disable them in your browser settings.",
+      },
+    },
+  },
+
+  faqSection: {
+    title: "Frequently asked questions",
+    subtitle: "Everything you need to know before booking",
+    items: [
+      {
+        q: "How do I book a vehicle?",
+        a: "It's simple: select your dates and pick-up location in the booking widget, choose the vehicle that suits you, then confirm in a few clicks. A confirmation is sent instantly by email.",
+      },
+      {
+        q: "What documents do I need?",
+        a: "All you need is a valid driving licence (category B minimum), a photo ID and a payment method. No cash deposit is required — everything is handled securely online.",
+      },
+      {
+        q: "Is insurance included in the price?",
+        a: "Yes, every rental includes comprehensive insurance. You set off with complete peace of mind, with no extra charges or surprises.",
+      },
+      {
+        q: "Can I cancel or modify my booking?",
+        a: "Any cancellation made more than 48 hours before the rental start is fully refunded. You can also modify your dates by contacting our customer service, subject to availability.",
+      },
+      {
+        q: "How does payment work?",
+        a: "Payment is made online via Stripe, a PCI-DSS certified platform. Visa, Mastercard and major bank cards are accepted. No banking data is stored on our servers.",
+      },
+      {
+        q: "Are there any hidden fees?",
+        a: "No. The displayed price is the final all-inclusive price (insurance, assistance, VAT). We believe in full transparency: no unpleasant surprises at signing.",
+      },
+      {
+        q: "What should I do in case of a breakdown or accident?",
+        a: "Our assistance is available 24/7. A dedicated number is provided when you pick up the keys. In the event of an incident, we take care of everything: roadside assistance, replacement vehicle, and paperwork.",
+      },
+    ],
   },
 
   trustStrip: {

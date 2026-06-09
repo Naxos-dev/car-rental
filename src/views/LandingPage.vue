@@ -53,7 +53,7 @@
     </section>
 
     <!-- Avantages -->
-    <section class="features">
+    <section class="features" id="about">
       <div class="container">
         <h2 class="section-title">{{ t("features.title") }}</h2>
         <div class="features-grid">
@@ -120,6 +120,46 @@
                 <strong>{{ t.name }}</strong>
                 <span>{{ t.city }}</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <div class="faq-header">
+          <h2 class="section-title">{{ t("faqSection.title") }}</h2>
+          <p class="faq-subtitle">{{ t("faqSection.subtitle") }}</p>
+        </div>
+        <div class="faq-list">
+          <div
+            v-for="(item, index) in faqItems"
+            :key="index"
+            class="faq-item"
+            :class="{ open: openFaq === index }"
+            @click="openFaq = openFaq === index ? null : index"
+          >
+            <div class="faq-question">
+              <span>{{ item.q }}</span>
+              <svg
+                class="faq-chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polyline
+                  points="6 9 12 15 18 9"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>{{ item.a }}</p>
             </div>
           </div>
         </div>
@@ -244,6 +284,8 @@ const features = computed(() => [
 ]);
 
 const testimonials = computed(() => tm("testimonialsData"));
+const faqItems = computed(() => tm("faqSection.items"));
+const openFaq = ref(0);
 </script>
 
 <style scoped>
@@ -588,6 +630,99 @@ const testimonials = computed(() => tm("testimonialsData"));
 .author-info span {
   font-size: 0.8rem;
   color: #888;
+}
+
+/* FAQ */
+.faq {
+  padding: 5rem 0;
+  background: #fff;
+}
+.faq-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.faq-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin-top: -1.5rem;
+}
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.faq-item {
+  border: 1px solid #e8ecf5;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.faq-item:hover {
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.08);
+  border-color: #e63946;
+}
+.faq-item.open {
+  border-color: #e63946;
+  box-shadow: 0 4px 20px rgba(230, 57, 70, 0.1);
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: #1a1a2e;
+  user-select: none;
+  gap: 1rem;
+}
+.faq-chevron {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #e63946;
+  transition: transform 0.25s;
+}
+.faq-item.open .faq-chevron {
+  transform: rotate(180deg);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    padding 0.3s ease;
+  padding: 0 1.5rem;
+}
+.faq-item.open .faq-answer {
+  max-height: 300px;
+  padding: 0 1.5rem 1.25rem;
+}
+.faq-answer p {
+  color: #555;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .faq {
+    padding: 3rem 0;
+  }
+  .faq-question {
+    font-size: 0.9rem;
+    padding: 1rem 1.1rem;
+  }
+  .faq-answer {
+    padding: 0 1.1rem;
+  }
+  .faq-item.open .faq-answer {
+    padding: 0 1.1rem 1rem;
+  }
 }
 
 /* CTA */

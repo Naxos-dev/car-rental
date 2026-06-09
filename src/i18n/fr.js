@@ -65,7 +65,7 @@ export default {
   fuel: {
     Essence: "Essence",
     Diesel: "Diesel",
-    "Électrique": "Électrique",
+    Électrique: "Électrique",
     Electrique: "Électrique",
     Hybride: "Hybride",
     "Hybride rechargeable": "Hybride rechargeable",
@@ -227,6 +227,112 @@ export default {
     dataProtected: "Données protégées",
     paymentLabel: "Paiement accepté :",
     rights: "Tous droits réservés",
+  },
+
+  legal: {
+    backHome: "Retour à l'accueil",
+    lastUpdated: "Dernière mise à jour",
+    terms: {
+      title: "Conditions Générales d'Utilisation",
+      s1: {
+        title: "Objet",
+        content:
+          "Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation du site AutoLoc ainsi que les services de location de véhicules proposés. En utilisant notre site, vous acceptez sans réserve les présentes CGU.",
+      },
+      s2: {
+        title: "Accès au service",
+        content:
+          "L'accès au service de location est réservé aux personnes physiques majeures (18 ans ou plus) titulaires d'un permis de conduire valide. AutoLoc se réserve le droit de refuser l'accès à toute personne ne remplissant pas ces conditions.",
+      },
+      s3: {
+        title: "Réservation et paiement",
+        content:
+          "Toute réservation est soumise à la disponibilité du véhicule et au paiement intégral du montant dû au moment de la confirmation. Le paiement est sécurisé via Stripe. La réservation est confirmée par e-mail après validation du paiement.",
+      },
+      s4: {
+        title: "Annulation et remboursement",
+        content:
+          "Toute annulation effectuée plus de 48 heures avant le début de la location est remboursée intégralement. En deçà de ce délai, aucun remboursement ne sera effectué. Les demandes d'annulation doivent être adressées par e-mail à contact{'@'}autoloc.fr.",
+      },
+      s5: {
+        title: "Responsabilité du locataire",
+        content:
+          "Le locataire s'engage à utiliser le véhicule avec soin et dans le respect du Code de la Route. Il est responsable des dommages causés au véhicule pendant la période de location, dans les limites prévues par le contrat d'assurance inclus.",
+      },
+      s6: {
+        title: "Droit applicable",
+        content:
+          "Les présentes CGU sont soumises au droit français. En cas de litige, les tribunaux compétents du ressort de Paris seront seuls compétents.",
+      },
+    },
+    privacy: {
+      title: "Politique de Confidentialité",
+      s1: {
+        title: "Responsable du traitement",
+        content:
+          "AutoLoc, dont le siège social est situé au 12 rue de la Paix, Paris, est responsable du traitement des données personnelles collectées via ce site.",
+      },
+      s2: {
+        title: "Données collectées",
+        content:
+          "Lors de votre utilisation du service, nous collectons les données suivantes : nom, prénom, adresse e-mail, numéro de téléphone, données de paiement (traitées exclusivement par Stripe), ainsi que les données de navigation (cookies, adresse IP).",
+      },
+      s3: {
+        title: "Finalités du traitement",
+        content:
+          "Vos données sont utilisées pour : la gestion des réservations et paiements, la communication relative à vos locations, l'amélioration de nos services, et le respect de nos obligations légales.",
+      },
+      s4: {
+        title: "Conservation des données",
+        content:
+          "Vos données personnelles sont conservées pendant la durée nécessaire à l'exécution du contrat, augmentée des délais légaux de prescription applicables (5 ans pour les données contractuelles).",
+      },
+      s5: {
+        title: "Vos droits",
+        content:
+          "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, de portabilité et d'opposition sur vos données. Pour exercer ces droits, contactez-nous à : contact{'@'}autoloc.fr.",
+      },
+      s6: {
+        title: "Cookies",
+        content:
+          "Notre site utilise des cookies strictement nécessaires à son fonctionnement (authentification, session) et des cookies d'analyse anonymisés. Vous pouvez les désactiver dans les paramètres de votre navigateur.",
+      },
+    },
+  },
+
+  faqSection: {
+    title: "Questions fréquentes",
+    subtitle: "Tout ce que vous devez savoir avant de réserver",
+    items: [
+      {
+        q: "Comment réserver un véhicule ?",
+        a: "C'est simple : sélectionnez vos dates et votre lieu de prise en charge dans le widget de réservation, choisissez le véhicule qui vous convient, puis validez en quelques clics. La confirmation arrive instantanément par e-mail.",
+      },
+      {
+        q: "Quels documents dois-je fournir ?",
+        a: "Il vous suffit d'un permis de conduire valide (B minimum), d'une pièce d'identité et d'un moyen de paiement. Aucun dépôt de garantie en espèces n'est requis — tout est géré de manière sécurisée en ligne.",
+      },
+      {
+        q: "L'assurance est-elle incluse dans le prix ?",
+        a: "Oui, chaque location inclut une assurance tous risques. Vous partez l'esprit tranquille, sans frais supplémentaires ni surprises.",
+      },
+      {
+        q: "Puis-je annuler ou modifier ma réservation ?",
+        a: "Toute annulation effectuée plus de 48 h avant le début de la location est remboursée intégralement. Vous pouvez également modifier vos dates en contactant notre service client, sous réserve de disponibilité.",
+      },
+      {
+        q: "Comment fonctionne le paiement ?",
+        a: "Le paiement s'effectue en ligne via Stripe, plateforme certifiée PCI-DSS. Visa, Mastercard et les principales cartes bancaires sont acceptées. Aucune donnée bancaire n'est stockée sur nos serveurs.",
+      },
+      {
+        q: "Y a-t-il des frais cachés ?",
+        a: "Non. Le prix affiché est le prix final, tout compris (assurance, assistance, TVA). Nous croyons en la transparence totale : pas de mauvaises surprises à la signature.",
+      },
+      {
+        q: "Que faire en cas de panne ou d'accident ?",
+        a: "Notre assistance est disponible 24h/24 et 7j/7. Un numéro dédié vous est communiqué à la remise des clés. En cas d'incident, nous nous occupons de tout : dépannage, véhicule de remplacement, gestion administrative.",
+      },
+    ],
   },
 
   trustStrip: {

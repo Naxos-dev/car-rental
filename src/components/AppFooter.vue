@@ -21,44 +21,34 @@
       </div>
 
       <div class="footer-links">
-        <h4>{{ t("footer.services") }}</h4>
-        <ul>
-          <li>
-            <a href="#">{{ t("footer.shortRental") }}</a>
-          </li>
-          <li>
-            <a href="#">{{ t("footer.longRental") }}</a>
-          </li>
-          <li>
-            <a href="#">{{ t("footer.utility") }}</a>
-          </li>
-          <li>
-            <a href="#">{{ t("footer.electric") }}</a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="footer-links">
         <h4>{{ t("footer.info") }}</h4>
         <ul>
           <li>
-            <a href="#">{{ t("footer.about") }}</a>
+            <router-link to="/#about">{{ t("footer.about") }}</router-link>
           </li>
           <li>
-            <a href="#">{{ t("footer.terms") }}</a>
+            <router-link to="/cgu">{{ t("footer.terms") }}</router-link>
           </li>
           <li>
-            <a href="#">{{ t("footer.privacy") }}</a>
+            <router-link to="/confidentialite">{{
+              t("footer.privacy")
+            }}</router-link>
           </li>
           <li>
-            <a href="#">{{ t("footer.faq") }}</a>
+            <router-link to="/#faq">{{ t("footer.faq") }}</router-link>
           </li>
         </ul>
       </div>
 
       <div class="footer-contact">
         <h4>{{ t("footer.contact") }}</h4>
-        <p class="contact-item">
+        <a
+          class="contact-item"
+          href="https://www.google.com/maps/search/?api=1&query=12+rue+de+la+Paix,+Paris"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Ouvrir l'adresse dans Google Maps"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -72,8 +62,12 @@
             <circle cx="12" cy="10" r="3" />
           </svg>
           12 rue de la Paix, Paris
-        </p>
-        <p class="contact-item">
+        </a>
+        <a
+          class="contact-item"
+          href="tel:+33123456789"
+          aria-label="Appeler le 01 23 45 67 89"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -88,8 +82,12 @@
             />
           </svg>
           01 23 45 67 89
-        </p>
-        <p class="contact-item">
+        </a>
+        <a
+          class="contact-item"
+          href="mailto:contact@autoloc.fr"
+          aria-label="Envoyer un email à contact@autoloc.fr"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -105,7 +103,7 @@
             <polyline points="22,6 12,13 2,6" />
           </svg>
           contact@autoloc.fr
-        </p>
+        </a>
       </div>
     </div>
     <div class="footer-trust">
@@ -171,7 +169,7 @@ const { t } = useI18n();
   margin: 0 auto;
   padding: 3rem 1.5rem;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1.5fr;
   gap: 2rem;
 }
 @media (max-width: 768px) {
@@ -214,7 +212,9 @@ const { t } = useI18n();
 .footer-links li {
   margin-bottom: 0.4rem;
 }
-.footer-links a {
+.footer-links a,
+.footer-links a.router-link-active,
+.footer-links a.router-link-exact-active {
   color: #aaa;
   text-decoration: none;
   font-size: 0.9rem;
@@ -223,19 +223,25 @@ const { t } = useI18n();
 .footer-links a:hover {
   color: #fff;
 }
-.footer-contact p {
+.footer-contact p,
+.footer-contact a {
   font-size: 0.9rem;
   margin-bottom: 0.4rem;
 }
-.footer-contact p.contact-item {
+.footer-contact .contact-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   color: #ccc;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-.footer-contact p.contact-item svg {
+.footer-contact .contact-item:hover {
+  color: #fff;
+}
+.footer-contact .contact-item svg {
   width: 15px;
   height: 15px;
   stroke: #e63946;
