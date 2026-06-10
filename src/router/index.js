@@ -7,12 +7,25 @@ import PaymentSuccessPage from "../views/PaymentSuccessPage.vue";
 import AuthPage from "../views/AuthPage.vue";
 import AccountPage from "../views/AccountPage.vue";
 import FleetPage from "../views/FleetPage.vue";
+import LegalPage from "../views/LegalPage.vue";
 import { authStore } from "../store/auth.js";
 import { userAuthStore } from "../store/userAuth.js";
 
 const routes = [
   { path: "/", name: "Home", component: LandingPage },
   { path: "/fleet", name: "Fleet", component: FleetPage },
+  {
+    path: "/cgu",
+    name: "Terms",
+    component: LegalPage,
+    meta: { legalType: "terms" },
+  },
+  {
+    path: "/confidentialite",
+    name: "Privacy",
+    component: LegalPage,
+    meta: { legalType: "privacy" },
+  },
   { path: "/login", name: "Login", component: LoginPage },
   { path: "/auth", name: "Auth", component: AuthPage },
   {
@@ -44,7 +57,14 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: "smooth",
+      };
+    }
+
     return { top: 0 };
   },
 });

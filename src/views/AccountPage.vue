@@ -4,14 +4,16 @@
       <!-- En-tête -->
       <div class="account-header">
         <div>
-          <h1 class="account-title">Mon compte</h1>
+          <h1 class="account-title">{{ t("account.title") }}</h1>
           <p v-if="userAuthStore.userProfile" class="account-name">
             {{ userAuthStore.userProfile.prenom }}
             {{ userAuthStore.userProfile.nom }}
           </p>
           <p class="account-email">{{ userAuthStore.user?.email }}</p>
         </div>
-        <button class="btn-logout" @click="handleLogout">Se déconnecter</button>
+        <button class="btn-logout" @click="handleLogout">
+          {{ t("account.logout") }}
+        </button>
       </div>
 
       <!-- Onglets -->
@@ -20,25 +22,25 @@
           :class="['tab-btn', { active: section === 'reservations' }]"
           @click="section = 'reservations'"
         >
-          🚗 Mes réservations
+          {{ t("account.reservations") }}
         </button>
         <button
           :class="['tab-btn', { active: section === 'settings' }]"
           @click="section = 'settings'"
         >
-          ⚙️ Paramètres
+          {{ t("account.settings") }}
         </button>
       </div>
 
       <!-- Section : Réservations -->
       <div v-if="section === 'reservations'" class="section-content">
         <div v-if="reservationStore.loading" class="empty-state">
-          Chargement...
+          {{ t("account.loading") }}
         </div>
         <div v-else-if="myReservations.length === 0" class="empty-state">
-          <p>Vous n'avez pas encore de réservation.</p>
+          <p>{{ t("account.noReservations") }}</p>
           <RouterLink to="/" class="btn-cta-link">
-            Voir les véhicules →
+            {{ t("account.seeVehicles") }}
           </RouterLink>
         </div>
         <div v-else class="reservations-list">
@@ -62,26 +64,27 @@
         <div class="settings-grid">
           <!-- Modifier l'email -->
           <div class="settings-card">
-            <h2>📧 Modifier l'email</h2>
+            <h2>{{ t("account.updateEmail") }}</h2>
             <p class="current-val">
-              Email actuel : <strong>{{ userAuthStore.user?.email }}</strong>
+              {{ t("account.currentEmail") }}
+              <strong>{{ userAuthStore.user?.email }}</strong>
             </p>
             <form @submit.prevent="handleUpdateEmail">
               <div class="field">
-                <label>Nouvel email</label>
+                <label>{{ t("account.newEmail") }}</label>
                 <input
                   v-model="emailForm.newEmail"
                   type="email"
-                  placeholder="nouveau@exemple.com"
+                  :placeholder="t('account.newEmailPlaceholder')"
                   required
                 />
               </div>
               <div class="field">
-                <label>Mot de passe actuel</label>
+                <label>{{ t("account.currentPassword") }}</label>
                 <input
                   v-model="emailForm.password"
                   type="password"
-                  placeholder="Pour confirmer votre identité"
+                  :placeholder="t('account.currentPasswordPlaceholder')"
                   required
                 />
               </div>
@@ -92,40 +95,44 @@
                 {{ emailMsg.text }}
               </p>
               <button type="submit" class="btn-save" :disabled="emailLoading">
-                {{ emailLoading ? "Mise à jour..." : "Mettre à jour l'email" }}
+                {{
+                  emailLoading
+                    ? t("account.updating")
+                    : t("account.updateEmailBtn")
+                }}
               </button>
             </form>
           </div>
 
           <!-- Changer le mot de passe -->
           <div class="settings-card">
-            <h2>🔒 Changer le mot de passe</h2>
+            <h2>{{ t("account.changePassword") }}</h2>
             <form @submit.prevent="handleUpdatePassword">
               <div class="field">
-                <label>Mot de passe actuel</label>
+                <label>{{ t("account.currentPassword") }}</label>
                 <input
                   v-model="passwordForm.current"
                   type="password"
-                  placeholder="••••••••"
+                  :placeholder="t('auth.passwordPlaceholder')"
                   required
                 />
               </div>
               <div class="field">
-                <label>Nouveau mot de passe</label>
+                <label>{{ t("account.newPassword") }}</label>
                 <input
                   v-model="passwordForm.new"
                   type="password"
-                  placeholder="Au moins 6 caractères"
+                  :placeholder="t('account.newPasswordPlaceholder')"
                   required
                   minlength="6"
                 />
               </div>
               <div class="field">
-                <label>Confirmer le nouveau mot de passe</label>
+                <label>{{ t("account.confirmPassword") }}</label>
                 <input
                   v-model="passwordForm.confirm"
                   type="password"
-                  placeholder="••••••••"
+                  :placeholder="t('account.confirmPasswordPlaceholder')"
                   required
                 />
               </div>
@@ -141,7 +148,9 @@
                 :disabled="passwordLoading"
               >
                 {{
-                  passwordLoading ? "Mise à jour..." : "Changer le mot de passe"
+                  passwordLoading
+                    ? t("account.updating")
+                    : t("account.changePasswordBtn")
                 }}
               </button>
             </form>
@@ -155,18 +164,20 @@
 <script setup>
 import { reactive, ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { userAuthStore } from "../store/userAuth.js";
 import { reservationStore } from "../store/reservations.js";
 
+const { t } = useI18n();
 const router = useRouter();
 const section = ref("reservations");
 
-const STATUS_LABELS = {
-  en_attente: "⏳ En attente",
-  payee: "💳 Payée",
-  confirmee: "✅ Confirmée",
-  annulee: "❌ Annulée",
-};
+const STATUS_LABELS = computed(() => ({
+  en_attente: `⏳ ${t("statusLabels.en_attente")}`,
+  payee: `💳 ${t("statusLabels.payee")}`,
+  confirmee: `✅ ${t("statusLabels.confirmee")}`,
+  annulee: `❌ ${t("statusLabels.annulee")}`,
+}));
 
 const myReservations = computed(() =>
   reservationStore.reservations.filter(

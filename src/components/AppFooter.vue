@@ -2,63 +2,145 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <svg class="footer-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22" stroke="#e63946" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="footer-logo-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22"
+            stroke="#e63946"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         <span class="logo-text">AutoLoc</span>
-        <p>Votre partenaire de location de voiture depuis 2010.</p>
+        <p>{{ t("footer.tagline") }}</p>
       </div>
 
       <div class="footer-links">
-        <h4>Services</h4>
+        <h4>{{ t("footer.info") }}</h4>
         <ul>
-          <li><a href="#">Location courte durée</a></li>
-          <li><a href="#">Location longue durée</a></li>
-          <li><a href="#">Véhicules utilitaires</a></li>
-          <li><a href="#">Véhicules électriques</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-links">
-        <h4>Informations</h4>
-        <ul>
-          <li><a href="#">À propos</a></li>
-          <li><a href="#">Conditions générales</a></li>
-          <li><a href="#">Politique de confidentialité</a></li>
-          <li><a href="#">FAQ</a></li>
+          <li>
+            <router-link to="/#about">{{ t("footer.about") }}</router-link>
+          </li>
+          <li>
+            <router-link to="/cgu">{{ t("footer.terms") }}</router-link>
+          </li>
+          <li>
+            <router-link to="/confidentialite">{{
+              t("footer.privacy")
+            }}</router-link>
+          </li>
+          <li>
+            <router-link to="/#faq">{{ t("footer.faq") }}</router-link>
+          </li>
         </ul>
       </div>
 
       <div class="footer-contact">
-        <h4>Contact</h4>
-        <p class="contact-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <h4>{{ t("footer.contact") }}</h4>
+        <a
+          class="contact-item"
+          href="https://www.google.com/maps/search/?api=1&query=12+rue+de+la+Paix,+Paris"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Ouvrir l'adresse dans Google Maps"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
           12 rue de la Paix, Paris
-        </p>
-        <p class="contact-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+        <a
+          class="contact-item"
+          href="tel:+33123456789"
+          aria-label="Appeler le 01 23 45 67 89"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+            />
+          </svg>
           01 23 45 67 89
-        </p>
-        <p class="contact-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+        <a
+          class="contact-item"
+          href="mailto:contact@autoloc.fr"
+          aria-label="Envoyer un email à contact@autoloc.fr"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+            />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
           contact@autoloc.fr
-        </p>
+        </a>
       </div>
     </div>
     <div class="footer-trust">
       <div class="footer-trust-inner">
         <div class="trust-badges">
           <span class="trust-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Site sécurisé SSL
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            {{ t("footer.ssl") }}
           </span>
           <span class="trust-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Données protégées
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            {{ t("footer.dataProtected") }}
           </span>
         </div>
         <div class="payment-methods">
-          <span class="payment-label">Paiement accepté :</span>
+          <span class="payment-label">{{ t("footer.paymentLabel") }}</span>
           <span class="payment-chip">VISA</span>
           <span class="payment-chip">Mastercard</span>
           <span class="payment-chip stripe">stripe</span>
@@ -66,12 +148,15 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© {{ new Date().getFullYear() }} AutoLoc — Tous droits réservés</p>
+      <p>© {{ new Date().getFullYear() }} AutoLoc — {{ t("footer.rights") }}</p>
     </div>
   </footer>
 </template>
 
-<script setup></script>
+<script setup>
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+</script>
 
 <style scoped>
 .footer {
@@ -84,7 +169,7 @@
   margin: 0 auto;
   padding: 3rem 1.5rem;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1.5fr;
   gap: 2rem;
 }
 @media (max-width: 768px) {
@@ -127,7 +212,9 @@
 .footer-links li {
   margin-bottom: 0.4rem;
 }
-.footer-links a {
+.footer-links a,
+.footer-links a.router-link-active,
+.footer-links a.router-link-exact-active {
   color: #aaa;
   text-decoration: none;
   font-size: 0.9rem;
@@ -136,19 +223,25 @@
 .footer-links a:hover {
   color: #fff;
 }
-.footer-contact p {
+.footer-contact p,
+.footer-contact a {
   font-size: 0.9rem;
   margin-bottom: 0.4rem;
 }
-.footer-contact p.contact-item {
+.footer-contact .contact-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   color: #ccc;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-.footer-contact p.contact-item svg {
+.footer-contact .contact-item:hover {
+  color: #fff;
+}
+.footer-contact .contact-item svg {
   width: 15px;
   height: 15px;
   stroke: #e63946;

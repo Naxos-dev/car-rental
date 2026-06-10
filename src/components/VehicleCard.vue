@@ -98,8 +98,6 @@ const btnLabel = computed(() => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   background: #fff;
   transition: transform 0.2s;
-  display: flex;
-  flex-direction: column;
 }
 .vehicle-card:hover {
   transform: translateY(-4px);

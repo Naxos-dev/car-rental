@@ -16,13 +16,13 @@
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          Partenaire de confiance depuis 2010
+          {{ t("hero.badge") }}
         </div>
         <h1 class="hero-title">
-          Louez votre véhicule<br />en toute simplicité
+          {{ t("hero.title") }}
         </h1>
         <p class="hero-subtitle">
-          Des centaines de véhicules disponibles partout en France
+          {{ t("hero.subtitle") }}
         </p>
         <BookingWidget />
       </div>
@@ -53,9 +53,9 @@
     </section>
 
     <!-- Avantages -->
-    <section class="features">
+    <section class="features" id="about">
       <div class="container">
-        <h2 class="section-title">Pourquoi choisir AutoLoc ?</h2>
+        <h2 class="section-title">{{ t("features.title") }}</h2>
         <div class="features-grid">
           <div class="feature-card" v-for="feat in features" :key="feat.title">
             <div class="feat-icon-wrap" v-html="feat.svg"></div>
@@ -69,107 +69,21 @@
     <!-- Flotte -->
     <section class="fleet" id="fleet">
       <div class="container">
-        <h2 class="section-title">Notre flotte</h2>
-        <div v-if="vehicleStore.loading" class="fleet-loading">
-          Chargement des véhicules...
+        <h2 class="section-title">{{ t("fleet.title") }}</h2>
+        <div v-if="vehicleStore.loading" class="fleet-grid">
+          <VehicleCardSkeleton v-for="n in 6" :key="n" />
         </div>
         <div v-else-if="vehicles.length === 0" class="fleet-empty">
-          Aucun véhicule disponible pour le moment.
+          {{ t("fleet.empty") }}
         </div>
         <div class="fleet-grid" v-else>
-          <div class="vehicle-card" v-for="v in vehicles" :key="v.id">
-            <div class="vehicle-img-wrapper">
-              <img
-                :src="v.photoURL"
-                :alt="`${v.marque} ${v.modele}`"
-                class="vehicle-img"
-              />
-              <span
-                :class="[
-                  'dispo-badge',
-                  !v.disponible
-                    ? 'dispo-badge--off'
-                    : isDateBlocked(v.id)
-                      ? 'dispo-badge--reserved'
-                      : 'dispo-badge--on',
-                ]"
-              >
-                {{
-                  !v.disponible
-                    ? "Indisponible"
-                    : isDateBlocked(v.id)
-                      ? "Réservé"
-                      : "Disponible"
-                }}
-              </span>
-            </div>
-            <div class="vehicle-info">
-              <h3>{{ v.marque }} {{ v.modele }}</h3>
-              <div class="vehicle-tags">
-                <span class="tag">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                  </svg>
-                  {{ v.carburant }}
-                </span>
-                <span class="tag">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                  {{ v.places }} places
-                </span>
-                <span class="tag tag--price">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <line x1="12" y1="1" x2="12" y2="23" />
-                    <path
-                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                    />
-                  </svg>
-                  {{ v.prix }}€/jour
-                </span>
-              </div>
-              <button
-                class="btn-reserve"
-                :disabled="!v.disponible || isDateBlocked(v.id)"
-                @click="openReservation(v)"
-              >
-                {{
-                  !v.disponible
-                    ? "Indisponible"
-                    : isDateBlocked(v.id)
-                      ? "Déjà réservé"
-                      : "Réserver"
-                }}
-              </button>
-            </div>
-          </div>
+          <VehicleCard
+            v-for="v in vehicles"
+            :key="v.id"
+            :vehicle="v"
+            :isBlocked="isDateBlocked(v.id)"
+            @reserve="openReservation"
+          />
         </div>
       </div>
     </section>
@@ -183,7 +97,7 @@
     <!-- Testimonials -->
     <section class="testimonials">
       <div class="container">
-        <h2 class="section-title">Ce que disent nos clients</h2>
+        <h2 class="section-title">{{ t("testimonials.title") }}</h2>
         <div class="testimonials-grid">
           <div class="testimonial-card" v-for="t in testimonials" :key="t.name">
             <div class="stars">
@@ -212,14 +126,52 @@
       </div>
     </section>
 
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <div class="faq-header">
+          <h2 class="section-title">{{ t("faqSection.title") }}</h2>
+          <p class="faq-subtitle">{{ t("faqSection.subtitle") }}</p>
+        </div>
+        <div class="faq-list">
+          <div
+            v-for="(item, index) in faqItems"
+            :key="index"
+            class="faq-item"
+            :class="{ open: openFaq === index }"
+            @click="openFaq = openFaq === index ? null : index"
+          >
+            <div class="faq-question">
+              <span>{{ item.q }}</span>
+              <svg
+                class="faq-chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polyline
+                  points="6 9 12 15 18 9"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>{{ item.a }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section class="cta">
       <div class="container">
-        <h2>Prêt à prendre la route ?</h2>
-        <p>Réservez en ligne en moins de 2 minutes, sans frais cachés.</p>
-        <RouterLink to="/fleet" class="btn-cta"
-          >Voir tous nos véhicules</RouterLink
-        >
+        <h2>{{ t("cta.title") }}</h2>
+        <p>{{ t("cta.desc") }}</p>
+        <RouterLink to="/fleet" class="btn-cta">{{ t("cta.btn") }}</RouterLink>
       </div>
     </section>
   </div>
@@ -228,13 +180,17 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import BookingWidget from "../components/BookingWidget.vue";
 import ReservationModal from "../components/ReservationModal.vue";
+import VehicleCard from "../components/VehicleCard.vue";
+import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
 import { userAuthStore } from "../store/userAuth.js";
 
+const { t, tm } = useI18n();
 const router = useRouter();
 const vehicles = computed(() => vehicleStore.vehicles);
 
@@ -267,75 +223,70 @@ function openReservation(vehicle) {
   selectedVehicle.value = vehicle;
 }
 
-const trustItems = [
+const trustItems = computed(() => [
   {
-    label: "Paiement 100% sécurisé",
+    label: t("trustStrip.securePayment"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
   },
   {
-    label: "Assurance tous risques incluse",
+    label: t("trustStrip.insurance"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
   },
   {
-    label: "Sans frais cachés",
+    label: t("trustStrip.noFees"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
   },
   {
-    label: "Support 7j/7",
+    label: t("trustStrip.support"),
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
   },
-];
+]);
 
-const stats = [
-  { number: "500+", label: "Clients satisfaits" },
-  { number: "50+", label: "Véhicules disponibles" },
-  { number: "15 ans", label: "D'expérience" },
-  { number: "4.9 / 5", label: "Note moyenne" },
-];
+const stats = computed(() => [
+  {
+    number: t("statsSection.clients.number"),
+    label: t("statsSection.clients.label"),
+  },
+  {
+    number: t("statsSection.vehicles.number"),
+    label: t("statsSection.vehicles.label"),
+  },
+  {
+    number: t("statsSection.experience.number"),
+    label: t("statsSection.experience.label"),
+  },
+  {
+    number: t("statsSection.rating.number"),
+    label: t("statsSection.rating.label"),
+  },
+]);
 
-const features = [
+const features = computed(() => [
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    title: "Réservation instantanée",
-    desc: "Confirmez votre réservation en quelques clics, 24h/24 et 7j/7.",
+    title: t("featuresSection[0].title"),
+    desc: t("featuresSection[0].desc"),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6"/></svg>`,
-    title: "Large choix de véhicules",
-    desc: "Citadines, SUV, électriques, utilitaires — nous avons le véhicule qu'il vous faut.",
+    title: t("featuresSection[1].title"),
+    desc: t("featuresSection[1].desc"),
   },
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-    title: "Prix transparents",
-    desc: "Aucun frais caché. Le prix affiché est le prix payé.",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h12M19 6.5C17.5 4.5 15.3 3.5 13 3.5C8.9 3.5 5.5 7.1 5.5 12s3.4 8.5 7.5 8.5c2.3 0 4.5-1 6-3"/></svg>`,
+    title: t("featuresSection[2].title"),
+    desc: t("featuresSection[2].desc"),
   },
   {
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-    title: "Assurance incluse",
-    desc: "Tous nos véhicules sont couverts par une assurance tous risques.",
+    title: t("featuresSection[3].title"),
+    desc: t("featuresSection[3].desc"),
   },
-];
+]);
 
-const testimonials = [
-  {
-    text: "Service impeccable, véhicule en parfait état. La réservation en ligne est très simple et le prix était exactement celui annoncé.",
-    name: "Sophie M.",
-    initials: "SM",
-    city: "Paris",
-  },
-  {
-    text: "J'utilise AutoLoc pour mes déplacements professionnels depuis 3 ans. Fiabilité et professionnalisme au rendez-vous à chaque fois.",
-    name: "Thomas B.",
-    initials: "TB",
-    city: "Lyon",
-  },
-  {
-    text: "Très bonne expérience. Véhicule propre, dépôt rapide et personnel accueillant. Je recommande vivement !",
-    name: "Marie L.",
-    initials: "ML",
-    city: "Bordeaux",
-  },
-];
+const testimonials = computed(() => tm("testimonialsData"));
+const faqItems = computed(() => tm("faqSection.items"));
+const openFaq = ref(0);
 </script>
 
 <style scoped>
@@ -539,97 +490,6 @@ const testimonials = [
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
-.vehicle-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s;
-}
-.vehicle-card:hover {
-  transform: translateY(-4px);
-}
-.vehicle-img-wrapper {
-  position: relative;
-}
-.vehicle-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  display: block;
-}
-.dispo-badge {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-.dispo-badge--on {
-  background: rgba(46, 125, 50, 0.9);
-  color: #fff;
-}
-.dispo-badge--off {
-  background: rgba(198, 40, 40, 0.85);
-  color: #fff;
-}
-.dispo-badge--reserved {
-  background: rgba(37, 99, 235, 0.85);
-  color: #fff;
-}
-.vehicle-info {
-  padding: 1.2rem;
-}
-.vehicle-info h3 {
-  margin: 0 0 0.6rem;
-  color: #1a1a2e;
-  font-size: 1.05rem;
-}
-.vehicle-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-.tag {
-  background: #f0f4ff;
-  color: #1a1a2e;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.tag svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-}
-.tag--price {
-  background: #fff3e0;
-  color: #e65100;
-}
-.btn-reserve {
-  width: 100%;
-  background: #e63946;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-reserve:hover:not(:disabled) {
-  background: #c1121f;
-}
-.btn-reserve:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
 
 /* Hero Badge */
 .hero-badge {
@@ -771,6 +631,99 @@ const testimonials = [
 .author-info span {
   font-size: 0.8rem;
   color: #888;
+}
+
+/* FAQ */
+.faq {
+  padding: 5rem 0;
+  background: #fff;
+}
+.faq-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.faq-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin-top: -1.5rem;
+}
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.faq-item {
+  border: 1px solid #e8ecf5;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.faq-item:hover {
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.08);
+  border-color: #e63946;
+}
+.faq-item.open {
+  border-color: #e63946;
+  box-shadow: 0 4px 20px rgba(230, 57, 70, 0.1);
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: #1a1a2e;
+  user-select: none;
+  gap: 1rem;
+}
+.faq-chevron {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #e63946;
+  transition: transform 0.25s;
+}
+.faq-item.open .faq-chevron {
+  transform: rotate(180deg);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    padding 0.3s ease;
+  padding: 0 1.5rem;
+}
+.faq-item.open .faq-answer {
+  max-height: 300px;
+  padding: 0 1.5rem 1.25rem;
+}
+.faq-answer p {
+  color: #555;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .faq {
+    padding: 3rem 0;
+  }
+  .faq-question {
+    font-size: 0.9rem;
+    padding: 1rem 1.1rem;
+  }
+  .faq-answer {
+    padding: 0 1.1rem;
+  }
+  .faq-item.open .faq-answer {
+    padding: 0 1.1rem 1rem;
+  }
 }
 
 /* CTA */
