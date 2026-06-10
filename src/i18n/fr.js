@@ -78,8 +78,19 @@ export default {
     subtitle: "Du {start} au {end} — {location}",
     loading: "Chargement des véhicules...",
     empty: "Aucun véhicule disponible pour les dates sélectionnées.",
+    emptyFiltered: "Aucun véhicule ne correspond à vos filtres.",
     available: "Disponible",
     book: "Réserver",
+    filters: {
+      fuel: "Carburant",
+      anyFuel: "Tous les carburants",
+      seats: "Nombre de places",
+      anySeats: "Toutes capacités",
+      seatsAtLeast: "{n}+ places",
+      maxPrice: "Prix maximum / jour",
+      reset: "Réinitialiser les filtres",
+      results: "{count} véhicule(s) trouvé(s)",
+    },
   },
 
   testimonials: {
