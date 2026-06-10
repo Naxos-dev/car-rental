@@ -1,0 +1,409 @@
+export default {
+  nav: {
+    home: "Home",
+    fleet: "Our Fleet",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    myAccount: "My account",
+    logout: "Log out",
+    login: "Log in",
+  },
+
+  hero: {
+    badge: "Trusted partner since 2010",
+    title: "Rent your vehicle with ease",
+    subtitle: "Hundreds of vehicles available across France",
+  },
+
+  trust: {
+    freeCancel: "Free cancellation",
+    assistance: "24/7 assistance",
+    insurance: "Insurance included",
+    noFees: "No hidden fees",
+  },
+
+  stats: {
+    vehicles: "Available vehicles",
+    cities: "Cities covered",
+    clients: "Satisfied customers",
+    years: "Years of experience",
+  },
+
+  features: {
+    title: "Why choose AutoLoc?",
+    booking: {
+      title: "Online booking",
+      desc: "Book your vehicle in a few clicks, 24/7.",
+    },
+    prices: {
+      title: "Best prices guaranteed",
+      desc: "Transparent pricing with no hidden fees or surprises.",
+    },
+    fleet: {
+      title: "Wide range of vehicles",
+      desc: "From city cars to SUVs, utility vehicles and electric cars.",
+    },
+    support: {
+      title: "Responsive customer support",
+      desc: "Our team is available 7 days a week to assist you.",
+    },
+  },
+
+  fleet: {
+    title: "Our Fleet",
+    loading: "Loading vehicles...",
+    empty: "No vehicles available at the moment.",
+    available: "Available",
+    reserved: "Reserved",
+    unavailable: "Unavailable",
+    alreadyReserved: "Already reserved",
+    book: "Book",
+    seats: "{n} seats",
+    perDay: "€/day",
+  },
+
+  fuel: {
+    Essence: "Petrol",
+    Diesel: "Diesel",
+    Électrique: "Electric",
+    Electrique: "Electric",
+    Hybride: "Hybrid",
+    "Hybride rechargeable": "Plug-in Hybrid",
+    GPL: "LPG",
+  },
+
+  fleetPage: {
+    back: "← Back",
+    title: "Available vehicles",
+    subtitle: "From {start} to {end} — {location}",
+    loading: "Loading vehicles...",
+    empty: "No vehicles available for the selected dates.",
+    emptyFiltered: "No vehicle matches your current filters.",
+    available: "Available",
+    book: "Book",
+    filters: {
+      fuel: "Fuel type",
+      anyFuel: "All fuel types",
+      seats: "Seats",
+      anySeats: "Any capacity",
+      seatsAtLeast: "{n}+ seats",
+      maxPrice: "Maximum price / day",
+      reset: "Reset filters",
+      results: "{count} vehicle(s) found",
+    },
+  },
+
+  testimonials: {
+    title: "What our customers say",
+  },
+
+  cta: {
+    title: "Ready to hit the road?",
+    desc: "Book online in less than 2 minutes, no hidden fees.",
+    btn: "See all our vehicles",
+  },
+
+  booking: {
+    title: "Book your vehicle",
+    location: "Pick-up location",
+    startDate: "Start date",
+    startTime: "Start time",
+    endDate: "End date",
+    endTime: "End time",
+    search: "See available vehicles ↓",
+  },
+
+  modal: {
+    reservationDetails: "Reservation details",
+    clientInfo: "Your information",
+    location: "Pick-up location",
+    startDate: "Start date",
+    startTime: "Start time",
+    endDate: "End date",
+    endTime: "End time",
+    firstName: "First name *",
+    lastName: "Last name *",
+    email: "Email *",
+    phone: "Phone",
+    firstNamePlaceholder: "John",
+    lastNamePlaceholder: "Smith",
+    emailPlaceholder: "john{'@'}example.com",
+    phonePlaceholder: "+44 7700 900123",
+    days: "{n} day | {n} days",
+    total: "Estimated total",
+    proceed: "Proceed to payment",
+    loginRequired: "You must be logged in to book.",
+    loginBtn: "Log in",
+    close: "Close",
+  },
+
+  searchBanner: {
+    cancel: "Cancel",
+    update: "Update",
+    startDate: "Start date",
+    startTime: "Start time",
+    endDate: "End date",
+    endTime: "End time",
+  },
+
+  auth: {
+    backHome: "← Back to home",
+    login: "Log in",
+    register: "Create account",
+    email: "Email",
+    password: "Password",
+    passwordPlaceholder: "••••••••",
+    passwordHint: "At least 6 characters",
+    firstName: "First name",
+    lastName: "Last name",
+    firstNamePlaceholder: "John",
+    lastNamePlaceholder: "Smith",
+    emailPlaceholder: "john{'@'}example.com",
+    loggingIn: "Logging in...",
+    registering: "Creating account...",
+    registerBtn: "Create my account",
+  },
+
+  account: {
+    title: "My account",
+    logout: "Log out",
+    reservations: "My reservations",
+    settings: "Settings",
+    loading: "Loading...",
+    noReservations: "You have no reservations yet.",
+    seeVehicles: "See vehicles →",
+    updateEmail: "Update email",
+    currentEmail: "Current email:",
+    newEmail: "New email",
+    newEmailPlaceholder: "new{'@'}example.com",
+    currentPassword: "Current password",
+    currentPasswordPlaceholder: "To confirm your identity",
+    updating: "Updating...",
+    updateEmailBtn: "Update email",
+    changePassword: "Change password",
+    newPassword: "New password",
+    newPasswordPlaceholder: "At least 6 characters",
+    confirmPassword: "Confirm password",
+    confirmPasswordPlaceholder: "Same as new password",
+    changePasswordBtn: "Change password",
+    profile: "Profile",
+    profileFirstName: "First name",
+    profileLastName: "Last name",
+    saveProfile: "Save",
+    saving: "Saving...",
+  },
+
+  checkout: {
+    title: "Reservation summary",
+    vehicle: "Selected vehicle",
+    reservationDetails: "Reservation details",
+    location: "Location",
+    start: "Start",
+    end: "End",
+    duration: "Duration",
+    day: "day",
+    days: "days",
+    clientInfo: "Your information",
+    name: "Name",
+    email: "Email",
+    phone: "Phone",
+    total: "Total incl. tax",
+    pay: "Pay {total}€ with Stripe",
+    paying: "Redirecting...",
+    payError: "Payment error",
+    secure: "100% secure payment by Stripe",
+    back: "← Edit reservation",
+  },
+
+  success: {
+    title: "Payment confirmed!",
+    desc: "Your reservation has been recorded. A summary will be sent to",
+    backHome: "← Back to home",
+  },
+
+  footer: {
+    tagline: "Your car rental partner since 2010.",
+    services: "Services",
+    shortRental: "Short-term rental",
+    longRental: "Long-term rental",
+    utility: "Utility vehicles",
+    electric: "Electric vehicles",
+    info: "Information",
+    about: "About us",
+    terms: "Terms & conditions",
+    privacy: "Privacy policy",
+    faq: "FAQ",
+    contact: "Contact",
+    ssl: "SSL secured website",
+    dataProtected: "Data protected",
+    paymentLabel: "Accepted payments:",
+    rights: "All rights reserved",
+  },
+
+  legal: {
+    backHome: "Back to home",
+    lastUpdated: "Last updated",
+    terms: {
+      title: "Terms and Conditions of Use",
+      s1: {
+        title: "Purpose",
+        content:
+          "These Terms and Conditions of Use govern access to and use of the AutoLoc website and vehicle rental services. By using our site, you unreservedly accept these Terms.",
+      },
+      s2: {
+        title: "Access to the service",
+        content:
+          "Access to the rental service is reserved for adults (18 years or older) holding a valid driving licence. AutoLoc reserves the right to refuse access to any person who does not meet these conditions.",
+      },
+      s3: {
+        title: "Booking and payment",
+        content:
+          "All bookings are subject to vehicle availability and full payment of the amount due at the time of confirmation. Payment is secured via Stripe. The booking is confirmed by email after payment validation.",
+      },
+      s4: {
+        title: "Cancellation and refund",
+        content:
+          "Any cancellation made more than 48 hours before the start of the rental will be fully refunded. Within this period, no refund will be made. Cancellation requests must be sent by email to contact{'@'}autoloc.fr.",
+      },
+      s5: {
+        title: "Tenant responsibility",
+        content:
+          "The tenant agrees to use the vehicle with care and in compliance with road traffic regulations. They are responsible for any damage caused to the vehicle during the rental period, within the limits provided by the included insurance contract.",
+      },
+      s6: {
+        title: "Applicable law",
+        content:
+          "These Terms are governed by French law. In the event of a dispute, the competent courts of the Paris jurisdiction shall have exclusive jurisdiction.",
+      },
+    },
+    privacy: {
+      title: "Privacy Policy",
+      s1: {
+        title: "Data controller",
+        content:
+          "AutoLoc, headquartered at 12 rue de la Paix, Paris, is responsible for processing personal data collected through this website.",
+      },
+      s2: {
+        title: "Data collected",
+        content:
+          "When using the service, we collect the following data: first name, last name, email address, phone number, payment data (processed exclusively by Stripe), as well as browsing data (cookies, IP address).",
+      },
+      s3: {
+        title: "Processing purposes",
+        content:
+          "Your data is used for: managing bookings and payments, communication relating to your rentals, improving our services, and complying with our legal obligations.",
+      },
+      s4: {
+        title: "Data retention",
+        content:
+          "Your personal data is retained for the duration necessary for the performance of the contract, plus the applicable legal limitation periods (5 years for contractual data).",
+      },
+      s5: {
+        title: "Your rights",
+        content:
+          "In accordance with the GDPR, you have the right to access, rectify, erase, restrict, port and object to your data. To exercise these rights, contact us at: contact{'@'}autoloc.fr.",
+      },
+      s6: {
+        title: "Cookies",
+        content:
+          "Our site uses cookies strictly necessary for its operation (authentication, session) and anonymised analytical cookies. You can disable them in your browser settings.",
+      },
+    },
+  },
+
+  faqSection: {
+    title: "Frequently asked questions",
+    subtitle: "Everything you need to know before booking",
+    items: [
+      {
+        q: "How do I book a vehicle?",
+        a: "It's simple: select your dates and pick-up location in the booking widget, choose the vehicle that suits you, then confirm in a few clicks. A confirmation is sent instantly by email.",
+      },
+      {
+        q: "What documents do I need?",
+        a: "All you need is a valid driving licence (category B minimum), a photo ID and a payment method. No cash deposit is required — everything is handled securely online.",
+      },
+      {
+        q: "Is insurance included in the price?",
+        a: "Yes, every rental includes comprehensive insurance. You set off with complete peace of mind, with no extra charges or surprises.",
+      },
+      {
+        q: "Can I cancel or modify my booking?",
+        a: "Any cancellation made more than 48 hours before the rental start is fully refunded. You can also modify your dates by contacting our customer service, subject to availability.",
+      },
+      {
+        q: "How does payment work?",
+        a: "Payment is made online via Stripe, a PCI-DSS certified platform. Visa, Mastercard and major bank cards are accepted. No banking data is stored on our servers.",
+      },
+      {
+        q: "Are there any hidden fees?",
+        a: "No. The displayed price is the final all-inclusive price (insurance, assistance, VAT). We believe in full transparency: no unpleasant surprises at signing.",
+      },
+      {
+        q: "What should I do in case of a breakdown or accident?",
+        a: "Our assistance is available 24/7. A dedicated number is provided when you pick up the keys. In the event of an incident, we take care of everything: roadside assistance, replacement vehicle, and paperwork.",
+      },
+    ],
+  },
+
+  trustStrip: {
+    securePayment: "100% secure payment",
+    insurance: "Comprehensive insurance included",
+    noFees: "No hidden fees",
+    support: "7/7 support",
+  },
+
+  statsSection: {
+    clients: { number: "500+", label: "Satisfied customers" },
+    vehicles: { number: "50+", label: "Available vehicles" },
+    experience: { number: "15 years", label: "Of experience" },
+    rating: { number: "4.9 / 5", label: "Average rating" },
+  },
+
+  featuresSection: [
+    {
+      title: "Instant booking",
+      desc: "Confirm your reservation in a few clicks, 24/7.",
+    },
+    {
+      title: "Wide range of vehicles",
+      desc: "City cars, SUVs, electric, utility — we have the vehicle you need.",
+    },
+    {
+      title: "Transparent pricing",
+      desc: "No hidden fees. The displayed price is the price you pay.",
+    },
+    {
+      title: "Insurance included",
+      desc: "All our vehicles are covered by comprehensive insurance.",
+    },
+  ],
+
+  testimonialsData: [
+    {
+      text: "Impeccable service, vehicle in perfect condition. Online booking is very simple and the price was exactly as advertised.",
+      name: "Sophie M.",
+      initials: "SM",
+      city: "Paris",
+    },
+    {
+      text: "I've been using AutoLoc for my business trips for 3 years. Reliability and professionalism every single time.",
+      name: "Thomas B.",
+      initials: "TB",
+      city: "Lyon",
+    },
+    {
+      text: "Great experience. Clean vehicle, quick drop-off and welcoming staff. Highly recommended!",
+      name: "Marie L.",
+      initials: "ML",
+      city: "Bordeaux",
+    },
+  ],
+
+  statusLabels: {
+    en_attente: "Pending",
+    confirmee: "Confirmed",
+    payee: "Paid",
+    annulee: "Cancelled",
+  },
+};
