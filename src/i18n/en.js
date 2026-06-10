@@ -78,8 +78,19 @@ export default {
     subtitle: "From {start} to {end} — {location}",
     loading: "Loading vehicles...",
     empty: "No vehicles available for the selected dates.",
+    emptyFiltered: "No vehicle matches your current filters.",
     available: "Available",
     book: "Book",
+    filters: {
+      fuel: "Fuel type",
+      anyFuel: "All fuel types",
+      seats: "Seats",
+      anySeats: "Any capacity",
+      seatsAtLeast: "{n}+ seats",
+      maxPrice: "Maximum price / day",
+      reset: "Reset filters",
+      results: "{count} vehicle(s) found",
+    },
   },
 
   testimonials: {
