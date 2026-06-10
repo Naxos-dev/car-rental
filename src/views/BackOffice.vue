@@ -1,7 +1,21 @@
 <template>
   <div class="backoffice">
     <div class="container">
-      <h1 class="page-title">🔧 Back-office — AutoLoc</h1>
+      <h1 class="page-title">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+          />
+        </svg>
+        Back-office — AutoLoc
+      </h1>
 
       <!-- Onglets -->
       <div class="tabs">
@@ -9,14 +23,41 @@
           :class="['tab', { active: activeTab === 'vehicles' }]"
           @click="activeTab = 'vehicles'"
         >
-          🚗 Véhicules
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
+            />
+            <circle cx="7" cy="17" r="2" />
+            <circle cx="17" cy="17" r="2" />
+          </svg>
+          Véhicules
         </button>
         <button
           :class="['tab', { active: activeTab === 'reservations' }]"
           @click="activeTab = 'reservations'"
         >
-          📋 Réservations
-          <span v-if="pendingCount" class="tab-badge">{{ pendingCount }}</span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 11l3 3L22 4" />
+            <path
+              d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+            />
+          </svg>
+          Réservations
         </button>
       </div>
 
@@ -45,7 +86,19 @@
                   class="photo-preview-img"
                 />
                 <div v-else class="file-placeholder">
-                  <span>📸</span><span>Cliquer pour ajouter une photo</span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                  <span>Cliquer pour ajouter une photo</span>
                 </div>
               </div>
             </div>
@@ -122,9 +175,47 @@
                 Annuler
               </button>
               <button type="submit" class="btn-submit" :disabled="saving">
-                <span v-if="saving">⏳ Enregistrement...</span>
-                <span v-else-if="editingId">💾 Sauvegarder</span>
-                <span v-else>➕ Ajouter le véhicule</span>
+                <svg
+                  v-if="saving"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="icon-spin"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <svg
+                  v-else-if="editingId"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                <svg
+                  v-else
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span v-if="saving">Enregistrement...</span>
+                <span v-else-if="editingId">Sauvegarder</span>
+                <span v-else>Ajouter le véhicule</span>
               </button>
             </div>
           </form>
@@ -172,11 +263,27 @@
                       v.carburant
                     }}</span>
                   </td>
-                  <td>👥 {{ v.places }}</td>
+                  <td class="td-center">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="inline-icon"
+                    >
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    {{ v.places }}
+                  </td>
                   <td>
                     <strong>{{ v.prix ?? "—" }}€</strong>
                   </td>
-                  <td>
+                  <td class="td-center">
                     <button
                       :class="[
                         'btn-toggle',
@@ -184,15 +291,75 @@
                       ]"
                       @click="vehicleStore.toggleDisponible(v.id, v.disponible)"
                     >
-                      {{ v.disponible ? "✅ Disponible" : "🔴 Indisponible" }}
+                      <svg
+                        v-if="v.disponible"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                      <svg
+                        v-else
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="15" y1="9" x2="9" y2="15" />
+                        <line x1="9" y1="9" x2="15" y2="15" />
+                      </svg>
+                      {{ v.disponible ? "Disponible" : "Indisponible" }}
                     </button>
                   </td>
-                  <td class="actions">
+                  <td class="actions td-center">
                     <button class="btn-edit" @click="editVehicle(v)">
-                      ✏️ Modifier
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <path
+                          d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                        />
+                        <path
+                          d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                        />
+                      </svg>
+                      Modifier
                     </button>
                     <button class="btn-delete" @click="deleteVehicle(v.id)">
-                      🗑️ Supprimer
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path
+                          d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                        />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                      Supprimer
                     </button>
                   </td>
                 </tr>
@@ -210,13 +377,43 @@
             :class="['vt-btn', { active: reservationsView === 'list' }]"
             @click="reservationsView = 'list'"
           >
-            ☰ Liste
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="inline-icon"
+            >
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            Liste
           </button>
           <button
             :class="['vt-btn', { active: reservationsView === 'calendar' }]"
             @click="reservationsView = 'calendar'"
           >
-            📅 Calendrier
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="inline-icon"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Calendrier
           </button>
         </div>
 
@@ -224,14 +421,6 @@
           <div class="stat-card">
             <span class="stat-num">{{ reservations.length }}</span
             ><span class="stat-label">Total</span>
-          </div>
-          <div class="stat-card stat-card--yellow">
-            <span class="stat-num">{{ pendingCount }}</span
-            ><span class="stat-label">En attente</span>
-          </div>
-          <div class="stat-card stat-card--blue">
-            <span class="stat-num">{{ paidCount }}</span
-            ><span class="stat-label">Payées</span>
           </div>
           <div class="stat-card stat-card--green">
             <span class="stat-num">{{ confirmedCount }}</span
@@ -262,6 +451,7 @@
                   <th>Véhicule</th>
                   <th>Lieu / Période</th>
                   <th>Statut</th>
+                  <th class="th-center">Détail</th>
                 </tr>
               </thead>
               <tbody>
@@ -282,7 +472,22 @@
                   </td>
                   <td>{{ r.vehicleLabel }}</td>
                   <td>
-                    <span class="location-label">📍 {{ r.location }}</span
+                    <span class="location-label">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <path
+                          d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                        />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {{ r.location }}</span
                     ><br />
                     <span class="date-range"
                       >{{ r.startDate }} {{ r.startTime }} → {{ r.endDate }}
@@ -297,11 +502,30 @@
                         reservationStore.updateStatut(r.id, $event.target.value)
                       "
                     >
-                      <option value="en_attente">⏳ En attente</option>
-                      <option value="payee">💳 Payée</option>
-                      <option value="confirmee">✅ Confirmée</option>
-                      <option value="annulee">❌ Annulée</option>
+                      <option value="confirmee">Confirmée</option>
+                      <option value="annulee">Annulée</option>
                     </select>
+                  </td>
+                  <td class="td-center">
+                    <button
+                      class="btn-detail"
+                      @click="openDetail(r)"
+                      title="Voir les détails"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -312,9 +536,6 @@
         <!-- Vue calendrier -->
         <div v-if="reservationsView === 'calendar'" class="calendar-wrapper">
           <div class="calendar-legend">
-            <span class="legend-dot" style="background: #f59e0b"></span> En
-            attente
-            <span class="legend-dot" style="background: #3b82f6"></span> Payée
             <span class="legend-dot" style="background: #22c55e"></span>
             Confirmée
             <span class="legend-dot" style="background: #9ca3af"></span> Annulée
@@ -326,6 +547,13 @@
         </div>
       </div>
     </div>
+
+    <ReservationDetailModal
+      v-if="detailReservation"
+      :reservation="detailReservation"
+      :visible="showDetailModal"
+      @close="showDetailModal = false"
+    />
   </div>
 </template>
 
@@ -333,6 +561,7 @@
 import { reactive, ref, computed } from "vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
+import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import frLocale from "@fullcalendar/core/locales/fr";
@@ -340,12 +569,6 @@ import frLocale from "@fullcalendar/core/locales/fr";
 const activeTab = ref("vehicles");
 const vehicles = computed(() => vehicleStore.vehicles);
 const reservations = computed(() => reservationStore.reservations);
-const pendingCount = computed(
-  () => reservations.value.filter((r) => r.statut === "en_attente").length,
-);
-const paidCount = computed(
-  () => reservations.value.filter((r) => r.statut === "payee").length,
-);
 const confirmedCount = computed(
   () => reservations.value.filter((r) => r.statut === "confirmee").length,
 );
@@ -447,6 +670,13 @@ function formatDate(ts) {
 
 // — Calendrier
 const reservationsView = ref("list");
+const detailReservation = ref(null);
+const showDetailModal = ref(false);
+
+function openDetail(r) {
+  detailReservation.value = r;
+  showDetailModal.value = true;
+}
 const STATUS_COLORS = {
   en_attente: "#f59e0b",
   payee: "#3b82f6",
@@ -497,6 +727,15 @@ const calendarOptions = computed(() => ({
   font-weight: 800;
   color: #1a1a2e;
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.page-title svg {
+  width: 28px;
+  height: 28px;
+  color: #e63946;
+  flex-shrink: 0;
 }
 
 /* Tabs */
@@ -517,9 +756,9 @@ const calendarOptions = computed(() => ({
   cursor: pointer;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   transition: color 0.2s;
 }
 .tab.active {
@@ -532,6 +771,12 @@ const calendarOptions = computed(() => ({
   border-radius: 20px;
   padding: 0.1rem 0.5rem;
   font-size: 0.75rem;
+}
+.tab svg,
+.vt-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 /* Stats */
@@ -653,8 +898,10 @@ select:focus {
   font-size: 0.9rem;
   padding: 2rem;
 }
-.file-placeholder span:first-child {
-  font-size: 2rem;
+.file-placeholder svg {
+  width: 40px;
+  height: 40px;
+  color: #aaa;
 }
 .photo-preview-img {
   width: 100%;
@@ -676,9 +923,17 @@ select:focus {
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .btn-submit:hover:not(:disabled) {
   background: #2d2d4e;
+}
+.btn-submit svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .btn-submit:disabled {
   background: #9e9e9e;
@@ -751,6 +1006,23 @@ select:focus {
   font-size: 0.82rem;
   color: #888;
 }
+.inline-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
 
 /* Tags */
 .tag {
@@ -789,6 +1061,9 @@ select:focus {
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .btn-toggle--on {
   background: #e8f5e9;
@@ -799,11 +1074,6 @@ select:focus {
   color: #c62828;
 }
 
-/* Actions */
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
 .btn-edit,
 .btn-delete {
   border: none;
@@ -813,6 +1083,9 @@ select:focus {
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .btn-edit {
   background: #e3f2fd;
@@ -877,6 +1150,33 @@ select:focus {
   background: #e8f5e9;
   color: #2e7d32;
 }
+.th-center {
+  text-align: center;
+}
+.td-center {
+  text-align: center;
+}
+.btn-detail {
+  background: #e8eaf6;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.btn-detail:hover {
+  background: #c5c9e8;
+}
+.btn-detail svg {
+  width: 16px;
+  height: 16px;
+}
+
 .statut--annulee {
   background: #fce4ec;
   color: #c62828;
@@ -902,6 +1202,9 @@ select:focus {
   color: #888;
   cursor: pointer;
   transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 .vt-btn.active {
   background: #1a1a2e;

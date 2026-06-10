@@ -1,0 +1,228 @@
+<template>
+  <Teleport to="body">
+    <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
+      <div class="modal-card">
+        <button
+          class="modal-close"
+          @click="$emit('close')"
+          aria-label="Fermer"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <div class="modal-header">
+          <h3>Détails de la réservation</h3>
+          <span :class="['statut-badge', `statut--${reservation.statut}`]">
+            {{ statutLabel }}
+          </span>
+        </div>
+
+        <!-- Véhicule -->
+        <div class="section">
+          <div class="section-label">Véhicule</div>
+          <div class="vehicle-summary">
+            <img
+              v-if="reservation.vehiclePhoto"
+              :src="reservation.vehiclePhoto"
+              :alt="reservation.vehicleLabel"
+              class="vehicle-thumb"
+            />
+            <div class="vehicle-summary-info">
+              <strong>{{ reservation.vehicleLabel }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates et lieu -->
+        <div class="section">
+          <div class="section-label">Dates et lieu</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Lieu</span>
+              <span class="info-value">{{ reservation.location }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Du</span>
+              <span class="info-value">{{ reservation.startDate }} {{ reservation.startTime }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Au</span>
+              <span class="info-value">{{ reservation.endDate }} {{ reservation.endTime }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client -->
+        <div class="section">
+          <div class="section-label">Client</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Nom</span>
+              <span class="info-value">{{ reservation.nom }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Email</span>
+              <a :href="`mailto:${reservation.email}`" class="info-link">{{ reservation.email }}</a>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Téléphone</span>
+              <span class="info-value">{{ reservation.telephone || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-close" @click="$emit('close')">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+</template>
+
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  reservation: { type: Object, required: true },
+  visible: { type: Boolean, required: true },
+});
+defineEmits(["close"]);
+
+const statutLabel = computed(() => {
+  const map = { confirmee: "Confirmée", annulee: "Annulée" };
+  return map[props.reservation.statut] ?? props.reservation.statut;
+});
+</script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.6);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+}
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: #e0e0e0; }
+.modal-close svg { width: 16px; height: 16px; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1a1a2e;
+}
+.statut-badge {
+  border-radius: 20px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.statut--confirmee { background: #e8f5e9; color: #2e7d32; }
+.statut--annulee { background: #fce4ec; color: #c62828; }
+
+.section { margin-bottom: 1.2rem; }
+.section-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+.vehicle-summary {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  background: #f8f9ff;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+.vehicle-thumb {
+  width: 80px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.vehicle-summary-info { font-size: 0.95rem; color: #1a1a2e; }
+
+.info-grid { display: flex; flex-direction: column; gap: 0.4rem; }
+.info-item { display: flex; gap: 0.8rem; align-items: baseline; }
+.info-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.info-value { font-size: 0.9rem; color: #1a1a2e; }
+.info-link { font-size: 0.9rem; color: #1565c0; text-decoration: none; }
+.info-link:hover { text-decoration: underline; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+.btn-close {
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-close:hover { background: #e0e0e0; }
+
+@media (max-width: 480px) {
+  .modal-card { padding: 1.25rem 1rem; border-radius: 14px; }
+  .modal-header { flex-direction: column; align-items: flex-start; }
+}
+</style>

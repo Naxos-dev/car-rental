@@ -18,11 +18,17 @@
               <div>
                 <strong class="vehicle-recap-name">{{ vehicleLabel }}</strong>
                 <div class="recap-tags">
-                  <span class="tag">⛽ {{ vehicle.carburant }}</span>
-                  <span class="tag">👥 {{ vehicle.places }} places</span>
-                  <span class="tag tag--price"
-                    >💶 {{ vehicle.prix }}€/jour</span
-                  >
+                  <span class="tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    {{ vehicle.carburant }}
+                  </span>
+                  <span class="tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    {{ vehicle.places }} places
+                  </span>
+                  <span class="tag tag--price">
+                    {{ vehicle.prix }}€/jour
+                  </span>
                 </div>
               </div>
             </div>
@@ -93,7 +99,10 @@
             <span v-else>{{ t("checkout.pay", { total: store.total }) }}</span>
           </button>
 
-          <p v-if="payError" class="pay-error">⚠️ {{ payError }}</p>
+          <p v-if="payError" class="pay-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pay-error-icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ payError }}
+          </p>
 
           <p class="secure-note">{{ t("checkout.secure") }}</p>
 
@@ -278,6 +287,14 @@ async function handlePay() {
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.tag-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 .tag--price {
   background: #fff3e0;
@@ -358,6 +375,15 @@ async function handlePay() {
   color: #c1121f;
   font-size: 0.88rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.pay-error-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .secure-note {
   font-size: 0.82rem;

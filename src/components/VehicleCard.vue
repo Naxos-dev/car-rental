@@ -104,12 +104,18 @@ const btnLabel = computed(() => {
 }
 .vehicle-img-wrapper {
   position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
 }
 .vehicle-img {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.3s;
+}
+.vehicle-card:hover .vehicle-img {
+  transform: scale(1.04);
 }
 .dispo-badge {
   position: absolute;

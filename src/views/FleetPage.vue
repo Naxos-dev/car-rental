@@ -257,8 +257,15 @@ function openReservation(vehicle) {
 }
 .filters-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.vehicle-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  transition: transform 0.2s;
 }
 .filter-field {
   display: flex;
@@ -327,30 +334,22 @@ function openReservation(vehicle) {
   gap: 1.5rem;
 }
 
-@media (max-width: 768px) {
-  .fleet-page {
-    padding: 2rem 0 4rem;
-  }
-  .page-title {
-    font-size: 1.5rem;
-  }
-  .filters-grid {
-    grid-template-columns: 1fr;
-  }
-  .filters-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
-  }
+@media (max-width: 1024px) {
   .fleet-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  .fleet-page {
+    padding: 1.5rem 0 4rem;
+  }
+  .page-title {
+    font-size: 1.4rem;
+  }
   .fleet-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 </style>

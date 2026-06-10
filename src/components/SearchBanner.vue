@@ -3,9 +3,9 @@
     <!-- Bandeau résumé -->
     <div class="search-banner" @click="toggleEdit">
       <div class="banner-info">
-        <span class="banner-location"
-          >📍 {{ searchStore.location || "Lille" }}</span
-        >
+        <span class="banner-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="banner-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          {{ searchStore.location || "Lille" }}</span>
         <span class="banner-dates">
           {{ formatDate(searchStore.startDate) }}
           <span class="sep">|</span>
@@ -162,6 +162,14 @@ function formatDate(dateStr) {
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.banner-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .banner-dates {
