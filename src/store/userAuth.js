@@ -9,8 +9,6 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
-  setPersistence,
-  browserSessionPersistence,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { setAdminRole } from "./auth.js";
@@ -29,7 +27,6 @@ export const userAuthStore = reactive({
     this.error = null;
     localStorage.setItem("authRole", "user");
     try {
-      await setPersistence(auth, browserSessionPersistence);
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       // Sauvegarder le profil dans Firestore
       await setDoc(doc(db, "users", cred.user.uid), { prenom, nom, email });
@@ -44,7 +41,6 @@ export const userAuthStore = reactive({
     this.error = null;
     localStorage.setItem("authRole", "user");
     try {
-      await setPersistence(auth, browserSessionPersistence);
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
       localStorage.removeItem("authRole");
