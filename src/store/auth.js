@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence,
 } from "firebase/auth";
 
 export const authStore = reactive({
@@ -23,6 +25,7 @@ export const authStore = reactive({
   async login(email, password) {
     this.error = null;
     try {
+      await setPersistence(auth, browserSessionPersistence);
       await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem("authRole", "admin");
       this._isAdmin = true;
