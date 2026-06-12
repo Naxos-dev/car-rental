@@ -37,9 +37,13 @@
           </div>
         </div>
 
-        <router-link to="/" class="btn-home">{{
-          t("success.backHome")
-        }}</router-link>
+        <router-link to="/" class="btn-home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="home-icon">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          {{ t("success.backHome") }}
+        </router-link>
       </div>
     </div>
   </div>
@@ -180,7 +184,9 @@ p {
   stroke: #555;
 }
 .btn-home {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   background: #e63946;
   color: #fff;
   text-decoration: none;
@@ -188,6 +194,11 @@ p {
   border-radius: 10px;
   font-weight: 700;
   transition: background 0.2s;
+}
+.home-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .btn-home:hover {
   background: #c1121f;

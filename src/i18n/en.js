@@ -110,7 +110,7 @@ export default {
     startTime: "Start time",
     endDate: "End date",
     endTime: "End time",
-    search: "See available vehicles ↓",
+    search: "See available vehicles",
   },
 
   modal: {
@@ -147,7 +147,7 @@ export default {
   },
 
   auth: {
-    backHome: "← Back to home",
+    backHome: "Back to home",
     login: "Log in",
     register: "Create account",
     email: "Email",
@@ -216,13 +216,13 @@ export default {
     paying: "Redirecting...",
     payError: "Payment error",
     secure: "100% secure payment by Stripe",
-    back: "← Edit reservation",
+    back: "Edit reservation",
   },
 
   success: {
     title: "Payment confirmed!",
     desc: "Your reservation has been recorded. A summary will be sent to",
-    backHome: "← Back to home",
+    backHome: "Back to home",
   },
 
   footer: {

@@ -95,6 +95,13 @@
           </div>
 
           <button class="btn-pay" :disabled="paying" @click="handlePay">
+            <svg v-if="!paying" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pay-icon">
+              <rect x="1" y="11" width="22" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pay-icon spin">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
             <span v-if="paying">{{ t("checkout.paying") }}</span>
             <span v-else>{{ t("checkout.pay", { total: store.total }) }}</span>
           </button>
@@ -104,9 +111,19 @@
             {{ payError }}
           </p>
 
-          <p class="secure-note">{{ t("checkout.secure") }}</p>
+          <p class="secure-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="secure-icon">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            {{ t("checkout.secure") }}
+          </p>
 
           <button class="btn-back" @click="router.back()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
             {{ t("checkout.back") }}
           </button>
         </div>
@@ -363,6 +380,21 @@ async function handlePay() {
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pay-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 0.8s linear infinite;
 }
 .btn-pay:hover:not(:disabled) {
   background: #c1121f;
@@ -389,6 +421,15 @@ async function handlePay() {
   font-size: 0.82rem;
   color: #888;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.secure-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 .btn-back {
   background: none;
@@ -397,6 +438,19 @@ async function handlePay() {
   font-size: 0.88rem;
   cursor: pointer;
   text-align: center;
-  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  transition: color 0.2s;
+}
+.btn-back:hover {
+  color: #1a1a2e;
+}
+.back-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 </style>

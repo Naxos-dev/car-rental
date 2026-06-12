@@ -7,14 +7,16 @@
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          stroke="#e63946"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
           <path
-            d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22"
-            stroke="#e63946"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
           />
+          <circle cx="7" cy="17" r="2" />
+          <circle cx="17" cy="17" r="2" />
         </svg>
         <span class="logo-text">AutoLoc</span>
       </RouterLink>
@@ -39,7 +41,11 @@
           t("nav.fleet")
         }}</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
-          ⚙️ Admin
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-admin-icon">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Admin
         </RouterLink>
 
         <!-- Boutons admin (back-office) -->
@@ -338,9 +344,17 @@ async function handleUserLogout() {
   font-weight: 600;
   font-size: 0.88rem;
   transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 .btn-admin:hover {
   opacity: 0.8;
+}
+.btn-admin-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 .btn-signin {
   background: linear-gradient(135deg, #667eea, #764ba2);

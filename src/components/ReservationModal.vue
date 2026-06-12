@@ -7,7 +7,10 @@
           @click="$emit('close')"
           :aria-label="t('modal.close')"
         >
-          ✕
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
         </button>
 
         <!-- Résumé véhicule -->
@@ -20,8 +23,24 @@
           <div class="vehicle-summary-info">
             <h3>{{ vehicle.marque }} {{ vehicle.modele }}</h3>
             <div class="vehicle-tags">
-              <span class="tag">⛽ {{ vehicle.carburant }}</span>
-              <span class="tag">👥 {{ vehicle.places }} places</span>
+              <span class="tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon">
+                  <path d="M3 22V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15"/>
+                  <path d="M3 22h10"/>
+                  <path d="M13 7h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V8l-3-3"/>
+                  <rect x="5" y="10" width="6" height="5" rx="1"/>
+                </svg>
+                {{ vehicle.carburant }}
+              </span>
+              <span class="tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                {{ vehicle.places }} places
+              </span>
             </div>
           </div>
         </div>
@@ -108,11 +127,20 @@
             </div>
           </div>
 
-          <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
+          <p v-if="errorMsg" class="error-msg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="msg-icon">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            {{ errorMsg }}
+          </p>
 
           <div v-if="success" class="success-msg">
-            ✅ Réservation enregistrée ! Un admin vous contactera pour
-            confirmer.
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="msg-icon">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Réservation enregistrée ! Un admin vous contactera pour confirmer.
           </div>
 
           <div class="modal-actions">
@@ -120,7 +148,11 @@
               {{ t("searchBanner.cancel") }}
             </button>
             <button type="submit" class="btn-confirm">
-              {{ t("modal.proceed") }} →
+              {{ t("modal.proceed") }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
             </button>
           </div>
         </form>
@@ -267,6 +299,14 @@ async function handleSubmit() {
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.tag-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 /* Form */
@@ -322,6 +362,9 @@ input:focus {
   border-radius: 8px;
   padding: 0.6rem 0.9rem;
   font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .success-msg {
   background: #e8f5e9;
@@ -330,6 +373,14 @@ input:focus {
   padding: 0.8rem 1rem;
   font-weight: 600;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.msg-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .modal-actions {
   display: flex;
@@ -360,6 +411,15 @@ input:focus {
   transition: background 0.2s;
   flex: 2;
   min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.btn-arrow {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 .btn-confirm:hover:not(:disabled) {
   background: #c1121f;

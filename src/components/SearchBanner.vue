@@ -52,7 +52,12 @@
         <form class="edit-form" @submit.prevent="applyChanges">
           <div class="edit-row">
             <div class="edit-field">
-              <label>{{ t("searchBanner.startDate") }}</label>
+              <label>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {{ t("searchBanner.startDate") }}
+              </label>
               <input
                 v-model="draft.startDate"
                 type="date"
@@ -61,13 +66,23 @@
               />
             </div>
             <div class="edit-field">
-              <label>{{ t("searchBanner.startTime") }}</label>
+              <label>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ t("searchBanner.startTime") }}
+              </label>
               <input v-model="draft.startTime" type="time" required />
             </div>
           </div>
           <div class="edit-row">
             <div class="edit-field">
-              <label>{{ t("searchBanner.endDate") }}</label>
+              <label>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {{ t("searchBanner.endDate") }}
+              </label>
               <input
                 v-model="draft.endDate"
                 type="date"
@@ -76,7 +91,12 @@
               />
             </div>
             <div class="edit-field">
-              <label>{{ t("searchBanner.endTime") }}</label>
+              <label>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ t("searchBanner.endTime") }}
+              </label>
               <input v-model="draft.endTime" type="time" required />
             </div>
           </div>
@@ -85,6 +105,9 @@
               {{ t("searchBanner.cancel") }}
             </button>
             <button type="submit" class="btn-apply">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="apply-icon">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
               {{ t("searchBanner.update") }}
             </button>
           </div>
@@ -242,6 +265,15 @@ function formatDate(dateStr) {
   font-size: 0.82rem;
   font-weight: 600;
   color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.label-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  stroke: #e63946;
 }
 
 .edit-field input {
@@ -291,6 +323,14 @@ function formatDate(dateStr) {
   font-size: 0.9rem;
   cursor: pointer;
   transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.apply-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .btn-apply:hover {

@@ -129,6 +129,10 @@
       </div>
 
       <button type="submit" class="btn-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
         {{ t("booking.search") }}
       </button>
     </form>
@@ -229,6 +233,15 @@ input[readonly] {
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.search-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
 }
 .btn-search:hover {
   background: #c1121f;

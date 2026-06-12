@@ -110,7 +110,7 @@ export default {
     startTime: "Heure de début",
     endDate: "Date de fin",
     endTime: "Heure de fin",
-    search: "Voir les véhicules disponibles ↓",
+    search: "Voir les véhicules disponibles",
   },
 
   modal: {
@@ -147,7 +147,7 @@ export default {
   },
 
   auth: {
-    backHome: "← Retour à l'accueil",
+    backHome: "Retour à l'accueil",
     login: "Se connecter",
     register: "Créer un compte",
     email: "Email",
@@ -216,13 +216,13 @@ export default {
     paying: "Redirection en cours...",
     payError: "Erreur de paiement",
     secure: "Paiement 100% sécurisé par Stripe",
-    back: "← Modifier la réservation",
+    back: "Modifier la réservation",
   },
 
   success: {
     title: "Paiement confirmé !",
     desc: "Votre réservation a bien été enregistrée. Un récapitulatif vous sera envoyé à",
-    backHome: "← Retour à l'accueil",
+    backHome: "Retour à l'accueil",
   },
 
   footer: {
