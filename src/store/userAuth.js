@@ -39,7 +39,6 @@ export const userAuthStore = reactive({
 
   async login(email, password) {
     this.error = null;
-    // Marquer comme session client (pas admin)
     localStorage.setItem("authRole", "user");
     try {
       await signInWithEmailAndPassword(auth, email, password);
