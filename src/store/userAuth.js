@@ -5,7 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateEmail,
+  verifyBeforeUpdateEmail,
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -63,7 +63,7 @@ export const userAuthStore = reactive({
         currentPassword,
       );
       await reauthenticateWithCredential(user, credential);
-      await updateEmail(user, newEmail);
+      await verifyBeforeUpdateEmail(user, newEmail);
     } catch (err) {
       this.error = mapAuthError(err.code);
       throw err;

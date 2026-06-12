@@ -243,7 +243,7 @@ async function handleUpdateEmail() {
   try {
     await userAuthStore.updateUserEmail(emailForm.newEmail, emailForm.password);
     emailMsg.ok = true;
-    emailMsg.text = "Email mis à jour avec succès.";
+    emailMsg.text = "Un lien de vérification a été envoyé à votre nouvel email. L'adresse sera mise à jour après confirmation.";
     emailForm.newEmail = "";
     emailForm.password = "";
   } catch {
