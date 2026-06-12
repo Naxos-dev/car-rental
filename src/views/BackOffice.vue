@@ -20,6 +20,25 @@
       <!-- Onglets -->
       <div class="tabs">
         <button
+          :class="['tab', { active: activeTab === 'reservations' }]"
+          @click="activeTab = 'reservations'"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 11l3 3L22 4" />
+            <path
+              d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+            />
+          </svg>
+          Réservations
+        </button>
+        <button
           :class="['tab', { active: activeTab === 'vehicles' }]"
           @click="activeTab = 'vehicles'"
         >
@@ -40,29 +59,284 @@
           </svg>
           Véhicules
         </button>
-        <button
-          :class="['tab', { active: activeTab === 'reservations' }]"
-          @click="activeTab = 'reservations'"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M9 11l3 3L22 4" />
-            <path
-              d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
-            />
-          </svg>
-          Réservations
-        </button>
       </div>
 
+      <!-- ════════════ RÉSERVATION EN AGENCE ════════════ -->
+      <section class="form-section agency-booking">
+        <div class="agency-booking-toggle" @click="showAgencyBooking = !showAgencyBooking">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Réservation en agence
+            <span class="badge-agency">Walk-in</span>
+          </h2>
+          <svg class="chevron" :class="{ open: showAgencyBooking }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <form v-if="showAgencyBooking" class="vehicle-form agency-form" @submit.prevent="handleAgencyBooking">
+          <!-- Étape 1 : période -->
+          <div class="field-row">
+            <div class="field">
+              <label for="ab-start">Date de début</label>
+              <input id="ab-start" v-model="agencyForm.startDate" type="date" required />
+            </div>
+            <div class="field">
+              <label for="ab-start-time">Heure de début</label>
+              <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
+            </div>
+            <div class="field">
+              <label for="ab-end">Date de fin</label>
+              <input id="ab-end" v-model="agencyForm.endDate" type="date" :min="agencyForm.startDate || undefined" required />
+            </div>
+            <div class="field">
+              <label for="ab-end-time">Heure de fin</label>
+              <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
+            </div>
+          </div>
+
+          <!-- Étape 2 : véhicule + lieu (affiché seulement quand les dates sont renseignées) -->
+          <template v-if="agencyForm.startDate && agencyForm.endDate">
+            <div v-if="availableVehicles.length === 0" class="no-vehicles-notice">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Aucun véhicule disponible sur cette période.
+            </div>
+            <div class="field-row" v-else>
+              <div class="field">
+                <label for="ab-vehicle">Véhicule disponible</label>
+                <select id="ab-vehicle" v-model="agencyForm.vehicleId" required>
+                  <option value="" disabled>Sélectionner un véhicule...</option>
+                  <option v-for="v in availableVehicles" :key="v.id" :value="v.id">
+                    {{ v.marque }} {{ v.modele }} — {{ v.prix }}€/j
+                  </option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ab-location">Lieu de retrait</label>
+                <input id="ab-location" v-model="agencyForm.location" type="text" placeholder="Ex: Paris Centre" required />
+              </div>
+            </div>
+
+            <!-- Étape 3 : infos client (affiché seulement quand un véhicule est choisi) -->
+            <template v-if="agencyForm.vehicleId">
+              <div class="field-row">
+                <div class="field">
+                  <label for="ab-nom">Nom du client</label>
+                  <input id="ab-nom" v-model="agencyForm.nom" type="text" placeholder="Prénom Nom" required />
+                </div>
+                <div class="field">
+                  <label for="ab-email">Email</label>
+                  <input id="ab-email" v-model="agencyForm.email" type="email" placeholder="client@email.com" required />
+                </div>
+                <div class="field">
+                  <label for="ab-tel">Téléphone</label>
+                  <input id="ab-tel" v-model="agencyForm.telephone" type="tel" placeholder="+33 6 00 00 00 00" required />
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn-cancel" @click="showAgencyBooking = false">Annuler</button>
+                <button type="submit" class="btn-submit" :disabled="agencyBookingSaving">
+                  <svg v-if="agencyBookingSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-spin">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                  </svg>
+                  <span>{{ agencyBookingSaving ? 'Enregistrement...' : 'Confirmer la réservation' }}</span>
+                </button>
+              </div>
+            </template>
+          </template>
+        </form>
+      </section>
+
+      <!-- ════════════ TAB RÉSERVATIONS ════════════ -->
+      <div v-if="activeTab === 'reservations'">
+        <!-- Toggle liste / calendrier -->
+        <div class="view-toggle">
+          <button
+            :class="['vt-btn', { active: reservationsView === 'list' }]"
+            @click="reservationsView = 'list'"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="inline-icon"
+            >
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            Liste
+          </button>
+          <button
+            :class="['vt-btn', { active: reservationsView === 'calendar' }]"
+            @click="reservationsView = 'calendar'"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="inline-icon"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Calendrier
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-num">{{ reservations.length }}</span
+            ><span class="stat-label">Total</span>
+          </div>
+          <div class="stat-card stat-card--green">
+            <span class="stat-num">{{ confirmedCount }}</span
+            ><span class="stat-label">Confirmées</span>
+          </div>
+          <div class="stat-card stat-card--red">
+            <span class="stat-num">{{ cancelledCount }}</span
+            ><span class="stat-label">Annulées</span>
+          </div>
+        </div>
+
+        <section class="list-section" v-if="reservationsView === 'list'">
+          <h2>
+            Réservations <span class="badge">{{ reservations.length }}</span>
+          </h2>
+          <div v-if="reservationStore.loading" class="empty-state">
+            Chargement depuis Firebase...
+          </div>
+          <div v-else-if="reservations.length === 0" class="empty-state">
+            Aucune réservation pour le moment.
+          </div>
+          <div class="vehicles-table-wrapper" v-else>
+            <table class="vehicles-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Client</th>
+                  <th>Véhicule</th>
+                  <th>Lieu / Période</th>
+                  <th>Statut</th>
+                  <th class="th-center">Détail</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="r in reservations"
+                  :key="r.id"
+                  :class="`row--${r.statut}`"
+                >
+                  <td class="date-col">{{ formatDate(r.createdAt) }}</td>
+                  <td>
+                    <strong>{{ r.nom }}</strong
+                    ><br />
+                    <a :href="`mailto:${r.email}`" class="client-email">{{
+                      r.email
+                    }}</a
+                    ><br />
+                    <span class="client-phone">{{ r.telephone }}</span>
+                  </td>
+                  <td>{{ r.vehicleLabel }}</td>
+                  <td>
+                    <span class="location-label">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="inline-icon"
+                      >
+                        <path
+                          d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                        />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {{ r.location }}</span
+                    ><br />
+                    <span class="date-range"
+                      >{{ r.startDate }} {{ r.startTime }} → {{ r.endDate }}
+                      {{ r.endTime }}</span
+                    >
+                  </td>
+                  <td>
+                    <select
+                      :value="r.statut"
+                      :class="['statut-select', `statut--${r.statut}`]"
+                      @change="
+                        reservationStore.updateStatut(r.id, $event.target.value)
+                      "
+                    >
+                      <option value="confirmee">Confirmée</option>
+                      <option value="annulee">Annulée</option>
+                    </select>
+                  </td>
+                  <td class="td-center">
+                    <button
+                      class="btn-detail"
+                      @click="openDetail(r)"
+                      title="Voir les détails"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Vue calendrier -->
+        <div v-if="reservationsView === 'calendar'" class="calendar-wrapper">
+          <div class="calendar-legend">
+            <span class="legend-dot" style="background: #22c55e"></span>
+            Confirmée
+            <span class="legend-dot" style="background: #9ca3af"></span> Annulée
+          </div>
+          <FullCalendar
+            :key="calendarEvents.length"
+            :options="calendarOptions"
+          />
+        </div>
+      </div>
       <!-- ════════════ TAB VÉHICULES ════════════ -->
-      <div v-if="activeTab === 'vehicles'">
+      <div v-else>
         <section class="form-section">
           <h2>
             {{ editingId ? "Modifier le véhicule" : "Ajouter un véhicule" }}
@@ -368,184 +642,6 @@
           </div>
         </section>
       </div>
-
-      <!-- ════════════ TAB RÉSERVATIONS ════════════ -->
-      <div v-else>
-        <!-- Toggle liste / calendrier -->
-        <div class="view-toggle">
-          <button
-            :class="['vt-btn', { active: reservationsView === 'list' }]"
-            @click="reservationsView = 'list'"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="inline-icon"
-            >
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </svg>
-            Liste
-          </button>
-          <button
-            :class="['vt-btn', { active: reservationsView === 'calendar' }]"
-            @click="reservationsView = 'calendar'"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="inline-icon"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            Calendrier
-          </button>
-        </div>
-
-        <div class="stats-row">
-          <div class="stat-card">
-            <span class="stat-num">{{ reservations.length }}</span
-            ><span class="stat-label">Total</span>
-          </div>
-          <div class="stat-card stat-card--green">
-            <span class="stat-num">{{ confirmedCount }}</span
-            ><span class="stat-label">Confirmées</span>
-          </div>
-          <div class="stat-card stat-card--red">
-            <span class="stat-num">{{ cancelledCount }}</span
-            ><span class="stat-label">Annulées</span>
-          </div>
-        </div>
-
-        <section class="list-section" v-if="reservationsView === 'list'">
-          <h2>
-            Réservations <span class="badge">{{ reservations.length }}</span>
-          </h2>
-          <div v-if="reservationStore.loading" class="empty-state">
-            Chargement depuis Firebase...
-          </div>
-          <div v-else-if="reservations.length === 0" class="empty-state">
-            Aucune réservation pour le moment.
-          </div>
-          <div class="vehicles-table-wrapper" v-else>
-            <table class="vehicles-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Véhicule</th>
-                  <th>Lieu / Période</th>
-                  <th>Statut</th>
-                  <th class="th-center">Détail</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="r in reservations"
-                  :key="r.id"
-                  :class="`row--${r.statut}`"
-                >
-                  <td class="date-col">{{ formatDate(r.createdAt) }}</td>
-                  <td>
-                    <strong>{{ r.nom }}</strong
-                    ><br />
-                    <a :href="`mailto:${r.email}`" class="client-email">{{
-                      r.email
-                    }}</a
-                    ><br />
-                    <span class="client-phone">{{ r.telephone }}</span>
-                  </td>
-                  <td>{{ r.vehicleLabel }}</td>
-                  <td>
-                    <span class="location-label">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="inline-icon"
-                      >
-                        <path
-                          d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                        />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {{ r.location }}</span
-                    ><br />
-                    <span class="date-range"
-                      >{{ r.startDate }} {{ r.startTime }} → {{ r.endDate }}
-                      {{ r.endTime }}</span
-                    >
-                  </td>
-                  <td>
-                    <select
-                      :value="r.statut"
-                      :class="['statut-select', `statut--${r.statut}`]"
-                      @change="
-                        reservationStore.updateStatut(r.id, $event.target.value)
-                      "
-                    >
-                      <option value="confirmee">Confirmée</option>
-                      <option value="annulee">Annulée</option>
-                    </select>
-                  </td>
-                  <td class="td-center">
-                    <button
-                      class="btn-detail"
-                      @click="openDetail(r)"
-                      title="Voir les détails"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path
-                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                        />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Vue calendrier -->
-        <div v-if="reservationsView === 'calendar'" class="calendar-wrapper">
-          <div class="calendar-legend">
-            <span class="legend-dot" style="background: #22c55e"></span>
-            Confirmée
-            <span class="legend-dot" style="background: #9ca3af"></span> Annulée
-          </div>
-          <FullCalendar
-            :key="calendarEvents.length"
-            :options="calendarOptions"
-          />
-        </div>
-      </div>
     </div>
 
     <ReservationDetailModal
@@ -558,7 +654,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
@@ -566,9 +662,9 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import frLocale from "@fullcalendar/core/locales/fr";
 
-const activeTab = ref("vehicles");
-const vehicles = computed(() => vehicleStore.vehicles);
+const activeTab = ref("reservations");
 const reservations = computed(() => reservationStore.reservations);
+const vehicles = computed(() => vehicleStore.vehicles);
 const confirmedCount = computed(
   () => reservations.value.filter((r) => r.statut === "confirmee").length,
 );
@@ -666,6 +762,65 @@ function formatDate(ts) {
     month: "2-digit",
     year: "numeric",
   });
+}
+
+// — Réservation en agence
+const showAgencyBooking = ref(false);
+const agencyBookingSaving = ref(false);
+const emptyAgencyForm = () => ({
+  nom: "",
+  email: "",
+  telephone: "",
+  vehicleId: "",
+  location: "",
+  startDate: "",
+  startTime: "09:00",
+  endDate: "",
+  endTime: "18:00",
+});
+const agencyForm = reactive(emptyAgencyForm());
+
+const availableVehicles = computed(() => {
+  if (!agencyForm.startDate || !agencyForm.endDate) return [];
+  return vehicles.value.filter((v) => {
+    return !reservationStore.reservations.some(
+      (r) =>
+        r.vehicleId === v.id &&
+        r.statut !== "annulee" &&
+        agencyForm.startDate < r.endDate &&
+        agencyForm.endDate > r.startDate,
+    );
+  });
+});
+
+watch(
+  () => [agencyForm.startDate, agencyForm.endDate],
+  () => { agencyForm.vehicleId = ""; },
+);
+
+async function handleAgencyBooking() {
+  agencyBookingSaving.value = true;
+  try {
+    const vehicle = vehicles.value.find((v) => v.id === agencyForm.vehicleId);
+    await reservationStore.addReservation({
+      vehicleId: agencyForm.vehicleId,
+      vehicleLabel: vehicle ? `${vehicle.marque} ${vehicle.modele}` : "",
+      nom: agencyForm.nom,
+      email: agencyForm.email,
+      telephone: agencyForm.telephone,
+      location: agencyForm.location,
+      startDate: agencyForm.startDate,
+      startTime: agencyForm.startTime,
+      endDate: agencyForm.endDate,
+      endTime: agencyForm.endTime,
+      userId: null,
+      statut: "confirmee",
+    });
+    Object.assign(agencyForm, emptyAgencyForm());
+    showAgencyBooking.value = false;
+  } finally {
+    agencyBookingSaving.value = false;
+  }
 }
 
 // — Calendrier
@@ -1184,6 +1339,72 @@ select:focus {
 .statut--payee {
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+/* Réservation en agence */
+.agency-booking {
+  margin-bottom: 2rem;
+  border-left: 4px solid #e63946;
+}
+.agency-booking-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.agency-booking-toggle h2 {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.agency-booking-toggle h2 svg {
+  width: 18px;
+  height: 18px;
+  color: #e63946;
+  flex-shrink: 0;
+}
+.badge-agency {
+  background: #fde8e8;
+  color: #e63946;
+  border-radius: 20px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.chevron {
+  width: 20px;
+  height: 20px;
+  color: #888;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.chevron.open {
+  transform: rotate(180deg);
+}
+.agency-form {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+.no-vehicles-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff8e1;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.no-vehicles-notice svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 /* Vue toggle */
