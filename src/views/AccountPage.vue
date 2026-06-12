@@ -43,17 +43,48 @@
             {{ t("account.seeVehicles") }}
           </RouterLink>
         </div>
-        <div v-else class="reservations-list">
-          <div v-for="r in myReservations" :key="r.id" class="reservation-card">
-            <div class="res-header">
-              <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
-              <span :class="['res-badge', `badge--${r.statut}`]">
-                {{ STATUS_LABELS[r.statut] ?? r.statut }}
-              </span>
+        <div v-else class="reservations-sections">
+          <!-- À venir -->
+          <div class="res-section">
+            <h2 class="res-section-title">{{ t("account.upcomingReservations") }}</h2>
+            <p v-if="upcomingReservations.length === 0" class="res-section-empty">
+              {{ t("account.noUpcomingReservations") }}
+            </p>
+            <div v-else class="reservations-list">
+              <div v-for="r in upcomingReservations" :key="r.id" class="reservation-card">
+                <div class="res-header">
+                  <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
+                  <span :class="['res-badge', `badge--${r.statut}`]">
+                    {{ STATUS_LABELS[r.statut] ?? r.statut }}
+                  </span>
+                </div>
+                <div class="res-details">
+                  <span>📍 {{ r.location }}</span>
+                  <span>📅 {{ r.startDate }} → {{ r.endDate }}</span>
+                </div>
+              </div>
             </div>
-            <div class="res-details">
-              <span>📍 {{ r.location }}</span>
-              <span>📅 {{ r.startDate }} → {{ r.endDate }}</span>
+          </div>
+
+          <!-- Anciennes -->
+          <div class="res-section">
+            <h2 class="res-section-title">{{ t("account.pastReservations") }}</h2>
+            <p v-if="pastReservations.length === 0" class="res-section-empty">
+              {{ t("account.noPastReservations") }}
+            </p>
+            <div v-else class="reservations-list">
+              <div v-for="r in pastReservations" :key="r.id" class="reservation-card reservation-card--past">
+                <div class="res-header">
+                  <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
+                  <span :class="['res-badge', `badge--${r.statut}`]">
+                    {{ STATUS_LABELS[r.statut] ?? r.statut }}
+                  </span>
+                </div>
+                <div class="res-details">
+                  <span>📍 {{ r.location }}</span>
+                  <span>📅 {{ r.startDate }} → {{ r.endDate }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -183,6 +214,17 @@ const myReservations = computed(() =>
   reservationStore.reservations.filter(
     (r) => r.userId === userAuthStore.user?.uid,
   ),
+);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const upcomingReservations = computed(() =>
+  myReservations.value.filter((r) => new Date(r.startDate) > today),
+);
+
+const pastReservations = computed(() =>
+  myReservations.value.filter((r) => new Date(r.startDate) <= today),
 );
 
 async function handleLogout() {
@@ -350,6 +392,24 @@ async function handleUpdatePassword() {
   opacity: 0.9;
 }
 
+.reservations-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.res-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid #e8e8f0;
+}
+.res-section-empty {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0;
+}
 .reservations-list {
   display: flex;
   flex-direction: column;
@@ -366,6 +426,17 @@ async function handleUpdatePassword() {
 }
 .reservation-card:hover {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+}
+.reservation-card--past {
+  background: #f4f4f8;
+  border-color: #e0e0ea;
+  color: #888;
+}
+.reservation-card--past .res-vehicle {
+  color: #666;
+}
+.reservation-card--past .res-details {
+  color: #aaa;
 }
 .res-header {
   display: flex;
