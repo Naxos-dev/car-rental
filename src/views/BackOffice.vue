@@ -649,6 +649,7 @@
       :reservation="detailReservation"
       :visible="showDetailModal"
       @close="showDetailModal = false"
+      @delete="handleDeleteReservation"
     />
   </div>
 </template>
@@ -831,6 +832,12 @@ const showDetailModal = ref(false);
 function openDetail(r) {
   detailReservation.value = r;
   showDetailModal.value = true;
+}
+
+async function handleDeleteReservation(id) {
+  await reservationStore.deleteReservation(id);
+  showDetailModal.value = false;
+  detailReservation.value = null;
 }
 const STATUS_COLORS = {
   en_attente: "#f59e0b",

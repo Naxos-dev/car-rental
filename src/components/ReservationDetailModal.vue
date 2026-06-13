@@ -131,7 +131,24 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-close" @click="$emit('close')">Fermer</button>
+          <div v-if="confirmDelete" class="confirm-delete">
+            <span>Confirmer la suppression ?</span>
+            <button class="btn-confirm-delete" @click="handleDelete">Oui, supprimer</button>
+            <button class="btn-cancel-delete" @click="confirmDelete = false">Annuler</button>
+          </div>
+          <template v-else>
+            <button class="btn-delete" @click="confirmDelete = true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+              Supprimer
+            </button>
+            <button class="btn-close" @click="$emit('close')">Fermer</button>
+          </template>
         </div>
       </div>
     </div>
@@ -139,18 +156,26 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   reservation: { type: Object, required: true },
   visible: { type: Boolean, required: true },
 });
-defineEmits(["close"]);
+const emit = defineEmits(["close", "delete"]);
+
+const confirmDelete = ref(false);
+
+watch(() => props.visible, (v) => { if (!v) confirmDelete.value = false; });
 
 const statutLabel = computed(() => {
   const map = { confirmee: "Confirmée", annulee: "Annulée" };
   return map[props.reservation.statut] ?? props.reservation.statut;
 });
+
+function handleDelete() {
+  emit("delete", props.reservation.id);
+}
 </script>
 
 <style scoped>
@@ -302,6 +327,8 @@ const statutLabel = computed(() => {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.6rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
@@ -322,10 +349,66 @@ const statutLabel = computed(() => {
 .btn-close:hover {
   background: #e0e0e0;
 }
-.close-icon {
-  width: 13px;
-  height: 13px;
+.btn-icon {
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
+}
+.btn-delete {
+  background: #fce4ec;
+  color: #c62828;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: auto;
+}
+.btn-delete:hover {
+  background: #ef9a9a;
+}
+.confirm-delete {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.confirm-delete span {
+  font-size: 0.88rem;
+  color: #c62828;
+  font-weight: 600;
+  margin-right: auto;
+}
+.btn-confirm-delete {
+  background: #c62828;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-confirm-delete:hover {
+  background: #b71c1c;
+}
+.btn-cancel-delete {
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancel-delete:hover {
+  background: #e0e0e0;
 }
 
 @media (max-width: 480px) {
