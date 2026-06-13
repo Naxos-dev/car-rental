@@ -405,9 +405,7 @@ export default {
   ],
 
   statusLabels: {
-    en_attente: "Pending",
     confirmee: "Confirmed",
-    payee: "Paid",
     annulee: "Cancelled",
   },
 };

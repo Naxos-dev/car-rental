@@ -99,7 +99,7 @@ onMounted(async () => {
       endDate: checkoutStore.endDate,
       endTime: checkoutStore.endTime,
       userId: userAuthStore.user?.uid ?? null,
-      statut: "payee",
+      statut: "confirmee",
     });
 
     checkoutStore.clear();

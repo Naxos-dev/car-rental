@@ -294,8 +294,6 @@ const router = useRouter();
 const section = ref("reservations");
 
 const STATUS_LABELS = computed(() => ({
-  en_attente: t("statusLabels.en_attente"),
-  payee: t("statusLabels.payee"),
   confirmee: t("statusLabels.confirmee"),
   annulee: t("statusLabels.annulee"),
 }));
@@ -559,14 +557,6 @@ async function handleUpdatePassword() {
   border-radius: 20px;
   font-size: 0.82rem;
   font-weight: 600;
-}
-.badge--en_attente {
-  background: #fef3c7;
-  color: #92400e;
-}
-.badge--payee {
-  background: #dbeafe;
-  color: #1e40af;
 }
 .badge--confirmee {
   background: #dcfce7;

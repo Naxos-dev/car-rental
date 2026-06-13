@@ -24,7 +24,7 @@ export const reservationStore = reactive({
     const { statut: dataStatut, ...rest } = data;
     await addDoc(collection(db, "reservations"), {
       ...rest,
-      statut: dataStatut ?? "en_attente",
+      statut: dataStatut ?? "confirmee",
       createdAt: serverTimestamp(),
     });
   },
