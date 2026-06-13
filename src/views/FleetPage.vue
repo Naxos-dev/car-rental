@@ -128,7 +128,7 @@ const unavailableVehicleIds = computed(() => {
     reservationStore.reservations
       .filter(
         (r) =>
-          ["payee", "confirmee"].includes(r.statut) &&
+          r.statut === "confirmee" &&
           new Date(r.startDate) <= selEnd &&
           new Date(r.endDate) >= selStart,
       )

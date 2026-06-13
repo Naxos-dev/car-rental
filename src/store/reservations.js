@@ -5,10 +5,15 @@ import {
   onSnapshot,
   addDoc,
   updateDoc,
+  deleteDoc,
+  setDoc,
+  getDoc,
+  getDocs,
   doc,
   serverTimestamp,
   query,
   orderBy,
+  where,
 } from "firebase/firestore";
 
 export const reservationStore = reactive({
@@ -19,13 +24,34 @@ export const reservationStore = reactive({
     const { statut: dataStatut, ...rest } = data;
     await addDoc(collection(db, "reservations"), {
       ...rest,
-      statut: dataStatut ?? "en_attente",
+      statut: dataStatut ?? "confirmee",
       createdAt: serverTimestamp(),
     });
   },
 
   async updateStatut(id, statut) {
     await updateDoc(doc(db, "reservations", id), { statut });
+  },
+
+  async _moveToArchive(id, data, reason) {
+    await setDoc(doc(db, "reservations_archived", id), {
+      ...data,
+      archiveReason: reason,
+      archivedAt: serverTimestamp(),
+    });
+    await deleteDoc(doc(db, "reservations", id));
+  },
+
+  async deleteReservation(id) {
+    const snap = await getDoc(doc(db, "reservations", id));
+    if (snap.exists()) await this._moveToArchive(id, snap.data(), "deleted");
+  },
+
+  async archivePastReservations() {
+    const today = new Date().toISOString().split("T")[0];
+    const q = query(collection(db, "reservations"), where("endDate", "<", today));
+    const snap = await getDocs(q);
+    await Promise.all(snap.docs.map((d) => this._moveToArchive(d.id, d.data(), "past")));
   },
 });
 
@@ -37,3 +63,5 @@ onSnapshot(q, (snapshot) => {
   }));
   reservationStore.loading = false;
 });
+
+reservationStore.archivePastReservations();

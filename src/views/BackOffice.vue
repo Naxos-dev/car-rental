@@ -649,6 +649,7 @@
       :reservation="detailReservation"
       :visible="showDetailModal"
       @close="showDetailModal = false"
+      @delete="handleDeleteReservation"
     />
   </div>
 </template>
@@ -832,9 +833,13 @@ function openDetail(r) {
   detailReservation.value = r;
   showDetailModal.value = true;
 }
+
+async function handleDeleteReservation(id) {
+  await reservationStore.deleteReservation(id);
+  showDetailModal.value = false;
+  detailReservation.value = null;
+}
 const STATUS_COLORS = {
-  en_attente: "#f59e0b",
-  payee: "#3b82f6",
   confirmee: "#22c55e",
   annulee: "#9ca3af",
 };
@@ -1297,10 +1302,6 @@ select:focus {
   cursor: pointer;
   outline: none;
 }
-.statut--en_attente {
-  background: #fff8e1;
-  color: #f57f17;
-}
 .statut--confirmee {
   background: #e8f5e9;
   color: #2e7d32;
@@ -1335,10 +1336,6 @@ select:focus {
 .statut--annulee {
   background: #fce4ec;
   color: #c62828;
-}
-.statut--payee {
-  background: #dbeafe;
-  color: #1d4ed8;
 }
 
 /* Réservation en agence */

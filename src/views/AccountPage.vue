@@ -53,14 +53,35 @@
             <div v-else class="reservations-list">
               <div v-for="r in upcomingReservations" :key="r.id" class="reservation-card">
                 <div class="res-header">
-                  <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
+                  <span class="res-vehicle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-icon">
+                      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"/>
+                      <circle cx="7" cy="17" r="2"/>
+                      <circle cx="17" cy="17" r="2"/>
+                    </svg>
+                    {{ r.vehicleLabel }}
+                  </span>
                   <span :class="['res-badge', `badge--${r.statut}`]">
                     {{ STATUS_LABELS[r.statut] ?? r.statut }}
                   </span>
                 </div>
                 <div class="res-details">
-                  <span>📍 {{ r.location }}</span>
-                  <span>📅 {{ r.startDate }} → {{ r.endDate }}</span>
+                  <span class="res-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="detail-icon">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {{ r.location }}
+                  </span>
+                  <span class="res-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="detail-icon">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    {{ r.startDate }} → {{ r.endDate }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -75,14 +96,35 @@
             <div v-else class="reservations-list">
               <div v-for="r in pastReservations" :key="r.id" class="reservation-card reservation-card--past">
                 <div class="res-header">
-                  <span class="res-vehicle">🚗 {{ r.vehicleLabel }}</span>
+                  <span class="res-vehicle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="res-icon">
+                      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"/>
+                      <circle cx="7" cy="17" r="2"/>
+                      <circle cx="17" cy="17" r="2"/>
+                    </svg>
+                    {{ r.vehicleLabel }}
+                  </span>
                   <span :class="['res-badge', `badge--${r.statut}`]">
                     {{ STATUS_LABELS[r.statut] ?? r.statut }}
                   </span>
                 </div>
                 <div class="res-details">
-                  <span>📍 {{ r.location }}</span>
-                  <span>📅 {{ r.startDate }} → {{ r.endDate }}</span>
+                  <span class="res-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="detail-icon">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {{ r.location }}
+                  </span>
+                  <span class="res-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="detail-icon">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    {{ r.startDate }} → {{ r.endDate }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -112,12 +154,24 @@
               </div>
               <div class="field">
                 <label>{{ t("account.currentPassword") }}</label>
-                <input
-                  v-model="emailForm.password"
-                  type="password"
-                  :placeholder="t('account.currentPasswordPlaceholder')"
-                  required
-                />
+                <div class="password-wrapper">
+                  <input
+                    v-model="emailForm.password"
+                    :type="showEmailPassword ? 'text' : 'password'"
+                    :placeholder="t('account.currentPasswordPlaceholder')"
+                    required
+                  />
+                  <button type="button" class="toggle-password" @click="showEmailPassword = !showEmailPassword" :aria-label="showEmailPassword ? 'Masquer' : 'Afficher'">
+                    <svg v-if="showEmailPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <p
                 v-if="emailMsg.text"
@@ -141,31 +195,67 @@
             <form @submit.prevent="handleUpdatePassword">
               <div class="field">
                 <label>{{ t("account.currentPassword") }}</label>
-                <input
-                  v-model="passwordForm.current"
-                  type="password"
-                  :placeholder="t('auth.passwordPlaceholder')"
-                  required
-                />
+                <div class="password-wrapper">
+                  <input
+                    v-model="passwordForm.current"
+                    :type="showPasswordCurrent ? 'text' : 'password'"
+                    :placeholder="t('auth.passwordPlaceholder')"
+                    required
+                  />
+                  <button type="button" class="toggle-password" @click="showPasswordCurrent = !showPasswordCurrent" :aria-label="showPasswordCurrent ? 'Masquer' : 'Afficher'">
+                    <svg v-if="showPasswordCurrent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="field">
                 <label>{{ t("account.newPassword") }}</label>
-                <input
-                  v-model="passwordForm.new"
-                  type="password"
-                  :placeholder="t('account.newPasswordPlaceholder')"
-                  required
-                  minlength="6"
-                />
+                <div class="password-wrapper">
+                  <input
+                    v-model="passwordForm.new"
+                    :type="showPasswordNew ? 'text' : 'password'"
+                    :placeholder="t('account.newPasswordPlaceholder')"
+                    required
+                    minlength="6"
+                  />
+                  <button type="button" class="toggle-password" @click="showPasswordNew = !showPasswordNew" :aria-label="showPasswordNew ? 'Masquer' : 'Afficher'">
+                    <svg v-if="showPasswordNew" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="field">
                 <label>{{ t("account.confirmPassword") }}</label>
-                <input
-                  v-model="passwordForm.confirm"
-                  type="password"
-                  :placeholder="t('account.confirmPasswordPlaceholder')"
-                  required
-                />
+                <div class="password-wrapper">
+                  <input
+                    v-model="passwordForm.confirm"
+                    :type="showPasswordConfirm ? 'text' : 'password'"
+                    :placeholder="t('account.confirmPasswordPlaceholder')"
+                    required
+                  />
+                  <button type="button" class="toggle-password" @click="showPasswordConfirm = !showPasswordConfirm" :aria-label="showPasswordConfirm ? 'Masquer' : 'Afficher'">
+                    <svg v-if="showPasswordConfirm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <p
                 v-if="passwordMsg.text"
@@ -204,10 +294,8 @@ const router = useRouter();
 const section = ref("reservations");
 
 const STATUS_LABELS = computed(() => ({
-  en_attente: `⏳ ${t("statusLabels.en_attente")}`,
-  payee: `💳 ${t("statusLabels.payee")}`,
-  confirmee: `✅ ${t("statusLabels.confirmee")}`,
-  annulee: `❌ ${t("statusLabels.annulee")}`,
+  confirmee: t("statusLabels.confirmee"),
+  annulee: t("statusLabels.annulee"),
 }));
 
 const myReservations = computed(() =>
@@ -231,6 +319,11 @@ async function handleLogout() {
   await userAuthStore.logout();
   router.push("/");
 }
+
+const showEmailPassword = ref(false);
+const showPasswordCurrent = ref(false);
+const showPasswordNew = ref(false);
+const showPasswordConfirm = ref(false);
 
 // — Modifier l'email
 const emailForm = reactive({ newEmail: "", password: "" });
@@ -449,20 +542,21 @@ async function handleUpdatePassword() {
   font-weight: 700;
   color: #1a1a2e;
   font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.res-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #667eea;
 }
 .res-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.82rem;
   font-weight: 600;
-}
-.badge--en_attente {
-  background: #fef3c7;
-  color: #92400e;
-}
-.badge--payee {
-  background: #dbeafe;
-  color: #1e40af;
 }
 .badge--confirmee {
   background: #dcfce7;
@@ -478,6 +572,17 @@ async function handleUpdatePassword() {
   color: #666;
   font-size: 0.9rem;
   flex-wrap: wrap;
+}
+.res-detail-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.detail-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: #888;
 }
 
 /* Settings */
@@ -550,9 +655,34 @@ async function handleUpdatePassword() {
   font-size: 0.92rem;
   outline: none;
   transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 .field input:focus {
   border-color: #667eea;
+}
+.password-wrapper {
+  position: relative;
+}
+.password-wrapper input {
+  padding-right: 3rem;
+}
+.toggle-password {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  color: #888;
+  display: flex;
+  align-items: center;
+}
+.toggle-password:hover {
+  color: #1a1a2e;
 }
 .msg {
   font-size: 0.88rem;

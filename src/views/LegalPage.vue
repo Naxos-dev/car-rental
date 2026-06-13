@@ -2,7 +2,13 @@
   <div class="legal-page">
     <div class="legal-container">
       <div class="legal-back">
-        <router-link to="/">← {{ t("legal.backHome") }}</router-link>
+        <router-link to="/" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          {{ t("legal.backHome") }}
+        </router-link>
       </div>
 
       <!-- CGU -->
@@ -107,16 +113,23 @@ const type = computed(() => route.meta.legalType);
   margin-bottom: 2rem;
 }
 
-.legal-back a {
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: #e63946;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
   transition: opacity 0.2s;
 }
-
-.legal-back a:hover {
+.back-link:hover {
   opacity: 0.75;
+}
+.back-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 h1 {
