@@ -313,9 +313,16 @@ const upcomingReservations = computed(() =>
   myReservations.value.filter((r) => new Date(r.startDate) > today),
 );
 
-const pastReservations = computed(() =>
-  myReservations.value.filter((r) => new Date(r.startDate) <= today),
+const myArchivedReservations = computed(() =>
+  reservationStore.archivedReservations.filter(
+    (r) => r.userId === userAuthStore.user?.uid,
+  ),
 );
+
+const pastReservations = computed(() => [
+  ...myReservations.value.filter((r) => new Date(r.startDate) <= today),
+  ...myArchivedReservations.value,
+].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
 
 async function handleLogout() {
   await userAuthStore.logout();
