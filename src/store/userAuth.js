@@ -39,9 +39,16 @@ export const userAuthStore = reactive({
 
   async login(email, password) {
     this.error = null;
-    localStorage.setItem("authRole", "user");
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const snap = await getDoc(doc(db, "users", cred.user.uid));
+      const role = snap.exists() ? snap.data().role : null;
+      if (role === "admin") {
+        setAdminRole(true);
+      } else {
+        localStorage.setItem("authRole", "user");
+      }
+      return role;
     } catch (err) {
       localStorage.removeItem("authRole");
       this.error = mapAuthError(err.code);

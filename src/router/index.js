@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LandingPage from "../views/LandingPage.vue";
 import BackOffice from "../views/BackOffice.vue";
-import LoginPage from "../views/LoginPage.vue";
 import CheckoutPage from "../views/CheckoutPage.vue";
 import PaymentSuccessPage from "../views/PaymentSuccessPage.vue";
 import AuthPage from "../views/AuthPage.vue";
@@ -26,8 +25,8 @@ const routes = [
     component: LegalPage,
     meta: { legalType: "privacy" },
   },
-  { path: "/login", name: "Login", component: LoginPage },
   { path: "/auth", name: "Auth", component: AuthPage },
+  { path: "/login", redirect: "/auth" },
   {
     path: "/account",
     name: "Account",
@@ -82,14 +81,9 @@ router.beforeEach(async (to) => {
     });
   }
 
-  // Garde admin : doit être connecté via la page /login
+  // Garde admin : doit être connecté avec un compte admin
   if (to.meta.requiresAuth && !authStore.isAdmin) {
-    return { name: "Login", query: { redirect: to.fullPath } };
-  }
-
-  // Redirige vers /admin si déjà admin et tente d'accéder au login
-  if (to.name === "Login" && authStore.isAdmin) {
-    return { name: "BackOffice" };
+    return { name: "Auth", query: { redirect: to.fullPath } };
   }
 
   // Garde client : doit avoir un compte
@@ -97,9 +91,9 @@ router.beforeEach(async (to) => {
     return { path: "/auth", query: { redirect: to.fullPath } };
   }
 
-  // Redirige vers /account si déjà connecté et tente d'accéder à /auth
+  // Redirige si déjà connecté et tente d'accéder à /auth
   if (to.name === "Auth" && userAuthStore.isAuthenticated) {
-    return { path: "/account" };
+    return authStore.isAdmin ? { path: "/admin" } : { path: "/account" };
   }
 });
 

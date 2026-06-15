@@ -328,8 +328,12 @@ async function handleLogin() {
   loading.value = true;
   errorMsg.value = "";
   try {
-    await userAuthStore.login(loginForm.email, loginForm.password);
-    router.push(route.query.redirect || "/account");
+    const role = await userAuthStore.login(loginForm.email, loginForm.password);
+    if (role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push(route.query.redirect || "/account");
+    }
   } catch {
     errorMsg.value = userAuthStore.error || "Erreur de connexion.";
   } finally {
