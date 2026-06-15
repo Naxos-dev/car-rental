@@ -1,15 +1,10 @@
 import { reactive } from "vue";
 import { auth } from "../firebase.js";
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 
 export const authStore = reactive({
   user: null,
   loading: true,
-  error: null,
   _isAdmin: false,
 
   get isAuthenticated() {
@@ -18,18 +13,6 @@ export const authStore = reactive({
 
   get isAdmin() {
     return this._isAdmin;
-  },
-
-  async login(email, password) {
-    this.error = null;
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem("authRole", "admin");
-      this._isAdmin = true;
-    } catch (err) {
-      this.error = mapFirebaseError(err.code);
-      throw err;
-    }
   },
 
   async logout() {
@@ -56,15 +39,4 @@ export function setAdminRole(isAdmin) {
   if (isAdmin) {
     localStorage.setItem("authRole", "admin");
   }
-}
-
-function mapFirebaseError(code) {
-  const messages = {
-    "auth/user-not-found": "Aucun compte trouvé avec cet email.",
-    "auth/wrong-password": "Mot de passe incorrect.",
-    "auth/invalid-email": "Adresse email invalide.",
-    "auth/too-many-requests": "Trop de tentatives. Réessayez plus tard.",
-    "auth/invalid-credential": "Identifiants incorrects.",
-  };
-  return messages[code] ?? "Une erreur est survenue. Réessayez.";
 }
