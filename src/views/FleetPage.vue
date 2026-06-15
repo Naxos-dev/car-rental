@@ -47,6 +47,7 @@
             <div class="price-filter">
               <input
                 type="range"
+                :key="highestPrice"
                 :min="0"
                 :max="highestPrice"
                 :step="1"
@@ -166,9 +167,9 @@ const highestPrice = computed(() =>
 
 watch(
   highestPrice,
-  (price) => {
-    if (!selectedMaxPrice.value || selectedMaxPrice.value > price) {
-      selectedMaxPrice.value = price;
+  (newPrice, oldPrice) => {
+    if (!selectedMaxPrice.value || selectedMaxPrice.value >= (oldPrice ?? newPrice)) {
+      selectedMaxPrice.value = newPrice;
     }
   },
   { immediate: true },
