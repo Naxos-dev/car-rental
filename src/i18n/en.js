@@ -106,9 +106,9 @@ export default {
   booking: {
     title: "Book your vehicle",
     location: "Pick-up location",
-    startDate: "Start date",
+    dateRange: "Rental period",
+    selectDates: "Select dates",
     startTime: "Start time",
-    endDate: "End date",
     endTime: "End time",
     search: "See available vehicles",
   },
@@ -135,14 +135,19 @@ export default {
     loginRequired: "You must be logged in to book.",
     loginBtn: "Log in",
     close: "Close",
+    dateRange: "Rental period",
+    selectDates: "Select dates",
+    reservedDatesLegend: "Already booked dates",
+    vehicleConflict: "This vehicle is already booked for these dates.",
+    selectBothDates: "Please select a start and end date.",
   },
 
   searchBanner: {
     cancel: "Cancel",
     update: "Update",
-    startDate: "Start date",
+    dateRange: "Rental period",
+    selectDates: "Select dates",
     startTime: "Start time",
-    endDate: "End date",
     endTime: "End time",
   },
 

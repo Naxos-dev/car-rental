@@ -79,18 +79,21 @@
 
         <form v-if="showAgencyBooking" class="vehicle-form agency-form" @submit.prevent="handleAgencyBooking">
           <!-- Étape 1 : période -->
+          <div class="field">
+            <label>Période de location</label>
+            <DateRangePicker
+              :startDate="agencyForm.startDate"
+              :endDate="agencyForm.endDate"
+              :disabledRanges="[]"
+              placeholder="Sélectionner les dates"
+              @update:startDate="agencyForm.startDate = $event"
+              @update:endDate="agencyForm.endDate = $event"
+            />
+          </div>
           <div class="field-row">
-            <div class="field">
-              <label for="ab-start">Date de début</label>
-              <input id="ab-start" v-model="agencyForm.startDate" type="date" required />
-            </div>
             <div class="field">
               <label for="ab-start-time">Heure de début</label>
               <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
-            </div>
-            <div class="field">
-              <label for="ab-end">Date de fin</label>
-              <input id="ab-end" v-model="agencyForm.endDate" type="date" :min="agencyForm.startDate || undefined" required />
             </div>
             <div class="field">
               <label for="ab-end-time">Heure de fin</label>
@@ -659,6 +662,7 @@ import { reactive, ref, computed, watch } from "vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
+import DateRangePicker from "../components/DateRangePicker.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import frLocale from "@fullcalendar/core/locales/fr";

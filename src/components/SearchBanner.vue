@@ -50,53 +50,27 @@
     <transition name="slide-down">
       <div v-if="editOpen" class="edit-panel">
         <form class="edit-form" @submit.prevent="applyChanges">
+          <!-- Période -->
+          <div class="edit-field edit-field--full">
+            <label>{{ t("searchBanner.dateRange") }}</label>
+            <DateRangePicker
+              :startDate="draft.startDate"
+              :endDate="draft.endDate"
+              :disabledRanges="[]"
+              :placeholder="t('searchBanner.selectDates')"
+              @update:startDate="draft.startDate = $event"
+              @update:endDate="draft.endDate = $event"
+            />
+          </div>
+
+          <!-- Heures -->
           <div class="edit-row">
             <div class="edit-field">
-              <label>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                {{ t("searchBanner.startDate") }}
-              </label>
-              <input
-                v-model="draft.startDate"
-                type="date"
-                :min="today"
-                required
-              />
-            </div>
-            <div class="edit-field">
-              <label>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
-                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                </svg>
-                {{ t("searchBanner.startTime") }}
-              </label>
+              <label>{{ t("searchBanner.startTime") }}</label>
               <input v-model="draft.startTime" type="time" required />
             </div>
-          </div>
-          <div class="edit-row">
             <div class="edit-field">
-              <label>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                {{ t("searchBanner.endDate") }}
-              </label>
-              <input
-                v-model="draft.endDate"
-                type="date"
-                :min="draft.startDate || today"
-                required
-              />
-            </div>
-            <div class="edit-field">
-              <label>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="label-icon">
-                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                </svg>
-                {{ t("searchBanner.endTime") }}
-              </label>
+              <label>{{ t("searchBanner.endTime") }}</label>
               <input v-model="draft.endTime" type="time" required />
             </div>
           </div>
@@ -121,6 +95,7 @@
 import { ref, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
+import DateRangePicker from "./DateRangePicker.vue";
 
 const { t } = useI18n();
 const editOpen = ref(false);
@@ -260,20 +235,14 @@ function formatDate(dateStr) {
   gap: 0.3rem;
   flex: 1;
 }
-
+.edit-field--full {
+  flex: none;
+  width: 100%;
+}
 .edit-field label {
   font-size: 0.82rem;
   font-weight: 600;
   color: #555;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.label-icon {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-  stroke: #e63946;
 }
 
 .edit-field input {

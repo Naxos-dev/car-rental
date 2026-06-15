@@ -53,34 +53,41 @@
             <label>{{ t("modal.location") }}</label>
             <input value="Lille" type="text" readonly />
           </div>
-          <div class="field-row">
-            <div class="field">
-              <label>{{ t("modal.startDate") }}</label>
-              <input
-                v-model="searchStore.startDate"
-                type="date"
-                :min="today"
-                required
-              />
+
+          <div class="field">
+            <div class="field-label-row">
+              <label>{{ t("modal.dateRange") }}</label>
+              <span v-if="disabledRanges.length" class="reserved-hint">
+                <span class="reserved-hint-dot"></span>
+                {{ t("modal.reservedDatesLegend") }}
+              </span>
             </div>
+            <DateRangePicker
+              :startDate="localStartDate"
+              :endDate="localEndDate"
+              :disabledRanges="disabledRanges"
+              :placeholder="t('modal.selectDates')"
+              @update:startDate="localStartDate = $event"
+              @update:endDate="localEndDate = $event"
+            />
+            <p v-if="isConflict" class="dates-conflict-msg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="msg-icon">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              {{ t("modal.vehicleConflict") }}
+            </p>
+          </div>
+
+          <div class="field-row">
             <div class="field">
               <label>{{ t("modal.startTime") }}</label>
-              <input v-model="searchStore.startTime" type="time" required />
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label>{{ t("modal.endDate") }}</label>
-              <input
-                v-model="searchStore.endDate"
-                type="date"
-                :min="searchStore.startDate || today"
-                required
-              />
+              <input v-model="localStartTime" type="time" required />
             </div>
             <div class="field">
               <label>{{ t("modal.endTime") }}</label>
-              <input v-model="searchStore.endTime" type="time" required />
+              <input v-model="localEndTime" type="time" required />
             </div>
           </div>
 
@@ -147,7 +154,7 @@
             <button type="button" class="btn-cancel" @click="$emit('close')">
               {{ t("searchBanner.cancel") }}
             </button>
-            <button type="submit" class="btn-confirm">
+            <button type="submit" class="btn-confirm" :disabled="isConflict">
               {{ t("modal.proceed") }}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
                 <line x1="5" y1="12" x2="19" y2="12"/>
@@ -167,7 +174,9 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 import { checkoutStore } from "../store/checkout.js";
+import { reservationStore } from "../store/reservations.js";
 import { userAuthStore } from "../store/userAuth.js";
+import DateRangePicker from "./DateRangePicker.vue";
 
 const { t } = useI18n();
 
@@ -175,18 +184,35 @@ const props = defineProps({ vehicle: Object, visible: Boolean });
 const emit = defineEmits(["close"]);
 const router = useRouter();
 
-const today = computed(() => new Date().toISOString().split("T")[0]);
-const customerForm = reactive({
-  prenom: "",
-  nom: "",
-  email: "",
-  telephone: "",
-});
+const customerForm = reactive({ prenom: "", nom: "", email: "", telephone: "" });
 const loading = ref(false);
 const success = ref(false);
 const errorMsg = ref("");
 
-// Pré-remplir avec le profil connecté à chaque ouverture
+// État local des dates — indépendant du searchStore global
+const localStartDate = ref("");
+const localEndDate = ref("");
+const localStartTime = ref("09:00");
+const localEndTime = ref("18:00");
+
+// Plages déjà réservées pour CE véhicule (passées à flatpickr)
+const disabledRanges = computed(() =>
+  reservationStore.reservations
+    .filter((r) => r.statut === "confirmee" && r.vehicleId === props.vehicle?.id)
+    .map((r) => ({ from: r.startDate, to: r.endDate })),
+);
+
+// Garde de sécurité — ne devrait jamais être vrai si flatpickr fonctionne
+const isConflict = computed(() => {
+  if (!localStartDate.value || !localEndDate.value) return false;
+  const selStart = new Date(localStartDate.value);
+  const selEnd = new Date(localEndDate.value);
+  return disabledRanges.value.some(
+    (r) => new Date(r.from) <= selEnd && new Date(r.to) >= selStart,
+  );
+});
+
+// Pré-remplir le formulaire à chaque ouverture
 watch(
   () => props.visible,
   (val) => {
@@ -199,6 +225,11 @@ watch(
         email: user?.email ?? "",
         telephone: "",
       });
+      // Initialiser les dates locales depuis le searchStore
+      localStartDate.value = searchStore.startDate;
+      localEndDate.value = searchStore.endDate;
+      localStartTime.value = searchStore.startTime || "09:00";
+      localEndTime.value = searchStore.endTime || "18:00";
       errorMsg.value = "";
       success.value = false;
     }
@@ -207,20 +238,32 @@ watch(
 
 async function handleSubmit() {
   errorMsg.value = "";
-  if (!searchStore.location || !searchStore.startDate || !searchStore.endDate) {
-    errorMsg.value = "Veuillez renseigner le lieu et les dates de réservation.";
+
+  if (!localStartDate.value || !localEndDate.value) {
+    errorMsg.value = t("modal.selectBothDates");
     return;
   }
-  // Sauvegarder dans le store de checkout
+  if (isConflict.value) {
+    errorMsg.value = t("modal.vehicleConflict");
+    return;
+  }
+
+  // Mettre à jour le searchStore avec les dates choisies dans le modal
+  searchStore.startDate = localStartDate.value;
+  searchStore.startTime = localStartTime.value;
+  searchStore.endDate = localEndDate.value;
+  searchStore.endTime = localEndTime.value;
+
   checkoutStore.vehicle = props.vehicle;
   checkoutStore.nom = `${customerForm.prenom} ${customerForm.nom}`.trim();
   checkoutStore.email = customerForm.email;
   checkoutStore.telephone = customerForm.telephone;
   checkoutStore.location = searchStore.location;
-  checkoutStore.startDate = searchStore.startDate;
-  checkoutStore.startTime = searchStore.startTime;
-  checkoutStore.endDate = searchStore.endDate;
-  checkoutStore.endTime = searchStore.endTime;
+  checkoutStore.startDate = localStartDate.value;
+  checkoutStore.startTime = localStartTime.value;
+  checkoutStore.endDate = localEndDate.value;
+  checkoutStore.endTime = localEndTime.value;
+
   emit("close");
   router.push("/checkout");
 }
@@ -355,6 +398,42 @@ input {
 }
 input:focus {
   border-color: #e63946;
+}
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.reserved-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #7a90b8;
+  font-weight: 500;
+}
+.reserved-hint-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.2);
+  border: 1.5px solid #8fa3c8;
+  flex-shrink: 0;
+  text-decoration: line-through;
+  display: inline-block;
+}
+.dates-conflict-msg {
+  margin: 0.3rem 0 0;
+  background: #fce4ec;
+  color: #c62828;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 .error-msg {
   background: #fce4ec;
