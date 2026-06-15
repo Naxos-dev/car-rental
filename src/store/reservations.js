@@ -18,6 +18,7 @@ import {
 
 export const reservationStore = reactive({
   reservations: [],
+  archivedReservations: [],
   loading: true,
 
   async addReservation(data) {
@@ -62,6 +63,14 @@ onSnapshot(q, (snapshot) => {
     ...d.data(),
   }));
   reservationStore.loading = false;
+});
+
+const qArchived = query(collection(db, "reservations_archived"), orderBy("createdAt", "desc"));
+onSnapshot(qArchived, (snapshot) => {
+  reservationStore.archivedReservations = snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
 });
 
 reservationStore.archivePastReservations();
