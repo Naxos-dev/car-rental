@@ -162,6 +162,9 @@ export default {
     loggingIn: "Connexion en cours...",
     registering: "Création du compte...",
     registerBtn: "Créer mon compte",
+    or: "ou",
+    loginWithGoogle: "Se connecter avec Google",
+    continueWithGoogle: "Continuer avec Google",
   },
 
   account: {
