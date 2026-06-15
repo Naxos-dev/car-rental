@@ -106,9 +106,9 @@ export default {
   booking: {
     title: "Réservez votre véhicule",
     location: "Lieu de prise en charge",
-    startDate: "Date de début",
+    dateRange: "Période de location",
+    selectDates: "Sélectionner les dates",
     startTime: "Heure de début",
-    endDate: "Date de fin",
     endTime: "Heure de fin",
     search: "Voir les véhicules disponibles",
   },
@@ -135,14 +135,19 @@ export default {
     loginRequired: "Vous devez être connecté pour réserver.",
     loginBtn: "Se connecter",
     close: "Fermer",
+    dateRange: "Période de location",
+    selectDates: "Sélectionner les dates",
+    reservedDatesLegend: "Dates déjà réservées",
+    vehicleConflict: "Ce véhicule est déjà réservé sur ces dates.",
+    selectBothDates: "Veuillez sélectionner une date de début et de fin.",
   },
 
   searchBanner: {
     cancel: "Annuler",
     update: "Mettre à jour",
-    startDate: "Date de début",
+    dateRange: "Période de location",
+    selectDates: "Sélectionner les dates",
     startTime: "Heure de début",
-    endDate: "Date de fin",
     endTime: "Heure de fin",
   },
 

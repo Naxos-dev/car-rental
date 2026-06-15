@@ -22,109 +22,28 @@
         <input id="location" value="Lille" type="text" readonly />
       </div>
 
-      <!-- Début de réservation -->
-      <div class="field-group">
-        <div class="field">
-          <label for="startDate">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            {{ t("booking.startDate") }}
-          </label>
-          <input
-            id="startDate"
-            v-model="searchStore.startDate"
-            type="date"
-            :min="today"
-            required
-          />
-        </div>
-        <div class="field">
-          <label for="startTime">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            {{ t("booking.startTime") }}
-          </label>
-          <input
-            id="startTime"
-            v-model="searchStore.startTime"
-            type="time"
-            required
-          />
-        </div>
+      <!-- Période de location -->
+      <div class="field">
+        <label>{{ t("booking.dateRange") }}</label>
+        <DateRangePicker
+          :startDate="localStartDate"
+          :endDate="localEndDate"
+          :disabledRanges="[]"
+          :placeholder="t('booking.selectDates')"
+          @update:startDate="localStartDate = $event"
+          @update:endDate="localEndDate = $event"
+        />
       </div>
 
-      <!-- Fin de réservation -->
+      <!-- Heures -->
       <div class="field-group">
         <div class="field">
-          <label for="endDate">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            {{ t("booking.endDate") }}
-          </label>
-          <input
-            id="endDate"
-            v-model="searchStore.endDate"
-            type="date"
-            :min="searchStore.startDate || today"
-            required
-          />
+          <label for="startTime">{{ t("booking.startTime") }}</label>
+          <input id="startTime" v-model="searchStore.startTime" type="time" required />
         </div>
         <div class="field">
-          <label for="endTime">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            {{ t("booking.endTime") }}
-          </label>
-          <input
-            id="endTime"
-            v-model="searchStore.endTime"
-            type="time"
-            required
-          />
+          <label for="endTime">{{ t("booking.endTime") }}</label>
+          <input id="endTime" v-model="searchStore.endTime" type="time" required />
         </div>
       </div>
 
@@ -140,16 +59,21 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
+import DateRangePicker from "./DateRangePicker.vue";
 
 const { t } = useI18n();
 const router = useRouter();
-const today = computed(() => new Date().toISOString().split("T")[0]);
+
+const localStartDate = ref(searchStore.startDate);
+const localEndDate = ref(searchStore.endDate);
 
 function handleSearch() {
+  searchStore.startDate = localStartDate.value;
+  searchStore.endDate = localEndDate.value;
   router.push("/fleet");
 }
 </script>
