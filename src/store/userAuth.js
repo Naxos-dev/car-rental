@@ -9,6 +9,8 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  signInWithPopup,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { setAdminRole } from "./auth.js";
@@ -52,6 +54,43 @@ export const userAuthStore = reactive({
     } catch (err) {
       localStorage.removeItem("authRole");
       this.error = mapAuthError(err.code);
+      throw err;
+    }
+  },
+
+  async loginWithGoogle() {
+    this.error = null;
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      const snap = await getDoc(doc(db, "users", cred.user.uid));
+      if (!snap.exists()) {
+        const displayName = cred.user.displayName || "";
+        const [prenom = "", ...rest] = displayName.split(" ");
+        const nom = rest.join(" ");
+        await setDoc(doc(db, "users", cred.user.uid), {
+          prenom,
+          nom,
+          email: cred.user.email,
+        });
+      }
+      const role = snap.exists() ? snap.data().role : null;
+      if (role === "admin") {
+        setAdminRole(true);
+      } else {
+        localStorage.setItem("authRole", "user");
+      }
+      return role;
+    } catch (err) {
+      const cancelled = [
+        "auth/popup-closed-by-user",
+        "auth/cancelled-popup-request",
+        "auth/user-cancelled",
+      ];
+      if (!cancelled.includes(err.code)) {
+        localStorage.removeItem("authRole");
+        this.error = mapAuthError(err.code);
+      }
       throw err;
     }
   },

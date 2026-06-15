@@ -162,6 +162,9 @@ export default {
     loggingIn: "Logging in...",
     registering: "Creating account...",
     registerBtn: "Create my account",
+    or: "or",
+    loginWithGoogle: "Sign in with Google",
+    continueWithGoogle: "Continue with Google",
   },
 
   account: {
