@@ -1,8 +1,12 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
-      <div class="modal-card">
-        <button class="modal-close" @click="$emit('close')" aria-label="Fermer">
+      <div ref="modalCardRef" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+        <button
+          class="modal-close"
+          @click="$emit('close')"
+          :aria-label="t('reservationDetail.close')"
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -17,7 +21,7 @@
         </button>
 
         <div class="modal-header">
-          <h3>Détails de la réservation</h3>
+          <h3 id="detail-modal-title">{{ t("reservationDetail.title") }}</h3>
           <span :class="['statut-badge', `statut--${reservation.statut}`]">
             {{ statutLabel }}
           </span>
@@ -41,15 +45,36 @@
               <circle cx="7" cy="17" r="2" />
               <circle cx="17" cy="17" r="2" />
             </svg>
-            Véhicule
+            {{ t("reservationDetail.sectionVehicle") }}
           </div>
           <div class="vehicle-summary">
             <img
-              v-if="reservation.vehiclePhoto"
-              :src="reservation.vehiclePhoto"
+              v-if="reservation.vehiclePhoto && !imgFailed"
+              :src="cloudinaryThumb(reservation.vehiclePhoto, 160, 104)"
               :alt="reservation.vehicleLabel"
               class="vehicle-thumb"
+              @error="imgFailed = true"
             />
+            <div
+              v-else
+              class="vehicle-thumb vehicle-thumb--placeholder"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
+                />
+                <circle cx="7" cy="17" r="2" />
+                <circle cx="17" cy="17" r="2" />
+              </svg>
+            </div>
             <div class="vehicle-summary-info">
               <strong>{{ reservation.vehicleLabel }}</strong>
             </div>
@@ -73,23 +98,25 @@
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            Dates et lieu
+            {{ t("reservationDetail.sectionDates") }}
           </div>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">Lieu</span>
+              <span class="info-label">{{
+                t("reservationDetail.location")
+              }}</span>
               <span class="info-value">{{ reservation.location }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">Du</span>
+              <span class="info-label">{{ t("reservationDetail.from") }}</span>
               <span class="info-value"
-                >{{ reservation.startDate }} {{ reservation.startTime }}</span
+                >{{ formatDate(reservation.startDate) }} {{ reservation.startTime }}</span
               >
             </div>
             <div class="info-item">
-              <span class="info-label">Au</span>
+              <span class="info-label">{{ t("reservationDetail.to") }}</span>
               <span class="info-value"
-                >{{ reservation.endDate }} {{ reservation.endTime }}</span
+                >{{ formatDate(reservation.endDate) }} {{ reservation.endTime }}</span
               >
             </div>
           </div>
@@ -110,21 +137,21 @@
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            Client
+            {{ t("reservationDetail.sectionClient") }}
           </div>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">Nom</span>
+              <span class="info-label">{{ t("reservationDetail.name") }}</span>
               <span class="info-value">{{ reservation.nom }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">Email</span>
+              <span class="info-label">{{ t("reservationDetail.email") }}</span>
               <a :href="`mailto:${reservation.email}`" class="info-link">{{
                 reservation.email
               }}</a>
             </div>
             <div class="info-item">
-              <span class="info-label">Téléphone</span>
+              <span class="info-label">{{ t("reservationDetail.phone") }}</span>
               <span class="info-value">{{ reservation.telephone || "—" }}</span>
             </div>
           </div>
@@ -132,22 +159,36 @@
 
         <div class="modal-footer">
           <div v-if="confirmDelete" class="confirm-delete">
-            <span>Confirmer la suppression ?</span>
-            <button class="btn-confirm-delete" @click="handleDelete">Oui, supprimer</button>
-            <button class="btn-cancel-delete" @click="confirmDelete = false">Annuler</button>
+            <span>{{ t("reservationDetail.confirmDelete") }}</span>
+            <button class="btn-confirm-delete" @click="handleDelete">
+              {{ t("reservationDetail.confirmDeleteYes") }}
+            </button>
+            <button class="btn-cancel-delete" @click="confirmDelete = false">
+              {{ t("searchBanner.cancel") }}
+            </button>
           </div>
           <template v-else>
             <button class="btn-delete" @click="confirmDelete = true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="btn-icon"
+              >
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                 <path d="M10 11v6" />
                 <path d="M14 11v6" />
                 <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
-              Supprimer
+              {{ t("reservationDetail.delete") }}
             </button>
-            <button class="btn-close" @click="$emit('close')">Fermer</button>
+            <button class="btn-close" @click="$emit('close')">
+              {{ t("reservationDetail.close") }}
+            </button>
           </template>
         </div>
       </div>
@@ -156,7 +197,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, nextTick, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
+import { formatDate } from "../composables/useFormatDate.js";
+import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+
+const { t } = useI18n();
 
 const props = defineProps({
   reservation: { type: Object, required: true },
@@ -165,13 +211,58 @@ const props = defineProps({
 const emit = defineEmits(["close", "delete"]);
 
 const confirmDelete = ref(false);
+const imgFailed = ref(false);
+const modalCardRef = ref(null);
 
-watch(() => props.visible, (v) => { if (!v) confirmDelete.value = false; });
+function handleModalKeydown(e) {
+  if (e.key === "Escape") {
+    emit("close");
+    return;
+  }
+  if (e.key === "Tab" && modalCardRef.value) {
+    const focusable = Array.from(
+      modalCardRef.value.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
 
-const statutLabel = computed(() => {
-  const map = { confirmee: "Confirmée", annulee: "Annulée" };
-  return map[props.reservation.statut] ?? props.reservation.statut;
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", handleModalKeydown);
+  document.body.style.overflow = "";
 });
+
+watch(
+  () => props.visible,
+  (v) => {
+    if (v) {
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleModalKeydown);
+      nextTick(() => modalCardRef.value?.querySelector(".modal-close")?.focus());
+    } else {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleModalKeydown);
+      confirmDelete.value = false;
+      imgFailed.value = false;
+    }
+  },
+);
+
+const statutLabel = computed(
+  () =>
+    t(`statusLabels.${props.reservation.statut}`) || props.reservation.statut,
+);
 
 function handleDelete() {
   emit("delete", props.reservation.id);
@@ -288,6 +379,17 @@ function handleDelete() {
   object-fit: cover;
   border-radius: 6px;
   flex-shrink: 0;
+}
+.vehicle-thumb--placeholder {
+  background: #f0f2f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vehicle-thumb--placeholder svg {
+  width: 28px;
+  height: 28px;
+  stroke: #c0c8e0;
 }
 .vehicle-summary-info {
   font-size: 0.95rem;
