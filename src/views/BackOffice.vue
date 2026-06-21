@@ -14,7 +14,7 @@
             d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
           />
         </svg>
-        Back-office — AutoLoc
+        {{ t("backoffice.title") }}
       </h1>
 
       <!-- Onglets -->
@@ -36,7 +36,7 @@
               d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
             />
           </svg>
-          Réservations
+          {{ t("backoffice.tabReservations") }}
         </button>
         <button
           :class="['tab', { active: activeTab === 'vehicles' }]"
@@ -57,112 +57,120 @@
             <circle cx="7" cy="17" r="2" />
             <circle cx="17" cy="17" r="2" />
           </svg>
-          Véhicules
+          {{ t("backoffice.tabVehicles") }}
         </button>
       </div>
 
-      <!-- ════════════ RÉSERVATION EN AGENCE ════════════ -->
-      <section class="form-section agency-booking">
-        <div class="agency-booking-toggle" @click="showAgencyBooking = !showAgencyBooking">
-          <h2>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            Réservation en agence
-            <span class="badge-agency">Walk-in</span>
-          </h2>
-          <svg class="chevron" :class="{ open: showAgencyBooking }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-
-        <form v-if="showAgencyBooking" class="vehicle-form agency-form" @submit.prevent="handleAgencyBooking">
-          <!-- Étape 1 : période -->
-          <div class="field">
-            <label>Période de location</label>
-            <DateRangePicker
-              :startDate="agencyForm.startDate"
-              :endDate="agencyForm.endDate"
-              :disabledRanges="[]"
-              placeholder="Sélectionner les dates"
-              @update:startDate="agencyForm.startDate = $event"
-              @update:endDate="agencyForm.endDate = $event"
-            />
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="ab-start-time">Heure de début</label>
-              <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
-            </div>
-            <div class="field">
-              <label for="ab-end-time">Heure de fin</label>
-              <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
-            </div>
-          </div>
-
-          <!-- Étape 2 : véhicule + lieu (affiché seulement quand les dates sont renseignées) -->
-          <template v-if="agencyForm.startDate && agencyForm.endDate">
-            <div v-if="availableVehicles.length === 0" class="no-vehicles-notice">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              Aucun véhicule disponible sur cette période.
-            </div>
-            <div class="field-row" v-else>
-              <div class="field">
-                <label for="ab-vehicle">Véhicule disponible</label>
-                <select id="ab-vehicle" v-model="agencyForm.vehicleId" required>
-                  <option value="" disabled>Sélectionner un véhicule...</option>
-                  <option v-for="v in availableVehicles" :key="v.id" :value="v.id">
-                    {{ v.marque }} {{ v.modele }} — {{ v.prix }}€/j
-                  </option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="ab-location">Lieu de retrait</label>
-                <input id="ab-location" v-model="agencyForm.location" type="text" placeholder="Ex: Paris Centre" required />
-              </div>
-            </div>
-
-            <!-- Étape 3 : infos client (affiché seulement quand un véhicule est choisi) -->
-            <template v-if="agencyForm.vehicleId">
-              <div class="field-row">
-                <div class="field">
-                  <label for="ab-nom">Nom du client</label>
-                  <input id="ab-nom" v-model="agencyForm.nom" type="text" placeholder="Prénom Nom" required />
-                </div>
-                <div class="field">
-                  <label for="ab-email">Email</label>
-                  <input id="ab-email" v-model="agencyForm.email" type="email" placeholder="client@email.com" required />
-                </div>
-                <div class="field">
-                  <label for="ab-tel">Téléphone</label>
-                  <input id="ab-tel" v-model="agencyForm.telephone" type="tel" placeholder="+33 6 00 00 00 00" required />
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button type="button" class="btn-cancel" @click="showAgencyBooking = false">Annuler</button>
-                <button type="submit" class="btn-submit" :disabled="agencyBookingSaving">
-                  <svg v-if="agencyBookingSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-spin">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6l4 2"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                  </svg>
-                  <span>{{ agencyBookingSaving ? 'Enregistrement...' : 'Confirmer la réservation' }}</span>
-                </button>
-              </div>
-            </template>
-          </template>
-        </form>
-      </section>
-
       <!-- ════════════ TAB RÉSERVATIONS ════════════ -->
       <div v-if="activeTab === 'reservations'">
+        <!-- ════════════ RÉSERVATION EN AGENCE ════════════ -->
+        <section class="form-section agency-booking">
+          <button
+            class="agency-booking-toggle"
+            type="button"
+            @click="showAgencyBooking = !showAgencyBooking"
+            :aria-expanded="showAgencyBooking"
+            aria-controls="agency-booking-form"
+          >
+            <h2>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              {{ t("backoffice.agencyBooking") }}
+              <span class="badge-agency">{{ t("backoffice.walkIn") }}</span>
+            </h2>
+            <svg class="chevron" :class="{ open: showAgencyBooking }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+
+          <form v-if="showAgencyBooking" id="agency-booking-form" class="vehicle-form agency-form" @submit.prevent="handleAgencyBooking">
+            <!-- Étape 1 : période -->
+            <div class="field">
+              <label>{{ t("booking.dateRange") }}</label>
+              <DateRangePicker
+                :startDate="agencyForm.startDate"
+                :endDate="agencyForm.endDate"
+                :disabledRanges="[]"
+                :placeholder="t('booking.selectDates')"
+                @update:startDate="agencyForm.startDate = $event"
+                @update:endDate="agencyForm.endDate = $event"
+              />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="ab-start-time">{{ t("booking.startTime") }}</label>
+                <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
+              </div>
+              <div class="field">
+                <label for="ab-end-time">{{ t("booking.endTime") }}</label>
+                <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
+              </div>
+            </div>
+
+            <!-- Étape 2 : véhicule + lieu (affiché seulement quand les dates sont renseignées) -->
+            <template v-if="agencyForm.startDate && agencyForm.endDate">
+              <div v-if="availableVehicles.length === 0" class="no-vehicles-notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {{ t("backoffice.noVehiclesAvailable") }}
+              </div>
+              <div class="field-row" v-else>
+                <div class="field">
+                  <label for="ab-vehicle">{{ t("backoffice.available") }}</label>
+                  <select id="ab-vehicle" v-model="agencyForm.vehicleId" required>
+                    <option value="" disabled>{{ t("backoffice.vehicleSelectPlaceholder") }}</option>
+                    <option v-for="v in availableVehicles" :key="v.id" :value="v.id">
+                      {{ v.marque }} {{ v.modele }} — {{ v.prix }}€/j
+                    </option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="ab-location">{{ t("booking.location") }}</label>
+                  <input id="ab-location" v-model="agencyForm.location" type="text" :placeholder="t('backoffice.pickupPlaceholder')" required />
+                </div>
+              </div>
+
+              <!-- Étape 3 : infos client (affiché seulement quand un véhicule est choisi) -->
+              <template v-if="agencyForm.vehicleId">
+                <div class="field-row">
+                  <div class="field">
+                    <label for="ab-nom">{{ t("backoffice.clientName") }}</label>
+                    <input id="ab-nom" v-model="agencyForm.nom" type="text" :placeholder="t('backoffice.clientNamePlaceholder')" required />
+                  </div>
+                  <div class="field">
+                    <label for="ab-email">{{ t("modal.email") }}</label>
+                    <input id="ab-email" v-model="agencyForm.email" type="email" :placeholder="t('backoffice.clientEmailPlaceholder')" required />
+                  </div>
+                  <div class="field">
+                    <label for="ab-tel">{{ t("modal.phone") }}</label>
+                    <input id="ab-tel" v-model="agencyForm.telephone" type="tel" :placeholder="t('backoffice.clientPhonePlaceholder')" required />
+                  </div>
+                </div>
+
+                <p v-if="agencyBookingError" class="form-error" role="alert">{{ agencyBookingError }}</p>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-cancel" @click="showAgencyBooking = false">{{ t("searchBanner.cancel") }}</button>
+                  <button type="submit" class="btn-submit" :disabled="agencyBookingSaving">
+                    <svg v-if="agencyBookingSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-spin">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 11l3 3L22 4"/>
+                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                    <span>{{ agencyBookingSaving ? t("backoffice.agencySaving") : t("backoffice.agencyConfirm") }}</span>
+                  </button>
+                </div>
+              </template>
+            </template>
+          </form>
+        </section>
+
         <!-- Toggle liste / calendrier -->
         <div class="view-toggle">
           <button
@@ -185,7 +193,7 @@
               <line x1="3" y1="12" x2="3.01" y2="12" />
               <line x1="3" y1="18" x2="3.01" y2="18" />
             </svg>
-            Liste
+            {{ t("backoffice.viewList") }}
           </button>
           <button
             :class="['vt-btn', { active: reservationsView === 'calendar' }]"
@@ -205,50 +213,50 @@
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            Calendrier
+            {{ t("backoffice.viewCalendar") }}
           </button>
         </div>
 
         <div class="stats-row">
           <div class="stat-card">
             <span class="stat-num">{{ reservations.length }}</span
-            ><span class="stat-label">Total</span>
+            ><span class="stat-label">{{ t("backoffice.statTotal") }}</span>
           </div>
           <div class="stat-card stat-card--green">
             <span class="stat-num">{{ confirmedCount }}</span
-            ><span class="stat-label">Confirmées</span>
+            ><span class="stat-label">{{ t("backoffice.statConfirmed") }}</span>
           </div>
           <div class="stat-card stat-card--red">
             <span class="stat-num">{{ cancelledCount }}</span
-            ><span class="stat-label">Annulées</span>
+            ><span class="stat-label">{{ t("backoffice.statCancelled") }}</span>
           </div>
         </div>
 
         <section class="list-section" v-if="reservationsView === 'list'">
           <h2>
-            Réservations <span class="badge">{{ reservations.length }}</span>
+            {{ t("backoffice.reservationsTitle") }} <span class="badge">{{ reservations.length }}</span>
           </h2>
           <div v-if="reservationStore.loading" class="empty-state">
-            Chargement depuis Firebase...
+            {{ t("backoffice.loading") }}
           </div>
           <div v-else-if="reservations.length === 0" class="empty-state">
-            Aucune réservation pour le moment.
+            {{ t("backoffice.noReservations") }}
           </div>
           <div class="vehicles-table-wrapper" v-else>
             <table class="vehicles-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Véhicule</th>
-                  <th>Lieu / Période</th>
-                  <th>Statut</th>
-                  <th class="th-center">Détail</th>
+                  <th>{{ t("backoffice.colDate") }}</th>
+                  <th>{{ t("backoffice.colClient") }}</th>
+                  <th>{{ t("backoffice.colVehicle") }}</th>
+                  <th>{{ t("backoffice.colPeriod") }}</th>
+                  <th>{{ t("backoffice.colStatus") }}</th>
+                  <th class="th-center">{{ t("backoffice.colDetail") }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="r in reservations"
+                  v-for="r in paginatedReservations"
                   :key="r.id"
                   :class="`row--${r.statut}`"
                 >
@@ -282,7 +290,7 @@
                       {{ r.location }}</span
                     ><br />
                     <span class="date-range"
-                      >{{ r.startDate }} {{ r.startTime }} → {{ r.endDate }}
+                      >{{ formatDate(r.startDate) }} {{ r.startTime }} → {{ formatDate(r.endDate) }}
                       {{ r.endTime }}</span
                     >
                   </td>
@@ -294,15 +302,15 @@
                         reservationStore.updateStatut(r.id, $event.target.value)
                       "
                     >
-                      <option value="confirmee">Confirmée</option>
-                      <option value="annulee">Annulée</option>
+                      <option value="confirmee">{{ t("backoffice.statusConfirmed") }}</option>
+                      <option value="annulee">{{ t("backoffice.statusCancelled") }}</option>
                     </select>
                   </td>
                   <td class="td-center">
                     <button
                       class="btn-detail"
                       @click="openDetail(r)"
-                      title="Voir les détails"
+                      :title="t('backoffice.viewDetail')"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -323,17 +331,31 @@
               </tbody>
             </table>
           </div>
+          <div v-if="totalPages > 1" class="pagination">
+            <button
+              class="btn-page"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
+            >{{ t("backoffice.prev") }}</button>
+            <span class="page-info">{{ t("backoffice.page") }} {{ currentPage }} {{ t("backoffice.of") }} {{ totalPages }}</span>
+            <button
+              class="btn-page"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+            >{{ t("backoffice.next") }}</button>
+          </div>
         </section>
 
         <!-- Vue calendrier -->
         <div v-if="reservationsView === 'calendar'" class="calendar-wrapper">
           <div class="calendar-legend">
             <span class="legend-dot" style="background: #22c55e"></span>
-            Confirmée
-            <span class="legend-dot" style="background: #9ca3af"></span> Annulée
+            {{ t("backoffice.statusConfirmed") }}
+            <span class="legend-dot" style="background: #9ca3af"></span> {{ t("backoffice.statusCancelled") }}
           </div>
-          <FullCalendar
-            :key="calendarEvents.length"
+          <component
+            :is="FullCalendar"
+            v-if="FullCalendar"
             :options="calendarOptions"
           />
         </div>
@@ -342,14 +364,15 @@
       <div v-else>
         <section class="form-section">
           <h2>
-            {{ editingId ? "Modifier le véhicule" : "Ajouter un véhicule" }}
+            {{ editingId ? t("backoffice.editVehicle") : t("backoffice.addVehicle") }}
           </h2>
           <form class="vehicle-form" @submit.prevent="handleSubmit">
             <!-- Upload Photo -->
             <div class="field">
-              <label>Photo du véhicule</label>
+              <label for="bo-photo">{{ t("backoffice.photoLabel") }}</label>
               <div class="file-drop" @click="fileInput.click()">
                 <input
+                  id="bo-photo"
                   ref="fileInput"
                   type="file"
                   accept="image/*"
@@ -359,7 +382,7 @@
                 <img
                   v-if="photoPreview"
                   :src="photoPreview"
-                  alt="Aperçu"
+                  :alt="t('backoffice.photoPreviewAlt')"
                   class="photo-preview-img"
                 />
                 <div v-else class="file-placeholder">
@@ -375,29 +398,30 @@
                     <circle cx="9" cy="9" r="2" />
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                   </svg>
-                  <span>Cliquer pour ajouter une photo</span>
+                  <span>{{ t("backoffice.clickToAddPhoto") }}</span>
                 </div>
               </div>
+              <p v-if="photoError" class="form-error" role="alert">{{ photoError }}</p>
             </div>
 
             <div class="field-row">
               <div class="field">
-                <label for="marque">Marque</label>
+                <label for="marque">{{ t("backoffice.brandLabel") }}</label>
                 <input
                   id="marque"
                   v-model="form.marque"
                   type="text"
-                  placeholder="Ex: Renault, BMW..."
+                  :placeholder="t('backoffice.brandPlaceholder')"
                   required
                 />
               </div>
               <div class="field">
-                <label for="modele">Modèle</label>
+                <label for="modele">{{ t("backoffice.modelLabel") }}</label>
                 <input
                   id="modele"
                   v-model="form.modele"
                   type="text"
-                  placeholder="Ex: Clio, Série 3..."
+                  :placeholder="t('backoffice.modelPlaceholder')"
                   required
                 />
               </div>
@@ -405,42 +429,44 @@
 
             <div class="field-row">
               <div class="field">
-                <label for="carburant">Type de carburant</label>
+                <label for="carburant">{{ t("backoffice.fuelLabel") }}</label>
                 <select id="carburant" v-model="form.carburant" required>
-                  <option value="" disabled>Sélectionner...</option>
-                  <option>Essence</option>
-                  <option>Diesel</option>
-                  <option>Électrique</option>
-                  <option>Hybride</option>
-                  <option>Hybride rechargeable</option>
-                  <option>GPL</option>
+                  <option value="" disabled>{{ t("backoffice.fuelSelectPlaceholder") }}</option>
+                  <option value="Essence">{{ t("fuel.Essence") }}</option>
+                  <option value="Diesel">{{ t("fuel.Diesel") }}</option>
+                  <option value="Électrique">{{ t("fuel.Électrique") }}</option>
+                  <option value="Hybride">{{ t("fuel.Hybride") }}</option>
+                  <option value="Hybride rechargeable">{{ t("fuel.Hybride rechargeable") }}</option>
+                  <option value="GPL">{{ t("fuel.GPL") }}</option>
                 </select>
               </div>
               <div class="field">
-                <label for="places">Nombre de places</label>
+                <label for="places">{{ t("backoffice.placesLabel") }}</label>
                 <input
                   id="places"
                   v-model.number="form.places"
                   type="number"
                   min="1"
                   max="20"
-                  placeholder="Ex: 5"
+                  :placeholder="t('backoffice.placesPlaceholder')"
                   required
                 />
               </div>
               <div class="field">
-                <label for="prix">Prix par jour (€)</label>
+                <label for="prix">{{ t("backoffice.priceLabel") }}</label>
                 <input
                   id="prix"
                   v-model.number="form.prix"
                   type="number"
                   min="0"
                   step="1"
-                  placeholder="Ex: 45"
+                  :placeholder="t('backoffice.pricePlaceholder')"
                   required
                 />
               </div>
             </div>
+
+            <p v-if="vehicleFormError" class="form-error" role="alert">{{ vehicleFormError }}</p>
 
             <div class="form-actions">
               <button
@@ -449,7 +475,7 @@
                 v-if="editingId"
                 @click="cancelEdit"
               >
-                Annuler
+                {{ t('searchBanner.cancel') }}
               </button>
               <button type="submit" class="btn-submit" :disabled="saving">
                 <svg
@@ -490,9 +516,9 @@
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                <span v-if="saving">Enregistrement...</span>
-                <span v-else-if="editingId">Sauvegarder</span>
-                <span v-else>Ajouter le véhicule</span>
+                <span v-if="saving">{{ t("backoffice.agencySaving") }}</span>
+                <span v-else-if="editingId">{{ t("backoffice.updateBtn") }}</span>
+                <span v-else>{{ t("backoffice.saveBtn") }}</span>
               </button>
             </div>
           </form>
@@ -500,35 +526,37 @@
 
         <section class="list-section">
           <h2>
-            Véhicules enregistrés
+            {{ t("backoffice.vehiclesTitle") }}
             <span class="badge">{{ vehicles.length }}</span>
           </h2>
           <div v-if="vehicleStore.loading" class="empty-state">
-            Chargement depuis Firebase...
+            {{ t("backoffice.loading") }}
           </div>
           <div v-else-if="vehicles.length === 0" class="empty-state">
-            Aucun véhicule. Ajoutez-en un ci-dessus.
+            {{ t("backoffice.noVehicles") }}
           </div>
           <div class="vehicles-table-wrapper" v-else>
             <table class="vehicles-table">
               <thead>
                 <tr>
-                  <th>Photo</th>
-                  <th>Marque / Modèle</th>
-                  <th>Carburant</th>
-                  <th>Places</th>
-                  <th>Prix/jour</th>
-                  <th>Disponibilité</th>
-                  <th>Actions</th>
+                  <th>{{ t("backoffice.colPhoto") }}</th>
+                  <th>{{ t("backoffice.colBrandModel") }}</th>
+                  <th>{{ t("backoffice.colFuel") }}</th>
+                  <th>{{ t("backoffice.colSeats") }}</th>
+                  <th>{{ t("backoffice.colPriceDay") }}</th>
+                  <th>{{ t("backoffice.colAvailability") }}</th>
+                  <th>{{ t("backoffice.colActions") }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="v in vehicles" :key="v.id">
                   <td>
                     <img
-                      :src="v.photoURL"
+                      v-if="v.photoURL"
+                      :src="cloudinaryThumb(v.photoURL, 160, 104)"
                       :alt="`${v.marque} ${v.modele}`"
                       class="table-thumb"
+                      @error="(e) => e.target.style.visibility = 'hidden'"
                     />
                   </td>
                   <td>
@@ -537,7 +565,7 @@
                   </td>
                   <td>
                     <span class="tag" :class="fuelClass(v.carburant)">{{
-                      v.carburant
+                      t(`fuel.${v.carburant}`)
                     }}</span>
                   </td>
                   <td class="td-center">
@@ -595,7 +623,7 @@
                         <line x1="15" y1="9" x2="9" y2="15" />
                         <line x1="9" y1="9" x2="15" y2="15" />
                       </svg>
-                      {{ v.disponible ? "Disponible" : "Indisponible" }}
+                      {{ v.disponible ? t("backoffice.available") : t("fleet.unavailable") }}
                     </button>
                   </td>
                   <td class="actions td-center">
@@ -616,9 +644,9 @@
                           d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
                         />
                       </svg>
-                      Modifier
+                      {{ t("backoffice.editBtn") }}
                     </button>
-                    <button class="btn-delete" @click="deleteVehicle(v.id)">
+                    <button class="btn-delete" @click="deleteVehicle(v)">
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -636,7 +664,7 @@
                         <path d="M14 11v6" />
                         <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                       </svg>
-                      Supprimer
+                      {{ t("backoffice.deleteBtn") }}
                     </button>
                   </td>
                 </tr>
@@ -654,18 +682,39 @@
       @close="showDetailModal = false"
       @delete="handleDeleteReservation"
     />
+
+    <!-- Confirmation de suppression véhicule -->
+    <Teleport to="body">
+      <div v-if="vehicleToDelete" class="delete-overlay" @click.self="vehicleToDelete = null">
+        <div ref="deleteDialogRef" class="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+          <h3 id="delete-dialog-title" class="delete-dialog-title">{{ t("backoffice.deleteBtn") }} — {{ t("backoffice.tabVehicles") }}</h3>
+          <p class="delete-dialog-desc">{{ t("backoffice.deleteConfirm", { label: vehicleToDelete.label }) }}</p>
+          <div class="delete-dialog-actions">
+            <button class="btn-cancel-delete" @click="vehicleToDelete = null">{{ t("searchBanner.cancel") }}</button>
+            <button class="btn-confirm-delete" @click="confirmDeleteVehicle">{{ t("backoffice.deleteBtn") }}</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed, watch } from "vue";
+import { reactive, ref, computed, watch, shallowRef, onUnmounted, nextTick } from "vue";
+import { useI18n } from "vue-i18n";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
+import { authStore } from "../store/auth.js";
+import { formatDate } from "../composables/useFormatDate.js";
+import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
-import FullCalendar from "@fullcalendar/vue3";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import frLocale from "@fullcalendar/core/locales/fr";
+
+const FullCalendar = shallowRef(null);
+const dayGridPlugin = shallowRef(null);
+const frLocale = shallowRef(null);
+
+const { t } = useI18n();
 
 const activeTab = ref("reservations");
 const reservations = computed(() => reservationStore.reservations);
@@ -677,9 +726,23 @@ const cancelledCount = computed(
   () => reservations.value.filter((r) => r.statut === "annulee").length,
 );
 
+// Pagination réservations
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const totalPages = computed(() => Math.ceil(reservations.value.length / itemsPerPage));
+const paginatedReservations = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return reservations.value.slice(start, start + itemsPerPage);
+});
+watch(reservations, () => { currentPage.value = 1; });
+watch(activeTab, (tab) => { if (tab !== 'reservations') showAgencyBooking.value = false; });
+
 // — Formulaire véhicule
 const editingId = ref(null);
 const saving = ref(false);
+const vehicleFormError = ref("");
+const photoError = ref("");
+const MAX_PHOTO_SIZE = 10 * 1024 * 1024;
 const photoFile = ref(null);
 const fileInput = ref(null);
 const emptyForm = () => ({
@@ -692,28 +755,48 @@ const emptyForm = () => ({
 });
 const form = reactive(emptyForm());
 
-const photoPreview = computed(() => {
-  if (photoFile.value) return URL.createObjectURL(photoFile.value);
-  return form.photoURL || "";
+const objectUrl = ref("");
+
+watch(photoFile, (newFile) => {
+  if (objectUrl.value) {
+    URL.revokeObjectURL(objectUrl.value);
+    objectUrl.value = "";
+  }
+  if (newFile) objectUrl.value = URL.createObjectURL(newFile);
 });
 
+onUnmounted(() => {
+  if (objectUrl.value) URL.revokeObjectURL(objectUrl.value);
+  document.removeEventListener("keydown", handleDeleteKeydown);
+});
+
+const photoPreview = computed(() => objectUrl.value || form.photoURL || "");
+
 function onFileChange(e) {
-  photoFile.value = e.target.files[0] || null;
+  const file = e.target.files[0] || null;
+  if (file && file.size > MAX_PHOTO_SIZE) {
+    photoError.value = t("backoffice.photoTooLarge");
+    photoFile.value = null;
+    e.target.value = "";
+    return;
+  }
+  photoError.value = "";
+  photoFile.value = file;
 }
 
 async function handleSubmit() {
   saving.value = true;
+  vehicleFormError.value = "";
   try {
     if (editingId.value) {
-      await vehicleStore.updateVehicle(
-        editingId.value,
-        { ...form },
-        photoFile.value,
-      );
+      await vehicleStore.updateVehicle(editingId.value, { ...form }, photoFile.value);
     } else {
       await vehicleStore.addVehicle({ ...form }, photoFile.value);
     }
     cancelEdit();
+  } catch (err) {
+    console.error("[BackOffice] Erreur sauvegarde véhicule:", err);
+    vehicleFormError.value = t("backoffice.saveError");
   } finally {
     saving.value = false;
   }
@@ -737,14 +820,36 @@ function cancelEdit() {
   editingId.value = null;
   Object.assign(form, emptyForm());
   photoFile.value = null;
+  photoError.value = "";
+  vehicleFormError.value = "";
   if (fileInput.value) fileInput.value.value = "";
 }
 
-async function deleteVehicle(id) {
-  if (confirm("Supprimer ce véhicule définitivement ?")) {
-    await vehicleStore.deleteVehicle(id);
-    if (editingId.value === id) cancelEdit();
+const vehicleToDelete = ref(null);
+const deleteDialogRef = ref(null);
+
+function handleDeleteKeydown(e) {
+  if (e.key === "Escape") vehicleToDelete.value = null;
+}
+
+watch(vehicleToDelete, (v) => {
+  if (v) {
+    document.addEventListener("keydown", handleDeleteKeydown);
+    nextTick(() => deleteDialogRef.value?.querySelector("button")?.focus());
+  } else {
+    document.removeEventListener("keydown", handleDeleteKeydown);
   }
+});
+
+function deleteVehicle(vehicle) {
+  vehicleToDelete.value = { id: vehicle.id, label: `${vehicle.marque} ${vehicle.modele}` };
+}
+
+async function confirmDeleteVehicle() {
+  const { id } = vehicleToDelete.value;
+  vehicleToDelete.value = null;
+  await vehicleStore.deleteVehicle(id);
+  if (editingId.value === id) cancelEdit();
 }
 
 function fuelClass(carburant) {
@@ -759,19 +864,10 @@ function fuelClass(carburant) {
   return map[carburant] || "";
 }
 
-function formatDate(ts) {
-  if (!ts) return "—";
-  const date = ts.toDate ? ts.toDate() : new Date(ts);
-  return date.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
 // — Réservation en agence
 const showAgencyBooking = ref(false);
 const agencyBookingSaving = ref(false);
+const agencyBookingError = ref("");
 const emptyAgencyForm = () => ({
   nom: "",
   email: "",
@@ -788,12 +884,13 @@ const agencyForm = reactive(emptyAgencyForm());
 const availableVehicles = computed(() => {
   if (!agencyForm.startDate || !agencyForm.endDate) return [];
   return vehicles.value.filter((v) => {
+    if (!v.disponible) return false;
     return !reservationStore.reservations.some(
       (r) =>
         r.vehicleId === v.id &&
         r.statut !== "annulee" &&
-        agencyForm.startDate < r.endDate &&
-        agencyForm.endDate > r.startDate,
+        agencyForm.startDate <= r.endDate &&
+        agencyForm.endDate >= r.startDate,
     );
   });
 });
@@ -805,11 +902,13 @@ watch(
 
 async function handleAgencyBooking() {
   agencyBookingSaving.value = true;
+  agencyBookingError.value = "";
   try {
     const vehicle = vehicles.value.find((v) => v.id === agencyForm.vehicleId);
     await reservationStore.addReservation({
       vehicleId: agencyForm.vehicleId,
       vehicleLabel: vehicle ? `${vehicle.marque} ${vehicle.modele}` : "",
+      vehiclePhoto: vehicle ? vehicle.photoURL || "" : "",
       nom: agencyForm.nom,
       email: agencyForm.email,
       telephone: agencyForm.telephone,
@@ -819,10 +918,16 @@ async function handleAgencyBooking() {
       endDate: agencyForm.endDate,
       endTime: agencyForm.endTime,
       userId: null,
+      bookingSource: "agency",
       statut: "confirmee",
     });
     Object.assign(agencyForm, emptyAgencyForm());
     showAgencyBooking.value = false;
+  } catch (err) {
+    console.error("[BackOffice] Erreur réservation agence:", err);
+    agencyBookingError.value = err.code === "AVAILABILITY_ERROR"
+      ? t("backoffice.vehicleUnavailable")
+      : t("backoffice.agencyBookingError");
   } finally {
     agencyBookingSaving.value = false;
   }
@@ -830,6 +935,23 @@ async function handleAgencyBooking() {
 
 // — Calendrier
 const reservationsView = ref("list");
+
+watch(
+  reservationsView,
+  async (view) => {
+    if (view === "calendar" && !FullCalendar.value) {
+      const [fc, dgp, loc] = await Promise.all([
+        import("@fullcalendar/vue3"),
+        import("@fullcalendar/daygrid"),
+        import("@fullcalendar/core/locales/fr"),
+      ]);
+      dayGridPlugin.value = dgp.default;
+      frLocale.value = loc.default;
+      FullCalendar.value = fc.default;
+    }
+  },
+  { immediate: true },
+);
 const detailReservation = ref(null);
 const showDetailModal = ref(false);
 
@@ -865,9 +987,9 @@ const calendarEvents = computed(() =>
     })),
 );
 const calendarOptions = computed(() => ({
-  plugins: [dayGridPlugin],
+  plugins: [dayGridPlugin.value],
   initialView: "dayGridMonth",
-  locale: frLocale,
+  locale: frLocale.value,
   events: calendarEvents.value,
   eventDisplay: "block",
   height: "auto",
@@ -878,7 +1000,7 @@ const calendarOptions = computed(() => ({
 <style scoped>
 .backoffice {
   padding: 3rem 0 5rem;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   min-height: 100vh;
 }
 .container {
@@ -889,7 +1011,7 @@ const calendarOptions = computed(() => ({
 .page-title {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -898,7 +1020,7 @@ const calendarOptions = computed(() => ({
 .page-title svg {
   width: 28px;
   height: 28px;
-  color: #e63946;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
@@ -926,11 +1048,11 @@ const calendarOptions = computed(() => ({
   transition: color 0.2s;
 }
 .tab.active {
-  color: #1a1a2e;
-  border-bottom-color: #e63946;
+  color: var(--color-navy);
+  border-bottom-color: var(--color-primary);
 }
 .tab-badge {
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border-radius: 20px;
   padding: 0.1rem 0.5rem;
@@ -976,7 +1098,7 @@ const calendarOptions = computed(() => ({
 .stat-num {
   font-size: 2rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .stat-label {
   font-size: 0.85rem;
@@ -993,7 +1115,7 @@ const calendarOptions = computed(() => ({
 }
 .form-section h2 {
   font-size: 1.2rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 1.5rem;
 }
 .vehicle-form {
@@ -1035,7 +1157,7 @@ select {
 }
 input:focus,
 select:focus {
-  border-color: #e63946;
+  border-color: var(--color-primary);
 }
 
 /* Photo Upload */
@@ -1051,7 +1173,7 @@ select:focus {
   transition: border-color 0.2s;
 }
 .file-drop:hover {
-  border-color: #e63946;
+  border-color: var(--color-primary);
 }
 .file-placeholder {
   display: flex;
@@ -1073,13 +1195,21 @@ select:focus {
   object-fit: cover;
 }
 
+.form-error {
+  background: #fce4ec;
+  color: #c62828;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+  margin: 0;
+}
 .form-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
 }
 .btn-submit {
-  background: #1a1a2e;
+  background: var(--color-navy);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -1122,14 +1252,14 @@ select:focus {
 }
 .list-section h2 {
   font-size: 1.2rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 .badge {
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border-radius: 20px;
   padding: 0.1rem 0.6rem;
@@ -1149,14 +1279,17 @@ select:focus {
 }
 .vehicles-table th {
   text-align: left;
-  padding: 0.7rem 1rem;
+  padding: 0.9rem 1rem;
   font-size: 0.85rem;
   color: #888;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .vehicles-table td {
-  padding: 0.7rem 1rem;
+  padding: 0.9rem 1rem;
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
 }
@@ -1318,7 +1451,7 @@ select:focus {
 }
 .btn-detail {
   background: #e8eaf6;
-  color: #1a1a2e;
+  color: var(--color-navy);
   border: none;
   border-radius: 8px;
   width: 34px;
@@ -1345,7 +1478,7 @@ select:focus {
 /* Réservation en agence */
 .agency-booking {
   margin-bottom: 2rem;
-  border-left: 4px solid #e63946;
+  border-left: 4px solid var(--color-primary);
 }
 .agency-booking-toggle {
   display: flex;
@@ -1353,6 +1486,13 @@ select:focus {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
 }
 .agency-booking-toggle h2 {
   margin-bottom: 0;
@@ -1363,12 +1503,12 @@ select:focus {
 .agency-booking-toggle h2 svg {
   width: 18px;
   height: 18px;
-  color: #e63946;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 .badge-agency {
   background: #fde8e8;
-  color: #e63946;
+  color: var(--color-primary);
   border-radius: 20px;
   padding: 0.1rem 0.5rem;
   font-size: 0.72rem;
@@ -1429,9 +1569,9 @@ select:focus {
   gap: 0.4rem;
 }
 .vt-btn.active {
-  background: #1a1a2e;
+  background: var(--color-navy);
   color: #fff;
-  border-color: #1a1a2e;
+  border-color: var(--color-navy);
 }
 
 /* Calendrier */
@@ -1456,5 +1596,91 @@ select:focus {
   height: 12px;
   border-radius: 50%;
   margin-right: 0.3rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+}
+.btn-page {
+  background: #f0f4ff;
+  border: 1.5px solid #dde3f5;
+  color: var(--color-navy);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-page:hover:not(:disabled) { background: #e2e8fa; }
+.btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-info { font-size: 0.88rem; color: #666; }
+
+/* Delete confirmation dialog */
+.delete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.5);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.delete-dialog {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.75rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+}
+.delete-dialog-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin: 0 0 0.5rem;
+}
+.delete-dialog-desc {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+.delete-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+.btn-cancel-delete {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancel-delete:hover {
+  background: #e0e0e0;
+}
+.btn-confirm-delete {
+  background: #c62828;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-confirm-delete:hover {
+  background: #b71c1c;
 }
 </style>
