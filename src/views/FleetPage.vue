@@ -2,7 +2,7 @@
   <div class="fleet-page">
     <div class="container">
       <div class="page-header">
-        <button class="btn-back" @click="router.back()">
+        <button class="btn-back" @click="goBack()">
           {{ t("fleetPage.back") }}
         </button>
         <h1 class="page-title">{{ t("fleetPage.title") }}</h1>
@@ -12,19 +12,23 @@
         >
           {{
             t("fleetPage.subtitle", {
-              start: formatDate(searchStore.startDate),
-              end: formatDate(searchStore.endDate),
+              start: formatDate(searchStore.startDate, { day: 'numeric', month: 'long' }),
+              end: formatDate(searchStore.endDate, { day: 'numeric', month: 'long' }),
               location: searchStore.location,
             })
           }}
         </p>
       </div>
 
+      <div v-if="route.query.redirected === '1'" class="notice-banner" role="alert">
+        {{ t("fleetPage.redirectedNotice") }}
+      </div>
+
       <div class="filters-panel" v-if="!vehicleStore.loading">
         <div class="filters-grid">
           <label class="filter-field">
             <span>{{ t("fleetPage.filters.fuel") }}</span>
-            <select v-model="selectedFuel">
+            <select id="filter-fuel" name="filter-fuel" v-model="selectedFuel">
               <option value="all">{{ t("fleetPage.filters.anyFuel") }}</option>
               <option v-for="fuel in fuelOptions" :key="fuel" :value="fuel">
                 {{ t(`fuel.${fuel}`) }}
@@ -34,7 +38,7 @@
 
           <label class="filter-field">
             <span>{{ t("fleetPage.filters.seats") }}</span>
-            <select v-model="selectedSeats">
+            <select id="filter-seats" name="filter-seats" v-model="selectedSeats">
               <option value="all">{{ t("fleetPage.filters.anySeats") }}</option>
               <option v-for="seat in seatOptions" :key="seat" :value="seat">
                 {{ t("fleetPage.filters.seatsAtLeast", { n: seat }) }}
@@ -45,13 +49,20 @@
           <label class="filter-field">
             <span>{{ t("fleetPage.filters.maxPrice") }}</span>
             <div class="price-filter">
+              <span class="price-bound">0€</span>
               <input
+                id="filter-max-price"
+                name="filter-max-price"
                 type="range"
                 :key="highestPrice"
                 :min="0"
                 :max="highestPrice"
                 :step="1"
                 v-model.number="selectedMaxPrice"
+                :aria-valuemin="0"
+                :aria-valuemax="highestPrice"
+                :aria-valuenow="selectedMaxPrice"
+                :aria-label="t('fleetPage.filters.maxPrice')"
               />
               <div class="price-value">{{ selectedMaxPrice }}€</div>
             </div>
@@ -64,7 +75,9 @@
           </button>
           <p class="results-count">
             {{
-              t("fleetPage.filters.results", { count: filteredVehicles.length })
+              filteredVehicles.length === 1
+                ? t("fleetPage.filters.resultOne")
+                : t("fleetPage.filters.results", { count: filteredVehicles.length })
             }}
           </p>
         </div>
@@ -77,7 +90,15 @@
         {{ t("fleetPage.empty") }}
       </div>
       <div v-else-if="filteredVehicles.length === 0" class="fleet-empty">
-        {{ t("fleetPage.emptyFiltered") }}
+        <p>{{ t("fleetPage.emptyFiltered") }}</p>
+        <div class="active-filters" v-if="selectedFuel !== 'all' || selectedSeats !== 'all' || selectedMaxPrice < highestPrice">
+          <button v-if="selectedFuel !== 'all'" class="filter-chip" type="button" @click="selectedFuel = 'all'">{{ t(`fuel.${selectedFuel}`) }} ✕</button>
+          <button v-if="selectedSeats !== 'all'" class="filter-chip" type="button" @click="selectedSeats = 'all'">{{ t("fleetPage.filters.seatsAtLeast", { n: selectedSeats }) }} ✕</button>
+          <button v-if="selectedMaxPrice < highestPrice" class="filter-chip" type="button" @click="selectedMaxPrice = highestPrice">≤ {{ selectedMaxPrice }}€ ✕</button>
+        </div>
+        <button class="btn-reset-cta" type="button" @click="resetFilters">
+          {{ t("fleetPage.filters.reset") }}
+        </button>
       </div>
       <div class="fleet-grid" v-else>
         <VehicleCard
@@ -98,28 +119,36 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, watch, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { formatDate } from "../composables/useFormatDate.js";
+
 import ReservationModal from "../components/ReservationModal.vue";
 import VehicleCard from "../components/VehicleCard.vue";
 import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
-import { userAuthStore } from "../store/userAuth.js";
+import { authStore as userAuthStore } from "../store/auth.js";
 
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 const selectedVehicle = ref(null);
 
-function formatDate(dateStr) {
-  if (!dateStr) return "—";
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-  });
-}
+onMounted(() => {
+  const vehicleId = route.query.vehicleId;
+  if (!vehicleId || !userAuthStore.isAuthenticated) return;
+  const tryOpen = () => {
+    const vehicle = vehicleStore.vehicles.find((v) => v.id === vehicleId && v.disponible);
+    if (vehicle) { selectedVehicle.value = vehicle; return true; }
+    return false;
+  };
+  if (!tryOpen()) {
+    const unwatch = watch(() => vehicleStore.vehicles, () => { if (tryOpen()) unwatch(); });
+  }
+});
 
 const unavailableVehicleIds = computed(() => {
   if (!searchStore.startDate || !searchStore.endDate) return new Set();
@@ -202,9 +231,14 @@ function resetFilters() {
   selectedMaxPrice.value = highestPrice.value;
 }
 
+function goBack() {
+  if (window.history.length > 1) router.back();
+  else router.push("/");
+}
+
 function openReservation(vehicle) {
   if (!userAuthStore.isAuthenticated) {
-    router.push({ path: "/auth", query: { redirect: "/fleet" } });
+    router.push({ path: "/auth", query: { redirect: `/fleet?vehicleId=${vehicle.id}` } });
     return;
   }
   selectedVehicle.value = vehicle;
@@ -214,7 +248,7 @@ function openReservation(vehicle) {
 <style scoped>
 .fleet-page {
   min-height: 100vh;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   padding: 3rem 0 5rem;
 }
 .container {
@@ -228,7 +262,7 @@ function openReservation(vehicle) {
 .btn-back {
   background: none;
   border: none;
-  color: #e63946;
+  color: var(--color-primary);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -242,7 +276,7 @@ function openReservation(vehicle) {
 .page-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin: 0 0 0.4rem;
 }
 .page-subtitle {
@@ -275,7 +309,7 @@ function openReservation(vehicle) {
 }
 .filter-field span {
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-size: 0.86rem;
 }
 .filter-field select {
@@ -288,16 +322,43 @@ function openReservation(vehicle) {
 .price-filter {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.5rem;
 }
 .price-filter input {
   flex: 1;
 }
+.price-bound {
+  font-size: 0.78rem;
+  color: #888;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .price-value {
-  min-width: 72px;
   text-align: right;
   font-weight: 700;
   color: #e65100;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.filter-chip {
+  background: #e8eaf6;
+  color: var(--color-navy);
+  border: none;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.filter-chip:hover {
+  background: #d0d4f0;
 }
 .filters-actions {
   display: flex;
@@ -308,14 +369,14 @@ function openReservation(vehicle) {
 .btn-reset {
   border: 1px solid #d8dced;
   background: #fff;
-  color: #1a1a2e;
+  color: var(--color-navy);
   border-radius: 8px;
   padding: 0.45rem 0.8rem;
   cursor: pointer;
   font-weight: 600;
 }
 .btn-reset:hover {
-  border-color: #1a1a2e;
+  border-color: var(--color-navy);
 }
 .results-count {
   margin: 0;
@@ -323,16 +384,59 @@ function openReservation(vehicle) {
   color: #5c5f6f;
   font-weight: 600;
 }
+.notice-banner {
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: #e65100;
+  font-weight: 600;
+}
 .fleet-loading,
 .fleet-empty {
   text-align: center;
   color: #999;
   padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
+.btn-reset-cta {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-reset-cta:hover { background: var(--color-primary-dark); }
 .fleet-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .filters-panel {
+    padding: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 }
 
 @media (max-width: 1024px) {

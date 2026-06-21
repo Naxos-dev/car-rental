@@ -32,9 +32,9 @@
     <section class="trust-strip">
       <div class="container">
         <div class="trust-items">
-          <div class="trust-item" v-for="t in trustItems" :key="t.label">
-            <span class="trust-icon" v-html="t.svg"></span>
-            <span>{{ t.label }}</span>
+          <div class="trust-item" v-for="item in trustItems" :key="item.label">
+            <span class="trust-icon" v-html="ICONS[item.iconKey]" aria-hidden="true"></span>
+            <span>{{ item.label }}</span>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
         <h2 class="section-title">{{ t("features.title") }}</h2>
         <div class="features-grid">
           <div class="feature-card" v-for="feat in features" :key="feat.title">
-            <div class="feat-icon-wrap" v-html="feat.svg"></div>
+            <div class="feat-icon-wrap" v-html="ICONS[feat.iconKey]" aria-hidden="true"></div>
             <h3>{{ feat.title }}</h3>
             <p>{{ feat.desc }}</p>
           </div>
@@ -74,7 +74,11 @@
           <VehicleCardSkeleton v-for="n in 6" :key="n" />
         </div>
         <div v-else-if="vehicles.length === 0" class="fleet-empty">
-          {{ t("fleet.empty") }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="fleet-empty-icon" aria-hidden="true">
+            <path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22"/>
+          </svg>
+          <p>{{ t("fleet.empty") }}</p>
+          <RouterLink to="/fleet" class="btn-fleet-empty">{{ t("cta.btn") }}</RouterLink>
         </div>
         <div class="fleet-grid" v-else>
           <VehicleCard
@@ -99,26 +103,27 @@
       <div class="container">
         <h2 class="section-title">{{ t("testimonials.title") }}</h2>
         <div class="testimonials-grid">
-          <div class="testimonial-card" v-for="t in testimonials" :key="t.name">
-            <div class="stars">
+          <div class="testimonial-card" v-for="item in testimonials" :key="item.name">
+            <div class="stars" role="img" :aria-label="t('testimonials.starsLabel')">
               <svg
                 v-for="i in 5"
                 :key="i"
                 viewBox="0 0 24 24"
                 fill="#f59e0b"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <polygon
                   points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                 />
               </svg>
             </div>
-            <p class="testimonial-text">"{{ t.text }}"</p>
+            <p class="testimonial-text">"{{ item.text }}"</p>
             <div class="testimonial-author">
-              <div class="author-avatar">{{ t.initials }}</div>
+              <div class="author-avatar" aria-hidden="true">{{ item.initials }}</div>
               <div class="author-info">
-                <strong>{{ t.name }}</strong>
-                <span>{{ t.city }}</span>
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.city }}</span>
               </div>
             </div>
           </div>
@@ -139,9 +144,15 @@
             :key="index"
             class="faq-item"
             :class="{ open: openFaq === index }"
-            @click="openFaq = openFaq === index ? null : index"
           >
-            <div class="faq-question">
+            <button
+              :id="`faq-btn-${index}`"
+              class="faq-question"
+              type="button"
+              :aria-expanded="openFaq === index"
+              :aria-controls="`faq-answer-${index}`"
+              @click="openFaq = openFaq === index ? null : index"
+            >
               <span>{{ item.q }}</span>
               <svg
                 class="faq-chevron"
@@ -157,8 +168,14 @@
                   stroke-linejoin="round"
                 />
               </svg>
-            </div>
-            <div class="faq-answer">
+            </button>
+            <div
+              class="faq-answer"
+              :id="`faq-answer-${index}`"
+              role="region"
+              :aria-labelledby="`faq-btn-${index}`"
+              :aria-hidden="openFaq !== index"
+            >
               <p>{{ item.a }}</p>
             </div>
           </div>
@@ -188,11 +205,24 @@ import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
-import { userAuthStore } from "../store/userAuth.js";
+import { authStore as userAuthStore } from "../store/auth.js";
 
 const { t, tm } = useI18n();
 const router = useRouter();
-const vehicles = computed(() => vehicleStore.vehicles);
+
+// Static SVG map — v-html is safe only because this object is frozen and never populated
+// from external data (Firestore, i18n, user input). Add new icons here; never use v-html
+// with runtime-supplied strings.
+const ICONS = Object.freeze({
+  lock: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  shield: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  phone: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+  clock: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  car: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6"/></svg>`,
+  euro: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h12M19 6.5C17.5 4.5 15.3 3.5 13 3.5C8.9 3.5 5.5 7.1 5.5 12s3.4 8.5 7.5 8.5c2.3 0 4.5-1 6-3"/></svg>`,
+});
+const vehicles = computed(() => vehicleStore.vehicles.filter((v) => v.disponible));
 
 const unavailableVehicleIds = computed(() => {
   if (!searchStore.startDate || !searchStore.endDate) return new Set();
@@ -217,7 +247,7 @@ const selectedVehicle = ref(null);
 
 function openReservation(vehicle) {
   if (!userAuthStore.isAuthenticated) {
-    router.push({ path: "/auth", query: { redirect: "/" } });
+    router.push({ path: "/auth", query: { redirect: `/fleet?vehicleId=${vehicle.id}` } });
     return;
   }
   selectedVehicle.value = vehicle;
@@ -226,19 +256,19 @@ function openReservation(vehicle) {
 const trustItems = computed(() => [
   {
     label: t("trustStrip.securePayment"),
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    iconKey: "lock",
   },
   {
     label: t("trustStrip.insurance"),
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    iconKey: "shield",
   },
   {
     label: t("trustStrip.noFees"),
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    iconKey: "check",
   },
   {
     label: t("trustStrip.support"),
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+    iconKey: "phone",
   },
 ]);
 
@@ -263,22 +293,22 @@ const stats = computed(() => [
 
 const features = computed(() => [
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    iconKey: "clock",
     title: t("featuresSection[0].title"),
     desc: t("featuresSection[0].desc"),
   },
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6"/></svg>`,
+    iconKey: "car",
     title: t("featuresSection[1].title"),
     desc: t("featuresSection[1].desc"),
   },
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h12M19 6.5C17.5 4.5 15.3 3.5 13 3.5C8.9 3.5 5.5 7.1 5.5 12s3.4 8.5 7.5 8.5c2.3 0 4.5-1 6-3"/></svg>`,
+    iconKey: "euro",
     title: t("featuresSection[2].title"),
     desc: t("featuresSection[2].desc"),
   },
   {
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    iconKey: "shield",
     title: t("featuresSection[3].title"),
     desc: t("featuresSection[3].desc"),
   },
@@ -286,7 +316,7 @@ const features = computed(() => [
 
 const testimonials = computed(() => tm("testimonialsData"));
 const faqItems = computed(() => tm("faqSection.items"));
-const openFaq = ref(0);
+const openFaq = ref(null);
 </script>
 
 <style scoped>
@@ -294,8 +324,7 @@ const openFaq = ref(0);
 .hero {
   position: relative;
   min-height: 580px;
-  background: url("https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1600")
-    center/cover no-repeat;
+  background: var(--color-navy) url("/app-background.jpeg") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,6 +354,15 @@ const openFaq = ref(0);
   color: #ddd;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
+}
+@media (max-width: 900px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
 }
 @media (max-width: 600px) {
   .hero-title {
@@ -362,6 +400,10 @@ const openFaq = ref(0);
   }
   .stat-number {
     font-size: 1.8rem;
+  }
+  .stat-label {
+    font-size: 0.73rem;
+    letter-spacing: 0.03em;
   }
 
   /* Features */
@@ -416,6 +458,10 @@ const openFaq = ref(0);
     flex-direction: column;
     gap: 0.6rem;
   }
+  .stat-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.01em;
+  }
 }
 
 /* Shared */
@@ -428,14 +474,14 @@ const openFaq = ref(0);
   text-align: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 2.5rem;
 }
 
 /* Features */
 .features {
   padding: 5rem 0;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
 }
 .features-grid {
   display: grid;
@@ -466,7 +512,7 @@ const openFaq = ref(0);
 }
 .feature-card h3 {
   margin: 0.8rem 0 0.4rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-size: 1rem;
 }
 .feature-card p {
@@ -484,6 +530,29 @@ const openFaq = ref(0);
   text-align: center;
   color: #999;
   padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.fleet-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #ccc;
+}
+.btn-fleet-empty {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-fleet-empty:hover {
+  background: var(--color-primary-dark);
 }
 .fleet-grid {
   display: grid;
@@ -534,7 +603,7 @@ const openFaq = ref(0);
 .trust-icon {
   display: flex;
   align-items: center;
-  color: #e63946;
+  color: var(--color-primary);
 }
 .trust-icon :deep(svg) {
   width: 17px;
@@ -562,10 +631,11 @@ const openFaq = ref(0);
   font-weight: 800;
   color: #fff;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .stat-label {
   font-size: 0.82rem;
-  color: #9999bb;
+  color: #c8c8e4;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -573,7 +643,7 @@ const openFaq = ref(0);
 /* Testimonials */
 .testimonials {
   padding: 5rem 0;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
 }
 .testimonials-grid {
   display: grid;
@@ -626,7 +696,7 @@ const openFaq = ref(0);
 }
 .author-info strong {
   font-size: 0.92rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .author-info span {
   font-size: 0.8rem;
@@ -665,46 +735,50 @@ const openFaq = ref(0);
 }
 .faq-item:hover {
   box-shadow: 0 4px 16px rgba(230, 57, 70, 0.08);
-  border-color: #e63946;
+  border-color: var(--color-primary);
 }
 .faq-item.open {
-  border-color: #e63946;
+  border-color: var(--color-primary);
   box-shadow: 0 4px 20px rgba(230, 57, 70, 0.1);
 }
 .faq-question {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   padding: 1.1rem 1.5rem;
   font-weight: 600;
   font-size: 0.97rem;
-  color: #1a1a2e;
-  user-select: none;
+  color: var(--color-navy);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
   gap: 1rem;
 }
 .faq-chevron {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #e63946;
+  color: var(--color-primary);
   transition: transform 0.25s;
 }
 .faq-item.open .faq-chevron {
   transform: rotate(180deg);
 }
 .faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.3s ease,
-    padding 0.3s ease;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
   padding: 0 1.5rem;
 }
 .faq-item.open .faq-answer {
-  max-height: 300px;
-  padding: 0 1.5rem 1.25rem;
+  grid-template-rows: 1fr;
+  padding-bottom: 1.25rem;
 }
 .faq-answer p {
+  overflow: hidden;
+  min-height: 0;
   color: #555;
   font-size: 0.92rem;
   line-height: 1.7;
@@ -717,18 +791,19 @@ const openFaq = ref(0);
   .faq-question {
     font-size: 0.9rem;
     padding: 1rem 1.1rem;
+    font-family: inherit;
   }
   .faq-answer {
     padding: 0 1.1rem;
   }
   .faq-item.open .faq-answer {
-    padding: 0 1.1rem 1rem;
+    padding-bottom: 1rem;
   }
 }
 
 /* CTA */
 .cta {
-  background: linear-gradient(135deg, #1a1a2e, #e63946);
+  background: linear-gradient(160deg, var(--color-navy) 0%, #3d1a2e 55%, var(--color-primary) 100%);
   color: #fff;
   padding: 5rem 0;
   text-align: center;
@@ -744,7 +819,7 @@ const openFaq = ref(0);
 }
 .btn-cta {
   background: #fff;
-  color: #e63946;
+  color: var(--color-primary);
   padding: 0.85rem 2rem;
   border-radius: 8px;
   text-decoration: none;

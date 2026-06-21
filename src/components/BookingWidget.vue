@@ -4,7 +4,7 @@
     <form class="widget-form" @submit.prevent="handleSearch">
       <!-- Localisation -->
       <div class="field">
-        <label for="location">
+        <span class="field-label">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -13,25 +13,39 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            aria-hidden="true"
           >
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
           {{ t("booking.location") }}
-        </label>
-        <input id="location" value="Lille" type="text" readonly />
+        </span>
+        <div
+          class="location-display"
+          role="status"
+          :aria-label="t('booking.location') + ': ' + searchStore.location"
+        >
+          {{ searchStore.location }}
+        </div>
       </div>
 
       <!-- Période de location -->
-      <div class="field">
-        <label>{{ t("booking.dateRange") }}</label>
+      <div :class="['field', { 'field--error': searchError }]">
+        <label for="dateRange">{{ t("booking.dateRange") }}</label>
         <DateRangePicker
+          inputId="dateRange"
           :startDate="localStartDate"
           :endDate="localEndDate"
           :disabledRanges="[]"
           :placeholder="t('booking.selectDates')"
-          @update:startDate="localStartDate = $event"
-          @update:endDate="localEndDate = $event"
+          @update:startDate="
+            localStartDate = $event;
+            searchError = '';
+          "
+          @update:endDate="
+            localEndDate = $event;
+            searchError = '';
+          "
         />
       </div>
 
@@ -39,18 +53,30 @@
       <div class="field-group">
         <div class="field">
           <label for="startTime">{{ t("booking.startTime") }}</label>
-          <input id="startTime" v-model="searchStore.startTime" type="time" required />
+          <input id="startTime" v-model="localStartTime" type="time" required />
         </div>
         <div class="field">
           <label for="endTime">{{ t("booking.endTime") }}</label>
-          <input id="endTime" v-model="searchStore.endTime" type="time" required />
+          <input id="endTime" v-model="localEndTime" type="time" required />
         </div>
       </div>
 
+      <p v-if="searchError" class="search-error" role="alert">
+        {{ searchError }}
+      </p>
+
       <button type="submit" class="btn-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="search-icon"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         {{ t("booking.search") }}
       </button>
@@ -70,10 +96,24 @@ const router = useRouter();
 
 const localStartDate = ref(searchStore.startDate);
 const localEndDate = ref(searchStore.endDate);
+const localStartTime = ref(searchStore.startTime);
+const localEndTime = ref(searchStore.endTime);
+const searchError = ref("");
 
 function handleSearch() {
+  searchError.value = "";
+  if (!localStartDate.value || !localEndDate.value) {
+    searchError.value = t("booking.selectDatesError");
+    return;
+  }
+  if (localStartDate.value > localEndDate.value) {
+    searchError.value = t("searchBanner.dateError");
+    return;
+  }
   searchStore.startDate = localStartDate.value;
   searchStore.endDate = localEndDate.value;
+  searchStore.startTime = localStartTime.value;
+  searchStore.endTime = localEndTime.value;
   router.push("/fleet");
 }
 </script>
@@ -90,7 +130,7 @@ function handleSearch() {
 .widget-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -114,7 +154,8 @@ function handleSearch() {
     flex-direction: column;
   }
 }
-label {
+label,
+.field-label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #444;
@@ -122,7 +163,29 @@ label {
   align-items: center;
   gap: 0.35rem;
 }
-label svg {
+label svg,
+.field-label svg {
+  width: 14px;
+  height: 14px;
+  stroke: #e63946;
+  flex-shrink: 0;
+}
+
+.location-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: #f0f4ff;
+  border: 1.5px solid #e8ecf5;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 500;
+  cursor: default;
+  user-select: none;
+}
+.location-pin {
   width: 14px;
   height: 14px;
   stroke: #e63946;
@@ -139,15 +202,10 @@ input {
   box-sizing: border-box;
 }
 input:focus {
-  border-color: #e63946;
-}
-input[readonly] {
-  background: #f0f0f0;
-  color: #888;
-  cursor: not-allowed;
+  border-color: var(--color-primary);
 }
 .btn-search {
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -168,6 +226,19 @@ input[readonly] {
   flex-shrink: 0;
 }
 .btn-search:hover {
-  background: #c1121f;
+  background: var(--color-primary-dark);
+}
+.search-error {
+  color: #c62828;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: #fce4ec;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  margin: 0;
+}
+.field--error :deep(.drp-input) {
+  border-color: #c62828 !important;
+  box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1) !important;
 }
 </style>

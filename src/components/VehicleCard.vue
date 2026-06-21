@@ -1,11 +1,28 @@
 <template>
   <div class="vehicle-card">
     <div class="vehicle-img-wrapper">
+      <div
+        v-if="vehicle.photoURL && !imgFailed && !imgLoaded"
+        class="vehicle-img-skeleton"
+        aria-hidden="true"
+      ></div>
+      <span v-if="vehicle.photoURL && !imgFailed && !imgLoaded" class="sr-only">{{ vehicle.marque }} {{ vehicle.modele }} — {{ t('fleet.loading') }}</span>
       <img
-        :src="vehicle.photoURL"
+        v-if="vehicle.photoURL && !imgFailed"
+        :src="cloudinaryThumb(vehicle.photoURL, 480, 360)"
         :alt="`${vehicle.marque} ${vehicle.modele}`"
         class="vehicle-img"
+        :class="{ 'vehicle-img--loaded': imgLoaded }"
+        @error="imgFailed = true"
+        @load="imgLoaded = true"
       />
+      <div v-if="!vehicle.photoURL || imgFailed" class="vehicle-img-placeholder" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"/>
+          <circle cx="7" cy="17" r="2"/>
+          <circle cx="17" cy="17" r="2"/>
+        </svg>
+      </div>
       <span :class="['dispo-badge', badgeClass]">{{ badgeLabel }}</span>
     </div>
     <div class="vehicle-info">
@@ -60,8 +77,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 
 const props = defineProps({
   vehicle: { type: Object, required: true },
@@ -71,6 +89,13 @@ const props = defineProps({
 defineEmits(["reserve"]);
 
 const { t, tm } = useI18n();
+const imgFailed = ref(false);
+const imgLoaded = ref(false);
+
+watch(() => props.vehicle?.photoURL, () => {
+  imgLoaded.value = false;
+  imgFailed.value = false;
+});
 
 const fuelMap = computed(() => tm('fuel'));
 
@@ -96,6 +121,17 @@ const btnLabel = computed(() => {
 </script>
 
 <style scoped>
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .vehicle-card {
   border-radius: 12px;
   overflow: hidden;
@@ -110,13 +146,42 @@ const btnLabel = computed(() => {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  min-height: 200px;
 }
 .vehicle-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.3s;
+  transition: transform 0.3s, opacity 0.25s;
+  opacity: 0;
+}
+.vehicle-img--loaded {
+  opacity: 1;
+}
+.vehicle-img-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f0f2f8 25%, #e4e8f4 50%, #f0f2f8 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.vehicle-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-page, #f8f9ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vehicle-img-placeholder svg {
+  width: 52px;
+  height: 52px;
+  color: #c8d0e8;
 }
 .vehicle-card:hover .vehicle-img {
   transform: scale(1.04);
@@ -147,7 +212,7 @@ const btnLabel = computed(() => {
 }
 .vehicle-info h3 {
   margin: 0 0 0.6rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-size: 1.05rem;
 }
 .vehicle-tags {
@@ -158,7 +223,7 @@ const btnLabel = computed(() => {
 }
 .tag {
   background: #f0f4ff;
-  color: #1a1a2e;
+  color: var(--color-navy);
   padding: 0.25rem 0.6rem;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -178,7 +243,7 @@ const btnLabel = computed(() => {
 }
 .btn-reserve {
   width: 100%;
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -197,10 +262,11 @@ const btnLabel = computed(() => {
   flex-shrink: 0;
 }
 .btn-reserve:hover:not(:disabled) {
-  background: #c1121f;
+  background: var(--color-primary-dark);
 }
 .btn-reserve:disabled {
-  background: #ccc;
+  background: #e8e8e8;
+  color: #999;
   cursor: not-allowed;
 }
 </style>

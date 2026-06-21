@@ -13,11 +13,9 @@
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/vue3": "^6.1.20",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
+    "@vuepic/vue-datepicker": "^14.0.0",
+    "date-fns": "^4.4.0",
     "firebase": "^12.13.0",
-    "flatpickr": "^4.6.13",
     "stripe": "^22.1.1",
     "vue": "^3.5.34",
     "vue-i18n": "^11.4.5",
@@ -25,7 +23,9 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
-    "playwright": "^1.61.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "vite": "^8.0.12"
   }
 }

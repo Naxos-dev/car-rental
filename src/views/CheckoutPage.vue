@@ -11,23 +11,25 @@
             <h2>{{ t("checkout.vehicle") }}</h2>
             <div class="vehicle-recap">
               <img
-                :src="vehicle.photoURL"
+                v-if="thumbUrl"
+                :src="thumbUrl"
                 :alt="vehicleLabel"
                 class="vehicle-recap-img"
+                @error="(e) => e.target.style.display = 'none'"
               />
               <div>
                 <strong class="vehicle-recap-name">{{ vehicleLabel }}</strong>
                 <div class="recap-tags">
                   <span class="tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                    {{ vehicle.carburant }}
+                    {{ fuelMap[vehicle.carburant] || vehicle.carburant }}
                   </span>
                   <span class="tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tag-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    {{ vehicle.places }} places
+                    {{ vehicle.places }} {{ t("fleet.seats") }}
                   </span>
                   <span class="tag tag--price">
-                    {{ vehicle.prix }}€/jour
+                    {{ vehicle.prix }}{{ t("fleet.perDay") }}
                   </span>
                 </div>
               </div>
@@ -43,11 +45,11 @@
             </div>
             <div class="detail-row">
               <span>{{ t("checkout.start") }}</span>
-              <strong>{{ store.startDate }} à {{ store.startTime }}</strong>
+              <strong>{{ formatDate(store.startDate) }} {{ t("checkout.atTime") }} {{ store.startTime }}</strong>
             </div>
             <div class="detail-row">
               <span>{{ t("checkout.end") }}</span>
-              <strong>{{ store.endDate }} à {{ store.endTime }}</strong>
+              <strong>{{ formatDate(store.endDate) }} {{ t("checkout.atTime") }} {{ store.endTime }}</strong>
             </div>
             <div class="detail-row">
               <span>{{ t("checkout.duration") }}</span>
@@ -94,7 +96,7 @@
             </div>
           </div>
 
-          <button class="btn-pay" :disabled="paying" @click="handlePay">
+          <button class="btn-pay" :disabled="paying" :aria-busy="paying" @click="handlePay">
             <svg v-if="!paying" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pay-icon">
               <rect x="1" y="11" width="22" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -119,7 +121,7 @@
             {{ t("checkout.secure") }}
           </p>
 
-          <button class="btn-back" @click="router.back()">
+          <button class="btn-back" @click="goBack()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
               <line x1="19" y1="12" x2="5" y2="12"/>
               <polyline points="12 19 5 12 12 5"/>
@@ -133,20 +135,27 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { checkoutStore } from "../store/checkout.js";
+import { authStore as userAuthStore } from "../store/auth.js";
+import { formatDate } from "../composables/useFormatDate.js";
+import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 
-const { t } = useI18n();
+const { t, tm } = useI18n();
+const fuelMap = computed(() => tm("fuel"));
 const router = useRouter();
 const store = checkoutStore;
 
-onMounted(() => {
-  if (!store.vehicle) router.replace("/");
-});
+function goBack() {
+  if (window.history.length > 1) router.back();
+  else router.push("/fleet");
+}
 
 const vehicle = computed(() => store.vehicle ?? {});
+
+const thumbUrl = computed(() => cloudinaryThumb(vehicle.value.photoURL, 330, 225));
 const vehicleLabel = computed(
   () => `${vehicle.value.marque} ${vehicle.value.modele}`,
 );
@@ -156,6 +165,7 @@ const paying = ref(false);
 const payError = ref("");
 
 async function handlePay() {
+  if (paying.value) return;
   paying.value = true;
   payError.value = "";
   try {
@@ -166,42 +176,36 @@ async function handlePay() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: store.total,
-        vehicleLabel: vehicleLabel.value,
-        customerEmail: store.email,
-        successUrl: `${window.location.origin}/payment-success`,
+        vehicleId: store.vehicle.id,
+        startDate: store.startDate,
+        endDate: store.endDate,
+        nom: store.nom,
+        email: store.email,
+        telephone: store.telephone,
+        location: store.location,
+        startTime: store.startTime,
+        endTime: store.endTime,
+        userId: userAuthStore.user?.uid ?? "",
         cancelUrl: `${window.location.origin}/checkout`,
       }),
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || `Erreur serveur (${res.status})`);
+      const err = new Error(errData.error || `Erreur serveur (${res.status})`);
+      if (res.status === 409) err.code = "AVAILABILITY_ERROR";
+      throw err;
     }
     const data = await res.json();
     if (data.url) {
-      // Persister les données avant le rechargement de page causé par la redirection Stripe
-      sessionStorage.setItem(
-        "pendingReservation",
-        JSON.stringify({
-          vehicle: { ...store.vehicle },
-          nom: store.nom,
-          email: store.email,
-          telephone: store.telephone,
-          location: store.location,
-          startDate: store.startDate,
-          startTime: store.startTime,
-          endDate: store.endDate,
-          endTime: store.endTime,
-        }),
-      );
       window.location.href = data.url;
     } else {
       throw new Error("URL de paiement non reçue");
     }
   } catch (err) {
     console.error("[Checkout] Erreur paiement:", err);
-    payError.value =
-      "Une erreur est survenue lors du paiement. Veuillez réessayer.";
+    payError.value = err.code === "AVAILABILITY_ERROR"
+      ? t("backoffice.vehicleUnavailable")
+      : t("checkout.paymentFailed");
     paying.value = false;
   }
 }
@@ -210,7 +214,7 @@ async function handlePay() {
 <style scoped>
 .checkout-page {
   min-height: 100vh;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   padding: 3rem 0 5rem;
 }
 .container {
@@ -221,7 +225,7 @@ async function handlePay() {
 .page-title {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 2rem;
 }
 .checkout-grid {
@@ -271,7 +275,7 @@ async function handlePay() {
 .summary-section h2 {
   font-size: 1rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 1rem;
 }
 .vehicle-recap {
@@ -289,7 +293,7 @@ async function handlePay() {
 .vehicle-recap-name {
   display: block;
   font-size: 1.05rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin-bottom: 0.5rem;
 }
 .recap-tags {
@@ -299,7 +303,7 @@ async function handlePay() {
 }
 .tag {
   background: #f0f4ff;
-  color: #1a1a2e;
+  color: var(--color-navy);
   padding: 0.2rem 0.55rem;
   border-radius: 20px;
   font-size: 0.78rem;
@@ -330,7 +334,7 @@ async function handlePay() {
   border-bottom: none;
 }
 .detail-row strong {
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 
 /* Payment */
@@ -367,11 +371,11 @@ async function handlePay() {
 }
 .price-total strong {
   font-size: 1.5rem;
-  color: #e63946;
+  color: var(--color-primary);
 }
 .btn-pay {
   width: 100%;
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -397,14 +401,19 @@ async function handlePay() {
   animation: spin 0.8s linear infinite;
 }
 .btn-pay:hover:not(:disabled) {
-  background: #c1121f;
+  background: var(--color-primary-dark);
+}
+@media (max-width: 400px) {
+  .btn-pay { font-size: 0.88rem; }
+  .pay-icon { width: 14px; height: 14px; }
 }
 .btn-pay:disabled {
   background: #ccc;
   cursor: not-allowed;
+  pointer-events: none;
 }
 .pay-error {
-  color: #c1121f;
+  color: var(--color-primary-dark);
   font-size: 0.88rem;
   text-align: center;
   display: flex;
@@ -446,7 +455,7 @@ async function handlePay() {
   transition: color 0.2s;
 }
 .btn-back:hover {
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .back-icon {
   width: 13px;

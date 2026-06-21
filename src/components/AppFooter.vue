@@ -2,21 +2,26 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <svg
-          class="footer-logo-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M19 17H5m14 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM5 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0zM3 11l2-6h14l2 6M1 11h22"
+        <div class="footer-logo">
+          <svg
+            class="footer-logo-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             stroke="#e63946"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-          />
-        </svg>
-        <span class="logo-text">AutoLoc</span>
+            aria-hidden="true"
+          >
+            <path
+              d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
+            />
+            <circle cx="7" cy="17" r="2" />
+            <circle cx="17" cy="17" r="2" />
+          </svg>
+          <span class="logo-text">AutoLoc</span>
+        </div>
         <p>{{ t("footer.tagline") }}</p>
       </div>
 
@@ -160,7 +165,7 @@ const { t } = useI18n();
 
 <style scoped>
 .footer {
-  background: #1a1a2e;
+  background: var(--color-navy);
   color: #ccc;
   margin-top: 4rem;
 }
@@ -182,16 +187,21 @@ const { t } = useI18n();
     grid-template-columns: 1fr;
   }
 }
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
 .footer-brand .footer-logo-icon {
   width: 28px;
   height: 28px;
-  margin-bottom: 0.2rem;
+  flex-shrink: 0;
 }
 .footer-brand .logo-text {
   font-size: 1.2rem;
   font-weight: 700;
   color: #fff;
-  margin-left: 0.4rem;
 }
 .footer-brand p {
   margin-top: 0.6rem;
@@ -215,7 +225,7 @@ const { t } = useI18n();
 .footer-links a,
 .footer-links a.router-link-active,
 .footer-links a.router-link-exact-active {
-  color: #aaa;
+  color: #ccc;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.2s;
@@ -233,13 +243,17 @@ const { t } = useI18n();
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
+  margin-left: -0.4rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
   color: #ccc;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s, background 0.2s;
 }
 .footer-contact .contact-item:hover {
   color: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 .footer-contact .contact-item svg {
   width: 15px;
@@ -270,7 +284,7 @@ const { t } = useI18n();
   align-items: center;
   gap: 0.35rem;
   font-size: 0.8rem;
-  color: #aaa;
+  color: #ccc;
 }
 .trust-badge svg {
   width: 14px;
@@ -285,7 +299,7 @@ const { t } = useI18n();
 }
 .payment-label {
   font-size: 0.78rem;
-  color: #888;
+  color: #aaa;
 }
 .payment-chip {
   background: #2d2d4e;
