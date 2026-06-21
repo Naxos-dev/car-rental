@@ -3,28 +3,97 @@ dotenv.config({ path: ".env.local" });
 import express from "express";
 import cors from "cors";
 import Stripe from "stripe";
+import { fetchVehicle, calcNbJours, checkVehicleAvailability, checkRateLimit } from "./api/_stripe-helpers.js";
 
 const app = express();
 const PORT = 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
+function rateLimit({ max, windowMs }) {
+  return (req, res, next) => {
+    if (checkRateLimit(req, { max, windowMs })) {
+      return res.status(429).json({ error: "Trop de requêtes. Réessayez plus tard." });
+    }
+    next();
+  };
+}
 
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-app.post("/create-checkout-session", async (req, res) => {
-  const { amount, vehicleLabel, customerEmail, successUrl, cancelUrl } =
-    req.body;
+app.post("/create-checkout-session", rateLimit({ max: 10, windowMs: 60_000 }), async (req, res) => {
+  const {
+    vehicleId,
+    startDate,
+    endDate,
+    nom = "",
+    email = "",
+    telephone = "",
+    location = "",
+    startTime = "",
+    endTime = "",
+    userId = "",
+    cancelUrl,
+  } = req.body;
 
-  if (!amount || !vehicleLabel || !successUrl || !cancelUrl) {
+  if (!vehicleId || !startDate || !endDate || !cancelUrl) {
     return res.status(400).json({ error: "Paramètres manquants" });
   }
+
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate) || endDate < startDate) {
+    return res.status(400).json({ error: "Dates invalides" });
+  }
+
+  // S1: reject cancelUrls that don't belong to the frontend origin.
+  try {
+    if (new URL(cancelUrl).origin !== FRONTEND_URL) {
+      return res.status(400).json({ error: "cancelUrl non autorisée" });
+    }
+  } catch {
+    return res.status(400).json({ error: "cancelUrl invalide" });
+  }
+
+  let vehicle;
+  try {
+    vehicle = await fetchVehicle(vehicleId);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+
+  try {
+    await checkVehicleAvailability(vehicleId, startDate, endDate);
+  } catch (err) {
+    if (err.code === "AVAILABILITY_ERROR") {
+      return res.status(409).json({ error: "VEHICLE_UNAVAILABLE" });
+    }
+  }
+
+  const nbJours = calcNbJours(startDate, endDate);
+  const amount = nbJours * vehicle.prix;
+  const vehicleLabel = `${vehicle.marque} ${vehicle.modele}`;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      customer_email: customerEmail || undefined,
+      customer_email: email || undefined,
+      metadata: {
+        vehicleId,
+        vehicleLabel,
+        photoURL: vehicle.photoURL ? vehicle.photoURL.substring(0, 500) : "",
+        nom,
+        email,
+        telephone,
+        location,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
+        userId,
+      },
       line_items: [
         {
           price_data: {
@@ -35,14 +104,31 @@ app.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: successUrl,
+      success_url: `${FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
     });
 
     res.json({ url: session.url });
   } catch (err) {
     console.error("Stripe error:", err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Erreur de paiement. Veuillez réessayer." });
+  }
+});
+
+app.post("/verify-session", rateLimit({ max: 20, windowMs: 60_000 }), async (req, res) => {
+  const { sessionId } = req.body;
+  if (!sessionId || typeof sessionId !== "string" || !sessionId.startsWith("cs_")) {
+    return res.status(400).json({ error: "sessionId invalide" });
+  }
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.payment_status !== "paid") {
+      return res.status(402).json({ error: "Paiement non complété" });
+    }
+    res.json({ paid: true, metadata: session.metadata });
+  } catch (err) {
+    console.error("Stripe verify error:", err.message);
+    res.status(400).json({ error: "Session Stripe introuvable" });
   }
 });
 

@@ -18,7 +18,7 @@ export const checkoutStore = reactive({
   },
 
   get total() {
-    return this.vehicle ? this.nbJours * (this.vehicle.prix ?? 0) : 0;
+    return this.vehicle ? Math.round(this.nbJours * (this.vehicle.prix ?? 0)) : 0;
   },
 
   clear() {
