@@ -17,25 +17,45 @@
       </div>
 
       <!-- Onglets -->
-      <div class="account-tabs">
+      <div class="account-tabs" role="tablist" :aria-label="t('account.title')">
         <button
+          id="tab-reservations"
+          role="tab"
+          :aria-selected="section === 'reservations'"
+          aria-controls="panel-reservations"
           :class="['tab-btn', { active: section === 'reservations' }]"
           @click="section = 'reservations'"
+          @keydown="handleTabKeydown($event, 'reservations')"
         >
           {{ t("account.reservations") }}
         </button>
         <button
+          id="tab-settings"
+          role="tab"
+          :aria-selected="section === 'settings'"
+          aria-controls="panel-settings"
           :class="['tab-btn', { active: section === 'settings' }]"
           @click="section = 'settings'"
+          @keydown="handleTabKeydown($event, 'settings')"
         >
           {{ t("account.settings") }}
         </button>
       </div>
 
       <!-- Section : Réservations -->
-      <div v-if="section === 'reservations'" class="section-content">
-        <div v-if="reservationStore.loading" class="empty-state">
-          {{ t("account.loading") }}
+      <div v-if="section === 'reservations'" id="panel-reservations" class="section-content" role="tabpanel" tabindex="-1" aria-labelledby="tab-reservations">
+        <div v-if="reservationStore.loading" aria-live="polite" aria-busy="true">
+          <p class="sr-only">{{ t("account.loading") }}</p>
+          <div class="reservations-list">
+            <div v-for="n in 3" :key="n" class="reservation-card skeleton-card" :class="`skeleton-card--${n}`" aria-hidden="true">
+              <div class="skeleton-header">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--badge"></div>
+              </div>
+              <div class="skeleton-line skeleton-line--detail"></div>
+              <div class="skeleton-line skeleton-line--short"></div>
+            </div>
+          </div>
         </div>
         <div v-else-if="myReservations.length === 0" class="empty-state">
           <p>{{ t("account.noReservations") }}</p>
@@ -44,6 +64,10 @@
           </RouterLink>
         </div>
         <div v-else class="reservations-sections">
+          <div class="status-legend">
+            <span class="res-badge badge--confirmee">{{ t("statusLabels.confirmee") }}</span>
+            <span class="res-badge badge--annulee">{{ t("statusLabels.annulee") }}</span>
+          </div>
           <!-- À venir -->
           <div class="res-section">
             <h2 class="res-section-title">{{ t("account.upcomingReservations") }}</h2>
@@ -80,7 +104,7 @@
                       <line x1="8" y1="2" x2="8" y2="6"/>
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    {{ r.startDate }} → {{ r.endDate }}
+                    {{ formatDate(r.startDate) }} → {{ formatDate(r.endDate) }}
                   </span>
                 </div>
               </div>
@@ -123,7 +147,7 @@
                       <line x1="8" y1="2" x2="8" y2="6"/>
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    {{ r.startDate }} → {{ r.endDate }}
+                    {{ formatDate(r.startDate) }} → {{ formatDate(r.endDate) }}
                   </span>
                 </div>
               </div>
@@ -133,7 +157,7 @@
       </div>
 
       <!-- Section : Paramètres -->
-      <div v-if="section === 'settings'" class="section-content">
+      <div v-if="section === 'settings'" id="panel-settings" class="section-content" role="tabpanel" tabindex="-1" aria-labelledby="tab-settings">
         <div class="settings-grid">
           <!-- Modifier l'email -->
           <div class="settings-card">
@@ -144,8 +168,9 @@
             </p>
             <form @submit.prevent="handleUpdateEmail">
               <div class="field">
-                <label>{{ t("account.newEmail") }}</label>
+                <label for="acc-new-email">{{ t("account.newEmail") }}</label>
                 <input
+                  id="acc-new-email"
                   v-model="emailForm.newEmail"
                   type="email"
                   :placeholder="t('account.newEmailPlaceholder')"
@@ -153,15 +178,16 @@
                 />
               </div>
               <div class="field">
-                <label>{{ t("account.currentPassword") }}</label>
+                <label for="acc-email-password">{{ t("account.currentPassword") }}</label>
                 <div class="password-wrapper">
                   <input
+                    id="acc-email-password"
                     v-model="emailForm.password"
                     :type="showEmailPassword ? 'text' : 'password'"
                     :placeholder="t('account.currentPasswordPlaceholder')"
                     required
                   />
-                  <button type="button" class="toggle-password" @click="showEmailPassword = !showEmailPassword" :aria-label="showEmailPassword ? 'Masquer' : 'Afficher'">
+                  <button type="button" class="toggle-password" @click="showEmailPassword = !showEmailPassword" :aria-label="showEmailPassword ? t('common.hidePassword') : t('common.showPassword')">
                     <svg v-if="showEmailPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                       <line x1="1" y1="1" x2="23" y2="23"/>
@@ -194,15 +220,16 @@
             <h2>{{ t("account.changePassword") }}</h2>
             <form @submit.prevent="handleUpdatePassword">
               <div class="field">
-                <label>{{ t("account.currentPassword") }}</label>
+                <label for="acc-current-password">{{ t("account.currentPassword") }}</label>
                 <div class="password-wrapper">
                   <input
+                    id="acc-current-password"
                     v-model="passwordForm.current"
                     :type="showPasswordCurrent ? 'text' : 'password'"
                     :placeholder="t('auth.passwordPlaceholder')"
                     required
                   />
-                  <button type="button" class="toggle-password" @click="showPasswordCurrent = !showPasswordCurrent" :aria-label="showPasswordCurrent ? 'Masquer' : 'Afficher'">
+                  <button type="button" class="toggle-password" @click="showPasswordCurrent = !showPasswordCurrent" :aria-label="showPasswordCurrent ? t('common.hidePassword') : t('common.showPassword')">
                     <svg v-if="showPasswordCurrent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                       <line x1="1" y1="1" x2="23" y2="23"/>
@@ -215,16 +242,17 @@
                 </div>
               </div>
               <div class="field">
-                <label>{{ t("account.newPassword") }}</label>
+                <label for="acc-new-password">{{ t("account.newPassword") }}</label>
                 <div class="password-wrapper">
                   <input
+                    id="acc-new-password"
                     v-model="passwordForm.new"
                     :type="showPasswordNew ? 'text' : 'password'"
                     :placeholder="t('account.newPasswordPlaceholder')"
                     required
                     minlength="6"
                   />
-                  <button type="button" class="toggle-password" @click="showPasswordNew = !showPasswordNew" :aria-label="showPasswordNew ? 'Masquer' : 'Afficher'">
+                  <button type="button" class="toggle-password" @click="showPasswordNew = !showPasswordNew" :aria-label="showPasswordNew ? t('common.hidePassword') : t('common.showPassword')">
                     <svg v-if="showPasswordNew" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                       <line x1="1" y1="1" x2="23" y2="23"/>
@@ -235,17 +263,31 @@
                     </svg>
                   </button>
                 </div>
+                <div v-if="passwordForm.new.length >= 3" class="password-strength" aria-live="polite">
+                  <div class="strength-bar">
+                    <div
+                      class="strength-fill"
+                      :class="`strength--${newPasswordStrength}`"
+                      :style="{ width: (newPasswordStrength / 4 * 100) + '%' }"
+                    ></div>
+                  </div>
+                  <span class="strength-label">
+                    {{ t("auth.passwordStrengthLabel") }}
+                    {{ t(`auth.passwordStrength.${newPasswordStrength || 1}`) }}
+                  </span>
+                </div>
               </div>
               <div class="field">
-                <label>{{ t("account.confirmPassword") }}</label>
+                <label for="acc-confirm-password">{{ t("account.confirmPassword") }}</label>
                 <div class="password-wrapper">
                   <input
+                    id="acc-confirm-password"
                     v-model="passwordForm.confirm"
                     :type="showPasswordConfirm ? 'text' : 'password'"
                     :placeholder="t('account.confirmPasswordPlaceholder')"
                     required
                   />
-                  <button type="button" class="toggle-password" @click="showPasswordConfirm = !showPasswordConfirm" :aria-label="showPasswordConfirm ? 'Masquer' : 'Afficher'">
+                  <button type="button" class="toggle-password" @click="showPasswordConfirm = !showPasswordConfirm" :aria-label="showPasswordConfirm ? t('common.hidePassword') : t('common.showPassword')">
                     <svg v-if="showPasswordConfirm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                       <line x1="1" y1="1" x2="23" y2="23"/>
@@ -286,11 +328,14 @@
 import { reactive, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { userAuthStore } from "../store/userAuth.js";
+import { authStore as userAuthStore } from "../store/auth.js";
 import { reservationStore } from "../store/reservations.js";
+import { useToast } from "../composables/useToast.js";
+import { formatDate } from "../composables/useFormatDate.js";
 
 const { t } = useI18n();
 const router = useRouter();
+const { show: showToast } = useToast();
 const section = ref("reservations");
 
 const STATUS_LABELS = computed(() => ({
@@ -298,18 +343,20 @@ const STATUS_LABELS = computed(() => ({
   annulee: t("statusLabels.annulee"),
 }));
 
-const myReservations = computed(() =>
-  reservationStore.reservations.filter(
-    (r) => r.userId === userAuthStore.user?.uid,
-  ),
-);
+const myReservations = computed(() => reservationStore.reservations);
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+function todayMidnight() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
 
-const upcomingReservations = computed(() =>
-  myReservations.value.filter((r) => new Date(r.startDate) > today),
-);
+// todayMidnight() is called inside each computed so the date is always fresh
+// when reservations data changes (Firestore live updates trigger recompute).
+const upcomingReservations = computed(() => {
+  const now = todayMidnight();
+  return myReservations.value.filter((r) => r.endDate && new Date(r.endDate) >= now);
+});
 
 const myArchivedReservations = computed(() =>
   reservationStore.archivedReservations.filter(
@@ -317,10 +364,13 @@ const myArchivedReservations = computed(() =>
   ),
 );
 
-const pastReservations = computed(() => [
-  ...myReservations.value.filter((r) => new Date(r.startDate) <= today),
-  ...myArchivedReservations.value,
-].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+const pastReservations = computed(() => {
+  const now = todayMidnight();
+  return [
+    ...myReservations.value.filter((r) => !r.endDate || new Date(r.endDate) < now),
+    ...myArchivedReservations.value,
+  ].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+});
 
 async function handleLogout() {
   await userAuthStore.logout();
@@ -343,12 +393,13 @@ async function handleUpdateEmail() {
   try {
     await userAuthStore.updateUserEmail(emailForm.newEmail, emailForm.password);
     emailMsg.ok = true;
-    emailMsg.text = "Un lien de vérification a été envoyé à votre nouvel email. L'adresse sera mise à jour après confirmation.";
+    emailMsg.text = t("account.emailVerificationSent");
+    showToast(t("account.emailVerificationSent"));
     emailForm.newEmail = "";
     emailForm.password = "";
   } catch {
     emailMsg.ok = false;
-    emailMsg.text = userAuthStore.error || "Erreur lors de la mise à jour.";
+    emailMsg.text = userAuthStore.error || t("account.updateError");
   } finally {
     emailLoading.value = false;
   }
@@ -356,13 +407,37 @@ async function handleUpdateEmail() {
 
 // — Changer le mot de passe
 const passwordForm = reactive({ current: "", new: "", confirm: "" });
+
+const newPasswordStrength = computed(() => {
+  const p = passwordForm.new;
+  if (!p) return 0;
+  let score = 0;
+  if (p.length >= 6) score++;
+  if (p.length >= 10) score++;
+  if (/[A-Z]/.test(p)) score++;
+  if (/[0-9]/.test(p)) score++;
+  if (/[^a-zA-Z0-9]/.test(p)) score++;
+  return Math.min(score, 4);
+});
+
+function handleTabKeydown(e, current) {
+  const tabs = ["reservations", "settings"];
+  const idx = tabs.indexOf(current);
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    e.preventDefault();
+    section.value = tabs[(idx + 1) % tabs.length];
+  } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    e.preventDefault();
+    section.value = tabs[(idx - 1 + tabs.length) % tabs.length];
+  }
+}
 const passwordLoading = ref(false);
 const passwordMsg = reactive({ text: "", ok: false });
 
 async function handleUpdatePassword() {
   if (passwordForm.new !== passwordForm.confirm) {
     passwordMsg.ok = false;
-    passwordMsg.text = "Les mots de passe ne correspondent pas.";
+    passwordMsg.text = t("auth.passwordMismatch");
     return;
   }
   passwordLoading.value = true;
@@ -373,11 +448,12 @@ async function handleUpdatePassword() {
       passwordForm.new,
     );
     passwordMsg.ok = true;
-    passwordMsg.text = "Mot de passe changé avec succès.";
+    passwordMsg.text = t("account.passwordChanged");
+    showToast(t("account.passwordChanged"));
     Object.assign(passwordForm, { current: "", new: "", confirm: "" });
   } catch {
     passwordMsg.ok = false;
-    passwordMsg.text = userAuthStore.error || "Erreur lors du changement.";
+    passwordMsg.text = userAuthStore.error || t("account.changeError");
   } finally {
     passwordLoading.value = false;
   }
@@ -385,9 +461,20 @@ async function handleUpdatePassword() {
 </script>
 
 <style scoped>
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .account-page {
   min-height: 100vh;
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   padding: 3rem 0 5rem;
 }
 .container {
@@ -407,13 +494,13 @@ async function handleUpdatePassword() {
 .account-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin: 0 0 0.25rem;
 }
 .account-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin: 0.15rem 0 0.1rem;
 }
 .account-email {
@@ -452,17 +539,17 @@ async function handleUpdatePassword() {
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
-  transition: all 0.2s;
+  transition: color 0.2s, border-bottom-color 0.2s, background 0.2s;
   border-radius: 8px 8px 0 0;
 }
 .tab-btn.active {
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-weight: 700;
-  border-bottom-color: #667eea;
+  border-bottom-color: var(--color-primary);
 }
 .tab-btn:hover:not(.active) {
   background: #f0f2f8;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 
 .section-content {
@@ -481,15 +568,15 @@ async function handleUpdatePassword() {
   display: inline-block;
   margin-top: 1rem;
   padding: 0.7rem 1.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--color-primary);
   color: #fff;
   text-decoration: none;
   border-radius: 10px;
   font-weight: 600;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 .btn-cta-link:hover {
-  opacity: 0.9;
+  background: var(--color-primary-dark);
 }
 
 .reservations-sections {
@@ -497,10 +584,16 @@ async function handleUpdatePassword() {
   flex-direction: column;
   gap: 2rem;
 }
+.status-legend {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: -0.75rem;
+}
 .res-section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin: 0 0 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1.5px solid #e8e8f0;
@@ -522,10 +615,7 @@ async function handleUpdatePassword() {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  transition: box-shadow 0.2s;
-}
-.reservation-card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+  cursor: default;
 }
 .reservation-card--past {
   background: #f4f4f8;
@@ -547,7 +637,7 @@ async function handleUpdatePassword() {
 }
 .res-vehicle {
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-size: 1rem;
   display: inline-flex;
   align-items: center;
@@ -557,7 +647,7 @@ async function handleUpdatePassword() {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: #667eea;
+  color: var(--color-primary);
 }
 .res-badge {
   padding: 0.25rem 0.75rem;
@@ -571,7 +661,7 @@ async function handleUpdatePassword() {
 }
 .badge--annulee {
   background: #f3f4f6;
-  color: #6b7280;
+  color: #555;
 }
 .res-details {
   display: flex;
@@ -624,7 +714,7 @@ async function handleUpdatePassword() {
   }
 }
 .settings-card {
-  background: #f8f9ff;
+  background: var(--color-bg-page);
   border-radius: 14px;
   padding: 1.5rem;
   border: 1.5px solid #e8e8f0;
@@ -632,7 +722,7 @@ async function handleUpdatePassword() {
 .settings-card h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
   margin: 0 0 0.5rem;
 }
 .current-val {
@@ -666,7 +756,7 @@ async function handleUpdatePassword() {
   box-sizing: border-box;
 }
 .field input:focus {
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 .password-wrapper {
   position: relative;
@@ -689,7 +779,7 @@ async function handleUpdatePassword() {
   align-items: center;
 }
 .toggle-password:hover {
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .msg {
   font-size: 0.88rem;
@@ -707,20 +797,95 @@ async function handleUpdatePassword() {
 }
 .btn-save {
   padding: 0.7rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.92rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 .btn-save:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--color-primary-dark);
 }
 .btn-save:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Password strength bar */
+.password-strength {
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: #e8e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s, background 0.3s;
+}
+.strength--1 { background: var(--color-primary); }
+.strength--2 { background: #f59e0b; }
+.strength--3 { background: #3b82f6; }
+.strength--4 { background: #16a34a; }
+.strength-label {
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* Skeleton loader */
+@keyframes shimmer {
+  0% { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+.skeleton-card {
+  pointer-events: none;
+}
+.skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e8e8f0 25%, #f0f0f8 50%, #e8e8f0 75%);
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s infinite linear;
+  margin-bottom: 0.5rem;
+}
+.skeleton-line--title {
+  height: 18px;
+  width: 55%;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.skeleton-line--badge {
+  height: 22px;
+  width: 80px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.skeleton-line--detail {
+  width: 75%;
+}
+.skeleton-line--short {
+  width: 40%;
+  margin-bottom: 0;
+}
+.skeleton-card--2 .skeleton-line { animation-delay: 0.15s; }
+.skeleton-card--3 .skeleton-line { animation-delay: 0.3s; }
 </style>

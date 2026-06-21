@@ -5,21 +5,21 @@
       <div class="banner-info">
         <span class="banner-location">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="banner-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          {{ searchStore.location || "Lille" }}</span>
+          {{ searchStore.location }}</span>
         <span class="banner-dates">
-          {{ formatDate(searchStore.startDate) }}
-          <span class="sep">|</span>
+          {{ fmtDate(searchStore.startDate) }}
+          <span class="sep" aria-hidden="true">|</span>
           {{ searchStore.startTime }}
-          <span class="sep">–</span>
-          {{ formatDate(searchStore.endDate) }}
-          <span class="sep">|</span>
+          <span class="sep" aria-hidden="true">–</span>
+          {{ fmtDate(searchStore.endDate) }}
+          <span class="sep" aria-hidden="true">|</span>
           {{ searchStore.endTime }}
         </span>
       </div>
       <button
         class="btn-edit"
         @click.stop="toggleEdit"
-        :aria-label="editOpen ? 'Fermer' : 'Modifier'"
+        :aria-label="editOpen ? t('searchBanner.close') : t('searchBanner.editSearch')"
       >
         <svg
           v-if="!editOpen"
@@ -48,7 +48,7 @@
 
     <!-- Panneau glissant -->
     <transition name="slide-down">
-      <div v-if="editOpen" class="edit-panel">
+      <div v-if="editOpen" class="edit-panel" aria-live="polite" :aria-label="t('searchBanner.editSearch')">
         <form class="edit-form" @submit.prevent="applyChanges">
           <!-- Période -->
           <div class="edit-field edit-field--full">
@@ -66,20 +66,21 @@
           <!-- Heures -->
           <div class="edit-row">
             <div class="edit-field">
-              <label>{{ t("searchBanner.startTime") }}</label>
-              <input v-model="draft.startTime" type="time" required />
+              <label for="sb-startTime">{{ t("searchBanner.startTime") }}</label>
+              <input id="sb-startTime" v-model="draft.startTime" type="time" required />
             </div>
             <div class="edit-field">
-              <label>{{ t("searchBanner.endTime") }}</label>
-              <input v-model="draft.endTime" type="time" required />
+              <label for="sb-endTime">{{ t("searchBanner.endTime") }}</label>
+              <input id="sb-endTime" v-model="draft.endTime" type="time" required />
             </div>
           </div>
+          <p v-if="dateError" ref="dateErrorRef" class="date-error" role="alert">{{ dateError }}</p>
           <div class="edit-actions">
             <button type="button" class="btn-cancel" @click="editOpen = false">
               {{ t("searchBanner.cancel") }}
             </button>
             <button type="submit" class="btn-apply">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="apply-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="apply-icon" aria-hidden="true">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
               {{ t("searchBanner.update") }}
@@ -92,15 +93,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 import DateRangePicker from "./DateRangePicker.vue";
+import { formatDate } from "../composables/useFormatDate.js";
 
 const { t } = useI18n();
 const editOpen = ref(false);
-
-const today = computed(() => new Date().toISOString().split("T")[0]);
+const dateError = ref("");
 
 const draft = reactive({
   startDate: searchStore.startDate,
@@ -115,11 +116,20 @@ function toggleEdit() {
     draft.startTime = searchStore.startTime;
     draft.endDate = searchStore.endDate;
     draft.endTime = searchStore.endTime;
+    dateError.value = "";
   }
   editOpen.value = !editOpen.value;
 }
 
+const dateErrorRef = ref(null);
+
 function applyChanges() {
+  dateError.value = "";
+  if (draft.startDate && draft.endDate && draft.startDate >= draft.endDate) {
+    dateError.value = t("searchBanner.dateError");
+    nextTick(() => dateErrorRef.value?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
+    return;
+  }
   searchStore.startDate = draft.startDate;
   searchStore.startTime = draft.startTime;
   searchStore.endDate = draft.endDate;
@@ -127,16 +137,14 @@ function applyChanges() {
   editOpen.value = false;
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+function fmtDate(dateStr) {
+  return formatDate(dateStr, { day: "numeric", month: "short", year: "numeric" });
 }
 </script>
 
 <style scoped>
 .search-banner-wrapper {
-  background: #1a1a2e;
+  background: var(--color-navy);
 }
 
 .search-banner {
@@ -187,8 +195,8 @@ function formatDate(dateStr) {
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #fff;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -257,7 +265,7 @@ function formatDate(dateStr) {
 }
 
 .edit-field input:focus {
-  border-color: #e63946;
+  border-color: var(--color-primary);
 }
 
 .edit-actions {
@@ -283,7 +291,7 @@ function formatDate(dateStr) {
 }
 
 .btn-apply {
-  background: #e63946;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -303,17 +311,27 @@ function formatDate(dateStr) {
 }
 
 .btn-apply:hover {
-  background: #c1121f;
+  background: var(--color-primary-dark);
+}
+
+.date-error {
+  color: #c62828;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: #fce4ec;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  margin: 0;
 }
 
 /* Animation glissante */
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition:
-    max-height 0.3s ease,
+    max-height 0.35s ease,
     opacity 0.3s ease;
   overflow: hidden;
-  max-height: 300px;
+  max-height: 520px;
 }
 
 .slide-down-enter-from,
