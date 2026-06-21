@@ -23,16 +23,26 @@
         <span class="logo-text">AutoLoc</span>
       </div>
 
-      <div class="auth-tabs">
+      <div v-if="tab !== 'forgot'" class="auth-tabs" role="tablist">
         <button
+          id="tab-login"
+          role="tab"
+          :aria-selected="tab === 'login'"
+          aria-controls="panel-login"
           :class="['tab-btn', { active: tab === 'login' }]"
           @click="switchTab('login')"
+          @keydown="handleTabKeydown($event, 'login')"
         >
           {{ t("auth.login") }}
         </button>
         <button
+          id="tab-register"
+          role="tab"
+          :aria-selected="tab === 'register'"
+          aria-controls="panel-register"
           :class="['tab-btn', { active: tab === 'register' }]"
           @click="switchTab('register')"
+          @keydown="handleTabKeydown($event, 'register')"
         >
           {{ t("auth.register") }}
         </button>
@@ -41,13 +51,17 @@
       <!-- Connexion -->
       <form
         v-if="tab === 'login'"
+        id="panel-login"
+        role="tabpanel"
+        tabindex="-1"
+        aria-labelledby="tab-login"
         class="auth-form"
         @submit.prevent="handleLogin"
       >
         <div class="field">
-          <label>{{ t("auth.email") }}</label>
+          <label for="login-email">{{ t("auth.email") }}</label>
           <input
-            id="email"
+            id="login-email"
             v-model="loginForm.email"
             type="email"
             :placeholder="t('auth.emailPlaceholder')"
@@ -56,10 +70,15 @@
           />
         </div>
         <div class="field">
-          <label>{{ t("auth.password") }}</label>
+          <div class="label-row">
+            <label for="login-password">{{ t("auth.password") }}</label>
+            <button type="button" class="link-btn" @click="tab = 'forgot'">
+              {{ t("auth.forgotPassword") }}
+            </button>
+          </div>
           <div class="password-wrapper">
             <input
-              id="password"
+              id="login-password"
               v-model="loginForm.password"
               :type="showLoginPassword ? 'text' : 'password'"
               :placeholder="t('auth.passwordPlaceholder')"
@@ -70,7 +89,7 @@
               type="button"
               class="toggle-password"
               @click="showLoginPassword = !showLoginPassword"
-              :aria-label="showLoginPassword ? 'Masquer' : 'Afficher'"
+              :aria-label="showLoginPassword ? t('common.hidePassword') : t('common.showPassword')"
             >
               <svg
                 v-if="showLoginPassword"
@@ -128,32 +147,21 @@
         </button>
       </form>
 
-      <!-- Séparateur + Google -->
-      <div v-if="tab === 'login'" class="divider">
-        <span>{{ t("auth.or") }}</span>
-      </div>
-      <button
-        v-if="tab === 'login'"
-        type="button"
-        class="btn-google"
-        :disabled="loading"
-        @click="handleGoogleLogin"
-      >
-        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        {{ t("auth.loginWithGoogle") }}
-      </button>
-
       <!-- Inscription -->
-      <form v-else class="auth-form" @submit.prevent="handleRegister">
+      <form
+        v-else-if="tab === 'register'"
+        id="panel-register"
+        role="tabpanel"
+        tabindex="-1"
+        aria-labelledby="tab-register"
+        class="auth-form"
+        @submit.prevent="handleRegister"
+      >
         <div class="field-row">
           <div class="field">
-            <label>{{ t("auth.firstName") }}</label>
+            <label for="reg-prenom">{{ t("auth.firstName") }}</label>
             <input
+              id="reg-prenom"
               v-model="registerForm.prenom"
               type="text"
               :placeholder="t('auth.firstNamePlaceholder')"
@@ -162,8 +170,9 @@
             />
           </div>
           <div class="field">
-            <label>{{ t("auth.lastName") }}</label>
+            <label for="reg-nom">{{ t("auth.lastName") }}</label>
             <input
+              id="reg-nom"
               v-model="registerForm.nom"
               type="text"
               :placeholder="t('auth.lastNamePlaceholder')"
@@ -173,8 +182,9 @@
           </div>
         </div>
         <div class="field">
-          <label>{{ t("auth.email") }}</label>
+          <label for="reg-email">{{ t("auth.email") }}</label>
           <input
+            id="reg-email"
             v-model="registerForm.email"
             type="email"
             :placeholder="t('auth.emailPlaceholder')"
@@ -183,9 +193,20 @@
           />
         </div>
         <div class="field">
-          <label>{{ t("auth.password") }}</label>
+          <label for="reg-phone">{{ t("auth.phone") }}</label>
+          <input
+            id="reg-phone"
+            v-model="registerForm.telephone"
+            type="tel"
+            :placeholder="t('auth.phonePlaceholder')"
+            autocomplete="tel"
+          />
+        </div>
+        <div class="field">
+          <label for="reg-password">{{ t("auth.password") }}</label>
           <div class="password-wrapper">
             <input
+              id="reg-password"
               v-model="registerForm.password"
               :type="showRegisterPassword ? 'text' : 'password'"
               :placeholder="t('auth.passwordHint')"
@@ -197,7 +218,7 @@
               type="button"
               class="toggle-password"
               @click="showRegisterPassword = !showRegisterPassword"
-              :aria-label="showRegisterPassword ? 'Masquer' : 'Afficher'"
+              :aria-label="showRegisterPassword ? t('common.hidePassword') : t('common.showPassword')"
             >
               <svg
                 v-if="showRegisterPassword"
@@ -231,11 +252,42 @@
               </svg>
             </button>
           </div>
+          <div v-if="registerForm.password.length >= 3" class="password-strength" aria-live="polite">
+            <div class="strength-bar">
+              <div
+                class="strength-fill"
+                :class="`strength--${passwordStrength}`"
+                :style="{ width: (passwordStrength / 4 * 100) + '%' }"
+              ></div>
+            </div>
+            <span class="strength-label">
+              {{ t("auth.passwordStrengthLabel") }}
+              {{ t(`auth.passwordStrength.${passwordStrength || 1}`) }}
+            </span>
+          </div>
+          <ul v-if="registerForm.password.length >= 1" class="password-reqs" aria-live="polite">
+            <li :class="['req-item', { 'req-item--ok': registerForm.password.length >= 6 }]">
+              <svg v-if="registerForm.password.length >= 6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+              {{ t('auth.reqLength') }}
+            </li>
+            <li :class="['req-item', { 'req-item--ok': /[A-Z]/.test(registerForm.password) }]">
+              <svg v-if="/[A-Z]/.test(registerForm.password)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+              {{ t('auth.reqUppercase') }}
+            </li>
+            <li :class="['req-item', { 'req-item--ok': /[0-9]/.test(registerForm.password) }]">
+              <svg v-if="/[0-9]/.test(registerForm.password)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+              {{ t('auth.reqNumber') }}
+            </li>
+          </ul>
         </div>
         <div class="field">
-          <label>{{ t("auth.password") }} (confirm)</label>
+          <label for="reg-confirm">{{ t("auth.passwordConfirm") }}</label>
           <div class="password-wrapper">
             <input
+              id="reg-confirm"
               v-model="registerForm.confirm"
               :type="showRegisterConfirm ? 'text' : 'password'"
               :placeholder="t('auth.passwordPlaceholder')"
@@ -246,7 +298,7 @@
               type="button"
               class="toggle-password"
               @click="showRegisterConfirm = !showRegisterConfirm"
-              :aria-label="showRegisterConfirm ? 'Masquer' : 'Afficher'"
+              :aria-label="showRegisterConfirm ? t('common.hidePassword') : t('common.showPassword')"
             >
               <svg
                 v-if="showRegisterConfirm"
@@ -305,33 +357,62 @@
       </form>
 
       <!-- Séparateur + Google -->
-      <div v-if="tab === 'register'" class="divider">
+      <div v-if="tab !== 'forgot'" class="divider">
         <span>{{ t("auth.or") }}</span>
       </div>
       <button
-        v-if="tab === 'register'"
+        v-if="tab !== 'forgot'"
         type="button"
         class="btn-google"
         :disabled="loading"
         @click="handleGoogleLogin"
       >
-        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
-        {{ t("auth.continueWithGoogle") }}
+        {{ tab === 'login' ? t("auth.loginWithGoogle") : t("auth.continueWithGoogle") }}
       </button>
+
+      <!-- Mot de passe oublié -->
+      <div v-if="tab === 'forgot'" class="forgot-section">
+        <button type="button" class="link-btn back-link" @click="switchTab('login')">
+          ← {{ t("auth.backToLogin") }}
+        </button>
+        <h2 class="forgot-title">{{ t("auth.forgotTitle") }}</h2>
+        <p class="forgot-desc">{{ t("auth.forgotDesc") }}</p>
+        <form class="auth-form" @submit.prevent="handleReset">
+          <div class="field">
+            <label for="forgot-email">{{ t("auth.email") }}</label>
+            <input
+              id="forgot-email"
+              v-model="forgotEmail"
+              type="email"
+              :placeholder="t('auth.emailPlaceholder')"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <p
+            v-if="forgotMsg.text"
+            :class="['msg-inline', forgotMsg.ok ? 'msg-inline--ok' : 'msg-inline--err']"
+          >{{ forgotMsg.text }}</p>
+          <button type="submit" class="btn-auth" :disabled="forgotLoading">
+            {{ forgotLoading ? t("auth.sending") : t("auth.sendReset") }}
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { userAuthStore } from "../store/userAuth.js";
+import { authStore as userAuthStore } from "../store/auth.js";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -349,13 +430,45 @@ const registerForm = reactive({
   prenom: "",
   nom: "",
   email: "",
+  telephone: "",
   password: "",
   confirm: "",
 });
 
+// Forgot password
+const forgotEmail = ref("");
+const forgotLoading = ref(false);
+const forgotMsg = reactive({ text: "", ok: false });
+
+const passwordStrength = computed(() => {
+  const p = registerForm.password;
+  if (!p) return 0;
+  let score = 0;
+  if (p.length >= 6) score++;
+  if (p.length >= 10) score++;
+  if (/[A-Z]/.test(p)) score++;
+  if (/[0-9]/.test(p)) score++;
+  if (/[^a-zA-Z0-9]/.test(p)) score++;
+  return Math.min(score, 4);
+});
+
+function handleTabKeydown(e, current) {
+  const tabs = ["login", "register"];
+  const idx = tabs.indexOf(current);
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    e.preventDefault();
+    switchTab(tabs[(idx + 1) % tabs.length]);
+  } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    e.preventDefault();
+    switchTab(tabs[(idx - 1 + tabs.length) % tabs.length]);
+  }
+}
+
 onMounted(() => {
   if (userAuthStore.isAuthenticated) {
-    router.replace(route.query.redirect || "/account");
+    const redirect = route.query.redirect;
+    const target = typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/account";
+    router.replace(target);
   }
 });
 
@@ -372,10 +485,12 @@ async function handleLogin() {
     if (role === "admin") {
       router.push("/admin");
     } else {
-      router.push(route.query.redirect || "/account");
+      const redirect = route.query.redirect;
+      const target = typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/account";
+      router.push(target);
     }
   } catch {
-    errorMsg.value = userAuthStore.error || "Erreur de connexion.";
+    errorMsg.value = userAuthStore.error || t("auth.loginError");
   } finally {
     loading.value = false;
   }
@@ -389,7 +504,9 @@ async function handleGoogleLogin() {
     if (role === "admin") {
       router.push("/admin");
     } else {
-      router.push(route.query.redirect || "/account");
+      const redirect = route.query.redirect;
+      const target = typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/account";
+      router.push(target);
     }
   } catch {
     if (userAuthStore.error) {
@@ -402,7 +519,7 @@ async function handleGoogleLogin() {
 
 async function handleRegister() {
   if (registerForm.password !== registerForm.confirm) {
-    errorMsg.value = "Les mots de passe ne correspondent pas.";
+    errorMsg.value = t("auth.passwordMismatch");
     return;
   }
   loading.value = true;
@@ -413,13 +530,31 @@ async function handleRegister() {
       registerForm.password,
       registerForm.prenom,
       registerForm.nom,
+      registerForm.telephone,
     );
-    router.push(route.query.redirect || "/account");
+    const redirect = route.query.redirect;
+    const target = typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/account";
+    router.push(target);
   } catch {
-    errorMsg.value =
-      userAuthStore.error || "Erreur lors de la création du compte.";
+    errorMsg.value = userAuthStore.error || t("auth.registerError");
   } finally {
     loading.value = false;
+  }
+}
+
+async function handleReset() {
+  forgotLoading.value = true;
+  forgotMsg.text = "";
+  try {
+    await userAuthStore.resetPassword(forgotEmail.value);
+    forgotMsg.ok = true;
+    forgotMsg.text = t("auth.resetSent");
+    forgotEmail.value = "";
+  } catch {
+    forgotMsg.ok = false;
+    forgotMsg.text = userAuthStore.error || t("auth.loginError");
+  } finally {
+    forgotLoading.value = false;
   }
 }
 </script>
@@ -452,7 +587,7 @@ async function handleRegister() {
   transition: color 0.2s;
 }
 .back-home:hover {
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 
 .auth-logo {
@@ -469,7 +604,7 @@ async function handleRegister() {
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 
 .auth-tabs {
@@ -494,7 +629,7 @@ async function handleRegister() {
 }
 .tab-btn.active {
   background: #fff;
-  color: #1a1a2e;
+  color: var(--color-navy);
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -535,7 +670,7 @@ async function handleRegister() {
   box-sizing: border-box;
 }
 .field input:focus {
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
 .password-wrapper {
@@ -559,7 +694,7 @@ async function handleRegister() {
   align-items: center;
 }
 .toggle-password:hover {
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 
 .error-msg {
@@ -582,17 +717,17 @@ async function handleRegister() {
 .btn-auth {
   margin-top: 0.25rem;
   padding: 0.85rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 .btn-auth:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--color-primary-dark);
 }
 .btn-auth:disabled {
   opacity: 0.6;
@@ -638,5 +773,125 @@ async function handleRegister() {
 .btn-google:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Label row (password label + forgot link) */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Generic text link button */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link-btn:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Password strength bar */
+.password-strength {
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: #e8e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s, background 0.3s;
+}
+.strength--1 { background: var(--color-primary); }
+.strength--2 { background: #f59e0b; }
+.strength--3 { background: #3b82f6; }
+.strength--4 { background: #16a34a; }
+.strength-label {
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+.password-reqs {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #aaa;
+  transition: color 0.2s;
+}
+.req-item--ok {
+  color: #16a34a;
+}
+.req-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+.req-icon--check {
+  color: #16a34a;
+}
+
+/* Forgot password section */
+.forgot-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.back-link {
+  font-size: 0.85rem;
+  text-decoration: none;
+  align-self: flex-start;
+}
+.forgot-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin: 0;
+}
+.forgot-desc {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Inline message (forgot success/error) */
+.msg-inline {
+  font-size: 0.88rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0;
+}
+.msg-inline--ok {
+  background: #dcfce7;
+  color: #166534;
+}
+.msg-inline--err {
+  background: #fce4ec;
+  color: #c62828;
 }
 </style>
