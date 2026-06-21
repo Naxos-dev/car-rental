@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { watch } from "vue";
 import LandingPage from "../views/LandingPage.vue";
 import BackOffice from "../views/BackOffice.vue";
 import CheckoutPage from "../views/CheckoutPage.vue";
@@ -7,8 +8,9 @@ import AuthPage from "../views/AuthPage.vue";
 import AccountPage from "../views/AccountPage.vue";
 import FleetPage from "../views/FleetPage.vue";
 import LegalPage from "../views/LegalPage.vue";
+import NotFoundPage from "../views/NotFoundPage.vue";
 import { authStore } from "../store/auth.js";
-import { userAuthStore } from "../store/userAuth.js";
+import { checkoutStore } from "../store/checkout.js";
 
 const routes = [
   { path: "/", name: "Home", component: LandingPage },
@@ -51,6 +53,7 @@ const routes = [
     component: BackOffice,
     meta: { requiresAuth: true },
   },
+  { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFoundPage },
 ];
 
 const router = createRouter({
@@ -69,15 +72,14 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  // Attendre que Firebase ait résolu l'état d'authentification
-  if (authStore.loading || userAuthStore.loading) {
+  // Attendre que Firebase ait résolu l'état d'authentification (max 5s)
+  if (authStore.loading) {
     await new Promise((resolve) => {
-      const stop = setInterval(() => {
-        if (!authStore.loading && !userAuthStore.loading) {
-          clearInterval(stop);
-          resolve();
-        }
-      }, 50);
+      const stop = watch(
+        () => authStore.loading,
+        (loading) => { if (!loading) { stop(); resolve(); } }
+      );
+      setTimeout(() => { stop(); resolve(); }, 5000);
     });
   }
 
@@ -86,13 +88,18 @@ router.beforeEach(async (to) => {
     return { name: "Auth", query: { redirect: to.fullPath } };
   }
 
-  // Garde client : doit avoir un compte
-  if (to.meta.requiresUserAuth && !userAuthStore.isAuthenticated) {
-    return { path: "/auth", query: { redirect: to.fullPath } };
+  // Garde client : doit avoir un compte (non-admin uniquement)
+  if (to.meta.requiresUserAuth && (!authStore.isAuthenticated || authStore.isAdmin)) {
+    return authStore.isAdmin ? { path: "/admin" } : { path: "/auth", query: { redirect: to.fullPath } };
+  }
+
+  // Garde checkout : redirige si aucun véhicule sélectionné
+  if (to.name === "Checkout" && !checkoutStore.vehicle) {
+    return { path: "/fleet", query: { redirected: "1" } };
   }
 
   // Redirige si déjà connecté et tente d'accéder à /auth
-  if (to.name === "Auth" && userAuthStore.isAuthenticated) {
+  if (to.name === "Auth" && authStore.isAuthenticated) {
     return authStore.isAdmin ? { path: "/admin" } : { path: "/account" };
   }
 });

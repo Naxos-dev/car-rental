@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="header-inner">
-      <RouterLink to="/" class="logo">
+      <RouterLink to="/" class="logo" :aria-label="'AutoLoc – ' + t('nav.home')">
         <svg
           class="logo-icon"
           viewBox="0 0 24 24"
@@ -11,6 +11,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <path
             d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
@@ -23,9 +24,12 @@
 
       <!-- Burger -->
       <button
+        ref="burgerRef"
         class="burger"
         @click="mobileOpen = !mobileOpen"
         :aria-label="mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')"
+        :aria-expanded="mobileOpen"
+        aria-controls="nav-menu"
       >
         <span :class="['burger-line', { open: mobileOpen }]"></span>
         <span :class="['burger-line', { open: mobileOpen }]"></span>
@@ -33,11 +37,12 @@
       </button>
 
       <nav
+        id="nav-menu"
+        ref="navRef"
         :class="['nav', { 'nav--open': mobileOpen }]"
-        @click="mobileOpen = false"
       >
-        <RouterLink to="/" class="nav-link">{{ t("nav.home") }}</RouterLink>
-        <RouterLink to="/fleet" class="nav-link">{{
+        <RouterLink to="/" class="nav-link" @click="mobileOpen = false">{{ t("nav.home") }}</RouterLink>
+        <RouterLink to="/fleet" class="nav-link" @click="mobileOpen = false">{{
           t("nav.fleet")
         }}</RouterLink>
         <RouterLink v-if="authStore.isAdmin" to="/admin" class="btn-admin">
@@ -58,16 +63,16 @@
 
         <!-- Boutons client (pages publiques) -->
         <template v-else-if="!isAdminRoute">
-          <template v-if="userAuthStore.isAuthenticated">
-            <div class="user-menu" ref="menuRef">
-              <button class="btn-user" @click="toggleMenu">
+          <template v-if="authStore.isAuthenticated">
+            <div class="user-menu" ref="menuRef" @click.stop>
+              <button class="btn-user" @click="toggleMenu" :aria-expanded="menuOpen" aria-haspopup="menu">
                 <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
                   <path
                     d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
                   />
                 </svg>
                 <span class="user-prenom">{{
-                  userAuthStore.userProfile?.prenom || userAuthStore.user?.email
+                  authStore.userProfile?.prenom || authStore.user?.email
                 }}</span>
                 <svg
                   class="chevron"
@@ -78,21 +83,22 @@
                   <path d="M7 10l5 5 5-5z" />
                 </svg>
               </button>
-              <div v-if="menuOpen" class="dropdown">
+              <div v-if="menuOpen" class="dropdown" role="menu" :aria-label="t('nav.myAccount')" @keydown.escape.stop="menuOpen = false">
                 <RouterLink
                   to="/account"
                   class="dropdown-item"
+                  role="menuitem"
                   @click="menuOpen = false"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path
                       d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
                     />
                   </svg>
                   {{ t("nav.myAccount") }}
                 </RouterLink>
-                <button class="dropdown-item danger" @click="handleUserLogout">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
+                <button class="dropdown-item danger" role="menuitem" @click="handleUserLogout">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path
                       d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
                     />
@@ -129,7 +135,6 @@ import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { authStore } from "../store/auth.js";
-import { userAuthStore } from "../store/userAuth.js";
 import SearchBanner from "./SearchBanner.vue";
 
 const { t, locale } = useI18n();
@@ -143,6 +148,8 @@ const route = useRoute();
 const router = useRouter();
 const menuOpen = ref(false);
 const menuRef = ref(null);
+const navRef = ref(null);
+const burgerRef = ref(null);
 const mobileOpen = ref(false);
 
 watch(
@@ -163,10 +170,47 @@ function handleClickOutside(e) {
   if (menuRef.value && !menuRef.value.contains(e.target)) {
     menuOpen.value = false;
   }
+  if (
+    mobileOpen.value &&
+    navRef.value && !navRef.value.contains(e.target) &&
+    burgerRef.value && !burgerRef.value.contains(e.target)
+  ) {
+    mobileOpen.value = false;
+  }
 }
 
+function trapFocus(e) {
+  if (!mobileOpen.value || !navRef.value) return;
+  const focusable = Array.from(
+    navRef.value.querySelectorAll('a, button, input, select, [tabindex]:not([tabindex="-1"])'),
+  ).filter((el) => !el.disabled);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.key === "Escape") {
+    mobileOpen.value = false;
+    burgerRef.value?.focus();
+  } else if (e.key === "Tab") {
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+watch(mobileOpen, (open) => {
+  if (open) document.addEventListener("keydown", trapFocus);
+  else document.removeEventListener("keydown", trapFocus);
+});
+
 onMounted(() => document.addEventListener("click", handleClickOutside));
-onUnmounted(() => document.removeEventListener("click", handleClickOutside));
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener("keydown", trapFocus);
+});
 
 async function handleAdminLogout() {
   await authStore.logout();
@@ -175,7 +219,7 @@ async function handleAdminLogout() {
 
 async function handleUserLogout() {
   menuOpen.value = false;
-  await userAuthStore.logout();
+  await authStore.logout();
   router.push("/");
 }
 </script>
@@ -212,7 +256,7 @@ async function handleUserLogout() {
 .logo-text {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .nav {
   display: flex;
@@ -228,14 +272,18 @@ async function handleUserLogout() {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
   z-index: 200;
 }
 .burger-line {
   display: block;
   width: 24px;
   height: 2px;
-  background: #1a1a2e;
+  background: var(--color-navy);
   border-radius: 2px;
   transition: all 0.25s;
   transform-origin: center;
@@ -310,7 +358,7 @@ async function handleUserLogout() {
 .nav-link:hover,
 .nav-link.router-link-active {
   background: #f0f4ff;
-  color: #1a1a2e;
+  color: var(--color-navy);
 }
 .user-info {
   font-size: 0.85rem;
@@ -336,7 +384,7 @@ async function handleUserLogout() {
   background: #f8bbd0;
 }
 .btn-admin {
-  background: #1a1a2e;
+  background: var(--color-navy);
   color: #fff;
   text-decoration: none;
   border-radius: 8px;
@@ -357,17 +405,17 @@ async function handleUserLogout() {
   flex-shrink: 0;
 }
 .btn-signin {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--color-primary);
   color: #fff;
   text-decoration: none;
   border-radius: 8px;
   padding: 0.4rem 1rem;
   font-weight: 600;
   font-size: 0.88rem;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 .btn-signin:hover {
-  opacity: 0.9;
+  background: var(--color-primary-dark);
 }
 
 /* Menu utilisateur */
@@ -384,7 +432,7 @@ async function handleUserLogout() {
   padding: 0.35rem 0.75rem;
   font-weight: 600;
   font-size: 0.88rem;
-  color: #1a1a2e;
+  color: var(--color-navy);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -394,7 +442,7 @@ async function handleUserLogout() {
 .user-icon {
   width: 18px;
   height: 18px;
-  color: #667eea;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 .user-prenom {
@@ -407,7 +455,7 @@ async function handleUserLogout() {
   width: 18px;
   height: 18px;
   color: #888;
-  transition: transform 0.2s;
+  transition: transform 0.3s ease-in-out;
   flex-shrink: 0;
 }
 .chevron.open {
@@ -433,7 +481,7 @@ async function handleUserLogout() {
   padding: 0.7rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #1a1a2e;
+  color: var(--color-navy);
   text-decoration: none;
   background: none;
   border: none;
@@ -447,7 +495,7 @@ async function handleUserLogout() {
 .dropdown-item svg {
   width: 16px;
   height: 16px;
-  color: #667eea;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 .dropdown-item.danger {
@@ -470,13 +518,13 @@ async function handleUserLogout() {
   gap: 2px;
 }
 .lang-btn {
-  padding: 0.2rem 0.6rem;
+  padding: 0.55rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 700;
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: #8892b0;
+  color: #555;
   cursor: pointer;
   transition:
     background 0.18s,
@@ -484,9 +532,15 @@ async function handleUserLogout() {
     box-shadow 0.18s;
   letter-spacing: 0.05em;
   line-height: 1.5;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .lang-btn:hover {
-  color: #4a5568;
+  color: var(--color-navy);
+  background: rgba(102, 126, 234, 0.12);
 }
 .lang-btn--active {
   background: #fff;
