@@ -80,7 +80,7 @@ body {
   position: fixed;
   bottom: 5.5rem;
   right: 1.5rem;
-  z-index: 1000;
+  z-index: 400;
   width: 44px;
   height: 44px;
   border-radius: 50%;

@@ -1438,6 +1438,7 @@ select:focus {
   font-weight: 700;
   cursor: pointer;
   outline: none;
+  min-width: 110px;
 }
 .statut--confirmee {
   background: #e8f5e9;
