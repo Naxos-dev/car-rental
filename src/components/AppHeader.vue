@@ -53,65 +53,55 @@
           Admin
         </RouterLink>
 
-        <!-- Boutons admin (back-office) -->
-        <template v-if="authStore.isAdmin && isAdminRoute">
-          <span class="user-info">{{ authStore.user?.email }}</span>
-          <button class="btn-logout" @click="handleAdminLogout">
-            {{ t("nav.logout") }}
-          </button>
-        </template>
-
-        <!-- Boutons client (pages publiques) -->
-        <template v-else-if="!isAdminRoute">
-          <template v-if="authStore.isAuthenticated">
-            <div class="user-menu" ref="menuRef" @click.stop>
-              <button class="btn-user" @click="toggleMenu" :aria-expanded="menuOpen" aria-haspopup="menu">
-                <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
+        <!-- Menu compte (admin ou client, toutes pages) -->
+        <template v-if="authStore.isAuthenticated">
+          <div class="user-menu" ref="menuRef" @click.stop>
+            <button class="btn-user" @click="toggleMenu" :aria-expanded="menuOpen" aria-haspopup="menu">
+              <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
+                />
+              </svg>
+              <span class="user-prenom">{{
+                authStore.userProfile?.prenom || authStore.user?.email
+              }}</span>
+              <svg
+                class="chevron"
+                :class="{ open: menuOpen }"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M7 10l5 5 5-5z" />
+              </svg>
+            </button>
+            <div v-if="menuOpen" class="dropdown" role="menu" :aria-label="t('nav.myAccount')" @keydown.escape.stop="menuOpen = false">
+              <RouterLink
+                to="/account"
+                class="dropdown-item"
+                role="menuitem"
+                @click="menuOpen = false"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path
                     d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
                   />
                 </svg>
-                <span class="user-prenom">{{
-                  authStore.userProfile?.prenom || authStore.user?.email
-                }}</span>
-                <svg
-                  class="chevron"
-                  :class="{ open: menuOpen }"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M7 10l5 5 5-5z" />
+                {{ t("nav.myAccount") }}
+              </RouterLink>
+              <button class="dropdown-item danger" role="menuitem" @click="handleUserLogout">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                  />
                 </svg>
+                {{ t("nav.logout") }}
               </button>
-              <div v-if="menuOpen" class="dropdown" role="menu" :aria-label="t('nav.myAccount')" @keydown.escape.stop="menuOpen = false">
-                <RouterLink
-                  to="/account"
-                  class="dropdown-item"
-                  role="menuitem"
-                  @click="menuOpen = false"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path
-                      d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
-                    />
-                  </svg>
-                  {{ t("nav.myAccount") }}
-                </RouterLink>
-                <button class="dropdown-item danger" role="menuitem" @click="handleUserLogout">
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path
-                      d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
-                    />
-                  </svg>
-                  {{ t("nav.logout") }}
-                </button>
-              </div>
             </div>
-          </template>
-          <RouterLink v-else to="/auth" class="btn-signin">
-            {{ t("nav.login") }}
-          </RouterLink>
+          </div>
         </template>
+        <RouterLink v-else to="/auth" class="btn-signin">
+          {{ t("nav.login") }}
+        </RouterLink>
 
         <!-- Switcher de langue -->
         <div class="lang-toggle">
@@ -159,7 +149,6 @@ watch(
   },
 );
 
-const isAdminRoute = computed(() => route.path.startsWith("/admin"));
 const isFleetRoute = computed(() => route.path === "/fleet");
 
 function toggleMenu() {
@@ -211,11 +200,6 @@ onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
   document.removeEventListener("keydown", trapFocus);
 });
-
-async function handleAdminLogout() {
-  await authStore.logout();
-  router.push("/");
-}
 
 async function handleUserLogout() {
   menuOpen.value = false;
@@ -359,29 +343,6 @@ async function handleUserLogout() {
 .nav-link.router-link-active {
   background: #f0f4ff;
   color: var(--color-navy);
-}
-.user-info {
-  font-size: 0.85rem;
-  color: #888;
-  padding: 0.4rem 0.5rem;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.btn-logout {
-  background: #fce4ec;
-  color: #c62828;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 0.9rem;
-  font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-logout:hover {
-  background: #f8bbd0;
 }
 .btn-admin {
   background: var(--color-navy);

@@ -39,13 +39,13 @@ const routes = [
     path: "/checkout",
     name: "Checkout",
     component: CheckoutPage,
-    meta: { requiresUserAuth: true },
+    meta: { requiresUserAuth: true, customerOnly: true },
   },
   {
     path: "/payment-success",
     name: "PaymentSuccess",
     component: PaymentSuccessPage,
-    meta: { requiresUserAuth: true },
+    meta: { requiresUserAuth: true, customerOnly: true },
   },
   {
     path: "/admin",
@@ -88,9 +88,14 @@ router.beforeEach(async (to) => {
     return { name: "Auth", query: { redirect: to.fullPath } };
   }
 
-  // Garde client : doit avoir un compte (non-admin uniquement)
-  if (to.meta.requiresUserAuth && (!authStore.isAuthenticated || authStore.isAdmin)) {
-    return authStore.isAdmin ? { path: "/admin" } : { path: "/auth", query: { redirect: to.fullPath } };
+  // Garde compte : doit être authentifié (admin ou client)
+  if (to.meta.requiresUserAuth && !authStore.isAuthenticated) {
+    return { name: "Auth", query: { redirect: to.fullPath } };
+  }
+
+  // Garde réservation : réservée aux clients (l'admin gère la flotte, pas les réservations)
+  if (to.meta.customerOnly && authStore.isAdmin) {
+    return { path: "/admin" };
   }
 
   // Garde checkout : redirige si aucun véhicule sélectionné
