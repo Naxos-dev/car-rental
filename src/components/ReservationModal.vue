@@ -324,10 +324,10 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 import { checkoutStore } from "../store/checkout.js";
-import { reservationStore } from "../store/reservations.js";
 import { authStore as userAuthStore } from "../store/auth.js";
 import DateRangePicker from "./DateRangePicker.vue";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+import { apiUrl } from "../utils/apiUrl.js";
 
 const { t, tm } = useI18n();
 const fuelMap = computed(() => tm('fuel'));
@@ -393,14 +393,30 @@ const localEndDate = ref("");
 const localStartTime = ref("09:00");
 const localEndTime = ref("18:00");
 
-// Plages déjà réservées pour CE véhicule (passées au DateRangePicker)
+// Plages déjà réservées pour CE véhicule (passées au DateRangePicker). Récupérées via un
+// endpoint dédié (Admin SDK côté serveur) plutôt que depuis reservationStore, qui — pour un
+// client non-admin — ne contient jamais que ses propres réservations (règles Firestore).
+const reservedRanges = ref([]);
+
+async function fetchReservedRanges(vehicleId) {
+  if (!vehicleId) {
+    reservedRanges.value = [];
+    return;
+  }
+  try {
+    const res = await fetch(`${apiUrl("vehicle-availability")}?vehicleId=${encodeURIComponent(vehicleId)}`);
+    if (!res.ok) throw new Error("fetch failed");
+    const { ranges } = await res.json();
+    reservedRanges.value = ranges;
+  } catch (err) {
+    console.error("[ReservationModal] Erreur récupération disponibilité:", err);
+    reservedRanges.value = [];
+  }
+}
+
 const disabledRanges = computed(() =>
-  reservationStore.reservations
-    .filter(
-      (r) =>
-        ["confirmee", "payee"].includes(r.statut) &&
-        r.vehicleId === props.vehicle?.id,
-    )
+  reservedRanges.value
+    .filter((r) => ["confirmee", "payee"].includes(r.statut))
     .map((r) => ({ from: r.startDate, to: r.endDate })),
 );
 
@@ -421,7 +437,7 @@ const isConflict = computed(() => {
 // Bloquer le scroll du body quand le modal est ouvert
 watch(
   () => props.visible,
-  (val) => {
+  async (val) => {
     document.body.style.overflow = val ? "hidden" : "";
     if (val) {
       const profile = userAuthStore.userProfile;
@@ -442,6 +458,7 @@ watch(
       errorMsg.value = "";
       loading.value = false;
       document.addEventListener("keydown", handleModalKeydown);
+      await fetchReservedRanges(props.vehicle?.id);
       initialConflict.value = isConflict.value;
       nextTick(() => {
         modalCardRef.value?.querySelector(".modal-close")?.focus();
@@ -449,6 +466,7 @@ watch(
     } else {
       document.removeEventListener("keydown", handleModalKeydown);
       initialConflict.value = false;
+      reservedRanges.value = [];
     }
   },
 );

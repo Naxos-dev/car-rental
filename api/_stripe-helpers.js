@@ -1,5 +1,5 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { initializeFirestore } from "firebase-admin/firestore";
+import { initializeFirestore, FieldValue } from "firebase-admin/firestore";
 
 // Comma-separated list of allowed origins, e.g. "https://myapp.com,https://myapp.vercel.app"
 // Leave unset in development to allow any origin from localhost.
@@ -36,7 +36,7 @@ export function setCors(req, res) {
   const allowed = devMode ? isLocalhost : ALLOWED_ORIGINS.includes(origin);
   if (allowed) res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
@@ -122,4 +122,48 @@ export async function checkVehicleAvailability(vehicleId, startDate, endDate) {
     err.code = "AVAILABILITY_ERROR";
     throw err;
   }
+}
+
+// Returns only the fields needed to grey out booked dates in the UI (vehicleId, dates, statut) —
+// never the customer's name/email/phone. Called from a public endpoint, so this is the one
+// place non-owners are allowed to see that a vehicle is booked for given dates.
+export async function getVehicleReservedRanges(vehicleId) {
+  const db = getAdminDb();
+  const snapshot = await db.collection("reservations").where("vehicleId", "==", vehicleId).get();
+  return snapshot.docs
+    .map((doc) => doc.data())
+    .filter((f) => f.statut !== "annulee" && f.startDate && f.endDate)
+    .map((f) => ({ vehicleId, startDate: f.startDate, endDate: f.endDate, statut: f.statut }));
+}
+
+// Creates the reservation from a completed Stripe Checkout Session, called from the Stripe
+// webhook (see api/stripe-webhook.js). This is the authoritative write: unlike the client-side
+// write it replaces, it uses Admin SDK credentials so it isn't subject to the Firestore rule
+// restricting reservation reads/writes to their own owner, and Stripe retries the webhook
+// automatically if it fails — so a payment is never "lost" the way a client-side write could be.
+// Idempotent on session.id (the Firestore doc ID), since Stripe can deliver the same event more
+// than once.
+export async function upsertReservationFromSession(session) {
+  const db = getAdminDb();
+  const ref = db.collection("reservations").doc(session.id);
+  if ((await ref.get()).exists) return;
+
+  const m = session.metadata || {};
+  await ref.set({
+    vehicleId: m.vehicleId,
+    vehicleLabel: m.vehicleLabel,
+    nom: m.nom || "",
+    email: m.email || session.customer_email || "",
+    telephone: m.telephone || "",
+    location: m.location || "",
+    startDate: m.startDate,
+    startTime: m.startTime || "",
+    endDate: m.endDate,
+    endTime: m.endTime || "",
+    vehiclePhoto: m.photoURL || "",
+    userId: m.userId || null,
+    stripeSessionId: session.id,
+    statut: "confirmee",
+    createdAt: FieldValue.serverTimestamp(),
+  });
 }

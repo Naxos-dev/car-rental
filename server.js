@@ -3,7 +3,14 @@ dotenv.config({ path: ".env.local" });
 import express from "express";
 import cors from "cors";
 import Stripe from "stripe";
-import { fetchVehicle, calcNbJours, checkVehicleAvailability, checkRateLimit } from "./api/_stripe-helpers.js";
+import {
+  fetchVehicle,
+  calcNbJours,
+  checkVehicleAvailability,
+  checkRateLimit,
+  getVehicleReservedRanges,
+  upsertReservationFromSession,
+} from "./api/_stripe-helpers.js";
 
 const app = express();
 const PORT = 3001;
@@ -18,10 +25,39 @@ function rateLimit({ max, windowMs }) {
   };
 }
 
-app.use(cors({ origin: "http://localhost:5173" }));
-app.use(express.json());
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+app.use(cors({ origin: "http://localhost:5173" }));
+
+// Mounted before express.json() (below) because signature verification needs the raw body.
+// For local testing: `stripe listen --forward-to localhost:3001/stripe-webhook`.
+app.post("/stripe-webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    return res.status(500).json({ error: "Webhook non configuré." });
+  }
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, req.headers["stripe-signature"], process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error("Stripe webhook signature error:", err.message);
+    return res.status(400).json({ error: "Signature invalide" });
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    if (session.payment_status === "paid") {
+      try {
+        await upsertReservationFromSession(session);
+      } catch (err) {
+        console.error("Reservation upsert error:", err);
+        return res.status(500).json({ error: "Erreur d'enregistrement" });
+      }
+    }
+  }
+  res.json({ received: true });
+});
+
+app.use(express.json());
 
 app.post("/create-checkout-session", rateLimit({ max: 10, windowMs: 60_000 }), async (req, res) => {
   const {
@@ -129,6 +165,20 @@ app.post("/verify-session", rateLimit({ max: 20, windowMs: 60_000 }), async (req
   } catch (err) {
     console.error("Stripe verify error:", err.message);
     res.status(400).json({ error: "Session Stripe introuvable" });
+  }
+});
+
+app.get("/vehicle-availability", rateLimit({ max: 60, windowMs: 60_000 }), async (req, res) => {
+  const vehicleId = req.query.vehicleId;
+  if (!vehicleId || !/^[\w-]{1,128}$/.test(vehicleId)) {
+    return res.status(400).json({ error: "vehicleId invalide" });
+  }
+  try {
+    const ranges = await getVehicleReservedRanges(vehicleId);
+    res.json({ ranges });
+  } catch (err) {
+    console.error("Vehicle availability error:", err);
+    res.status(503).json({ error: "Service temporairement indisponible. Réessayez dans quelques instants." });
   }
 });
 
