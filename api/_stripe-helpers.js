@@ -1,8 +1,33 @@
+import { initializeApp, cert, getApps } from "firebase-admin/app";
+import { initializeFirestore } from "firebase-admin/firestore";
+
 // Comma-separated list of allowed origins, e.g. "https://myapp.com,https://myapp.vercel.app"
 // Leave unset in development to allow any origin from localhost.
 export const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
   : [];
+
+// Reservations require an authenticated Firestore read (see firestore.rules), which the
+// REST-with-API-key calls below can't provide. Admin SDK credentials bypass security rules
+// for this trusted server-side check. Lazily initialized so a missing key only breaks the
+// availability check, not the whole module.
+let _adminDb = null;
+function getAdminDb() {
+  if (_adminDb) return _adminDb;
+  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!key) throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY non configurée");
+  let app;
+  if (!getApps().length) {
+    const serviceAccount = JSON.parse(Buffer.from(key, "base64").toString("utf-8"));
+    app = initializeApp({ credential: cert(serviceAccount) });
+  } else {
+    app = getApps()[0];
+  }
+  // gRPC (the Admin SDK's default transport) can hang or fail to establish in some
+  // serverless environments (e.g. Vercel functions). REST avoids that at a small latency cost.
+  _adminDb = initializeFirestore(app, { preferRest: true });
+  return _adminDb;
+}
 
 export function setCors(req, res) {
   const origin = req.headers.origin || "";
@@ -66,51 +91,27 @@ export function calcNbJours(startDate, endDate) {
   return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-// Fetches all reservations for a vehicle via Firestore REST and checks for date overlap.
+// Fetches all reservations for a vehicle via the Admin SDK (bypasses security rules — see
+// getAdminDb) and checks for date overlap.
 // Throws with err.code === "AVAILABILITY_ERROR" if conflicting reservation found.
 // Returns without throwing if the Firestore query itself fails (don't block checkout on infra errors).
 export async function checkVehicleAvailability(vehicleId, startDate, endDate) {
-  const projectId = process.env.FIREBASE_PROJECT_ID ?? process.env.VITE_FIREBASE_PROJECT_ID;
-  const apiKey = process.env.FIREBASE_API_KEY ?? process.env.VITE_FIREBASE_API_KEY;
-  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery?key=${apiKey}`;
-
-  let resp;
+  let snapshot;
   try {
-    resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        structuredQuery: {
-          from: [{ collectionId: "reservations" }],
-          where: {
-            fieldFilter: {
-              field: { fieldPath: "vehicleId" },
-              op: "EQUAL",
-              value: { stringValue: vehicleId },
-            },
-          },
-        },
-      }),
-    });
+    const db = getAdminDb();
+    snapshot = await db.collection("reservations").where("vehicleId", "==", vehicleId).get();
   } catch (err) {
+    console.error("Availability check error:", err);
     const e = new Error("Availability check unreachable");
     e.code = "AVAILABILITY_CHECK_FAILED";
     throw e;
   }
 
-  if (!resp.ok) {
-    const e = new Error("Availability check failed");
-    e.code = "AVAILABILITY_CHECK_FAILED";
-    throw e;
-  }
-
-  const results = await resp.json();
-  const conflict = results.some((item) => {
-    if (!item.document) return false;
-    const f = item.document.fields || {};
-    const statut = f.statut?.stringValue;
-    const rStart = f.startDate?.stringValue;
-    const rEnd = f.endDate?.stringValue;
+  const conflict = snapshot.docs.some((doc) => {
+    const f = doc.data();
+    const statut = f.statut;
+    const rStart = f.startDate;
+    const rEnd = f.endDate;
     // Treat a reservation with missing dates as always conflicting (corrupted doc).
     if (!rStart || !rEnd) return statut !== "annulee";
     return statut !== "annulee" && rStart <= endDate && rEnd >= startDate;
