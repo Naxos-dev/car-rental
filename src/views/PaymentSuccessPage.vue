@@ -99,11 +99,13 @@
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { reservationStore } from "../store/reservations.js";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase.js";
 import { authStore as userAuthStore } from "../store/auth.js";
 import { checkoutStore } from "../store/checkout.js";
 import { formatDate as _formatDate } from "../composables/useFormatDate.js";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+import { apiUrl } from "../utils/apiUrl.js";
 
 const { t } = useI18n();
 
@@ -123,16 +125,6 @@ const recapImgFailed = ref(false);
 let _stopAuthWatch = null;
 onUnmounted(() => { _stopAuthWatch?.(); _stopAuthWatch = null; });
 
-function getVerifyUrl() {
-  const checkoutUrl = import.meta.env.VITE_CHECKOUT_FUNCTION_URL;
-  if (checkoutUrl) {
-    // Derive verify-session URL from the checkout function URL (same base path).
-    return checkoutUrl.replace(/\/[^/]+$/, "/verify-session");
-  }
-  return "/api/verify-session";
-}
-
-
 onMounted(async () => {
   const sessionId = route.query.session_id;
 
@@ -142,7 +134,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await fetch(getVerifyUrl(), {
+    const res = await fetch(apiUrl("verify-session"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId }),
@@ -168,8 +160,8 @@ onMounted(async () => {
       photoURL,
     };
 
-    // Wait for Firebase auth to resolve before writing so userId comes from the verified
-    // session, not from attacker-controllable Stripe metadata.
+    // Wait for Firebase auth to resolve before deciding whether to poll for the reservation
+    // (the poll below only applies to signed-in users, per Firestore's read rule).
     if (userAuthStore.loading) {
       await new Promise((resolve) => {
         const stop = watch(() => userAuthStore.loading, (isLoading) => {
@@ -181,37 +173,30 @@ onMounted(async () => {
       _stopAuthWatch = null;
     }
 
-    // Use session ID as document ID — safe to call twice (transaction guard inside).
-    // If the write fails (e.g. browser crash, network), the payment is already captured.
-    // A non-availability write error shows a warning rather than hiding the payment confirmation.
-    try {
-      await reservationStore.addReservationWithId(sessionId, {
-        vehicleId: metadata.vehicleId,
-        vehicleLabel: metadata.vehicleLabel,
-        nom: metadata.nom,
-        email: metadata.email,
-        telephone: metadata.telephone,
-        location: metadata.location,
-        startDate: metadata.startDate,
-        startTime: metadata.startTime,
-        endDate: metadata.endDate,
-        endTime: metadata.endTime,
-        vehiclePhoto: rawUrl || "",
-        userId: userAuthStore.user?.uid ?? null,
-        stripeSessionId: sessionId,
-        statut: "confirmee",
-      });
-      checkoutStore.clear();
-    } catch (writeErr) {
-      if (writeErr.code === "AVAILABILITY_ERROR") throw writeErr;
-      console.error("[PaymentSuccess] Erreur écriture réservation:", writeErr);
-      writeWarning.value = true;
+    // The reservation itself is now created server-side by the Stripe webhook (see
+    // api/stripe-webhook.js) using Admin SDK credentials — it no longer depends on this page's
+    // Firestore write succeeding under the client's own security rules. Here we just poll for
+    // the resulting doc (readable since the webhook stores the signed-in user as its owner) to
+    // confirm it landed; if it's still missing after a few seconds, show a soft warning instead
+    // of blocking the success confirmation, since the payment itself is already secured.
+    if (userAuthStore.user) {
+      const ref = doc(db, "reservations", sessionId);
+      let found = false;
+      for (let i = 0; i < 6; i++) {
+        try {
+          found = (await getDoc(ref)).exists();
+        } catch (pollErr) {
+          console.error("[PaymentSuccess] Erreur lecture réservation:", pollErr);
+        }
+        if (found) break;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      if (!found) writeWarning.value = true;
     }
+    checkoutStore.clear();
   } catch (err) {
     console.error("[PaymentSuccess] Erreur vérification:", err);
-    verifyError.value = err.code === "AVAILABILITY_ERROR"
-      ? t("success.doubleBooking")
-      : t("success.errorDesc");
+    verifyError.value = t("success.errorDesc");
   } finally {
     loading.value = false;
   }

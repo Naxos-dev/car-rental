@@ -53,28 +53,6 @@ export const reservationStore = reactive({
     });
   },
 
-  // Idempotent: uses the Stripe session ID as document ID to prevent double-writes on page refresh.
-  // The availability check (S3) cannot be made fully atomic from the client because Firestore
-  // transactions don't support collection queries — the true fix is a server-side Stripe webhook.
-  async addReservationWithId(id, data) {
-    if (data.vehicleId && data.startDate && data.endDate) {
-      await this._assertAvailable(data.vehicleId, data.startDate, data.endDate);
-    }
-    const ref = doc(db, "reservations", id);
-    const { statut: dataStatut, ...rest } = data;
-    // runTransaction makes the idempotency check + write atomic, preventing duplicate writes
-    // from concurrent sessions carrying the same Stripe session ID.
-    await runTransaction(db, async (tx) => {
-      const existing = await tx.get(ref);
-      if (existing.exists()) return;
-      tx.set(ref, {
-        ...rest,
-        statut: dataStatut ?? "confirmee",
-        createdAt: serverTimestamp(),
-      });
-    });
-  },
-
   async updateStatut(id, statut) {
     await updateDoc(doc(db, "reservations", id), { statut });
   },
