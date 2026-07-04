@@ -128,9 +128,9 @@ import ReservationModal from "../components/ReservationModal.vue";
 import VehicleCard from "../components/VehicleCard.vue";
 import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
-import { reservationStore } from "../store/reservations.js";
 import { searchStore } from "../store/search.js";
 import { authStore as userAuthStore } from "../store/auth.js";
+import { useReservedRanges } from "../composables/useReservedRanges.js";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -150,15 +150,24 @@ onMounted(() => {
   }
 });
 
+const { ranges: reservedRanges, fetchAll: fetchReservedRanges } = useReservedRanges();
+
+watch(
+  [() => searchStore.startDate, () => searchStore.endDate],
+  ([startDate, endDate]) => {
+    if (startDate && endDate) fetchReservedRanges();
+  },
+  { immediate: true },
+);
+
 const unavailableVehicleIds = computed(() => {
   if (!searchStore.startDate || !searchStore.endDate) return new Set();
   const selStart = new Date(searchStore.startDate);
   const selEnd = new Date(searchStore.endDate);
   return new Set(
-    reservationStore.reservations
+    reservedRanges.value
       .filter(
         (r) =>
-          r.statut === "confirmee" &&
           new Date(r.startDate) <= selEnd &&
           new Date(r.endDate) >= selStart,
       )
