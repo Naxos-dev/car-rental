@@ -127,13 +127,16 @@ export async function checkVehicleAvailability(vehicleId, startDate, endDate) {
 // Returns only the fields needed to grey out booked dates in the UI (vehicleId, dates, statut) —
 // never the customer's name/email/phone. Called from a public endpoint, so this is the one
 // place non-owners are allowed to see that a vehicle is booked for given dates.
+// Omitting vehicleId returns ranges for every vehicle (used by the fleet list availability filter).
 export async function getVehicleReservedRanges(vehicleId) {
   const db = getAdminDb();
-  const snapshot = await db.collection("reservations").where("vehicleId", "==", vehicleId).get();
+  let q = db.collection("reservations");
+  if (vehicleId) q = q.where("vehicleId", "==", vehicleId);
+  const snapshot = await q.get();
   return snapshot.docs
     .map((doc) => doc.data())
-    .filter((f) => f.statut !== "annulee" && f.startDate && f.endDate)
-    .map((f) => ({ vehicleId, startDate: f.startDate, endDate: f.endDate, statut: f.statut }));
+    .filter((f) => f.statut !== "annulee" && f.startDate && f.endDate && f.vehicleId)
+    .map((f) => ({ vehicleId: f.vehicleId, startDate: f.startDate, endDate: f.endDate, statut: f.statut }));
 }
 
 // Creates the reservation from a completed Stripe Checkout Session, called from the Stripe

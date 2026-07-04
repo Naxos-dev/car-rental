@@ -169,12 +169,14 @@ app.post("/verify-session", rateLimit({ max: 20, windowMs: 60_000 }), async (req
 });
 
 app.get("/vehicle-availability", rateLimit({ max: 60, windowMs: 60_000 }), async (req, res) => {
+  // vehicleId is optional: omitted, it returns reserved ranges for every vehicle
+  // (used by the fleet list to filter out vehicles booked by other users).
   const vehicleId = req.query.vehicleId;
-  if (!vehicleId || !/^[\w-]{1,128}$/.test(vehicleId)) {
+  if (vehicleId && !/^[\w-]{1,128}$/.test(vehicleId)) {
     return res.status(400).json({ error: "vehicleId invalide" });
   }
   try {
-    const ranges = await getVehicleReservedRanges(vehicleId);
+    const ranges = await getVehicleReservedRanges(vehicleId || undefined);
     res.json({ ranges });
   } catch (err) {
     console.error("Vehicle availability error:", err);

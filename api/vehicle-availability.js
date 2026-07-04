@@ -11,13 +11,15 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Trop de requêtes. Réessayez plus tard." });
   }
 
+  // vehicleId is optional: omitted, it returns reserved ranges for every vehicle
+  // (used by the fleet list to filter out vehicles booked by other users).
   const vehicleId = req.query?.vehicleId;
-  if (!vehicleId || !VEHICLE_ID_RE.test(vehicleId)) {
+  if (vehicleId && !VEHICLE_ID_RE.test(vehicleId)) {
     return res.status(400).json({ error: "vehicleId invalide" });
   }
 
   try {
-    const ranges = await getVehicleReservedRanges(vehicleId);
+    const ranges = await getVehicleReservedRanges(vehicleId || undefined);
     res.json({ ranges });
   } catch (err) {
     console.error("Vehicle availability error:", err);
