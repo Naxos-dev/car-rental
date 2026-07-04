@@ -83,6 +83,11 @@ app.post("/create-checkout-session", rateLimit({ max: 10, windowMs: 60_000 }), a
     return res.status(400).json({ error: "Dates invalides" });
   }
 
+  const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+  if ((startTime && !TIME_RE.test(startTime)) || (endTime && !TIME_RE.test(endTime))) {
+    return res.status(400).json({ error: "Heures invalides" });
+  }
+
   // S1: reject cancelUrls that don't belong to the frontend origin.
   try {
     if (new URL(cancelUrl).origin !== FRONTEND_URL) {
@@ -107,7 +112,7 @@ app.post("/create-checkout-session", rateLimit({ max: 10, windowMs: 60_000 }), a
     }
   }
 
-  const nbJours = calcNbJours(startDate, endDate);
+  const nbJours = calcNbJours(startDate, endDate, startTime, endTime);
   const amount = nbJours * vehicle.prix;
   const vehicleLabel = `${vehicle.marque} ${vehicle.modele}`;
 

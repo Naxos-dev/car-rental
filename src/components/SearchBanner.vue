@@ -125,7 +125,7 @@ const dateErrorRef = ref(null);
 
 function applyChanges() {
   dateError.value = "";
-  if (draft.startDate && draft.endDate && draft.startDate >= draft.endDate) {
+  if (draft.startDate && draft.endDate && draft.startDate > draft.endDate) {
     dateError.value = t("searchBanner.dateError");
     nextTick(() => dateErrorRef.value?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
     return;

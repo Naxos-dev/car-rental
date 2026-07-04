@@ -86,9 +86,19 @@ export async function fetchVehicle(vehicleId) {
   return { prix, marque, modele, photoURL };
 }
 
-export function calcNbJours(startDate, endDate) {
-  const diff = new Date(endDate) - new Date(startDate);
-  return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+const DAY_MS = 24 * 60 * 60 * 1000;
+const GRACE_MS = 60 * 60 * 1000;
+
+// Mirrors src/store/checkout.js: any elapsed time over full 24h blocks beyond
+// a 60min grace period rolls over into an extra billed day.
+export function calcNbJours(startDate, endDate, startTime = "", endTime = "") {
+  const start = new Date(`${startDate}T${startTime || "00:00"}`);
+  const end = new Date(`${endDate}T${endTime || "00:00"}`);
+  const diff = end - start;
+  if (diff <= 0) return 1;
+  const wholeDays = Math.floor(diff / DAY_MS);
+  const remainder = diff - wholeDays * DAY_MS;
+  return Math.max(1, wholeDays + (remainder > GRACE_MS ? 1 : 0));
 }
 
 // Fetches all reservations for a vehicle via the Admin SDK (bypasses security rules — see
