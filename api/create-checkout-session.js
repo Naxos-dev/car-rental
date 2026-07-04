@@ -17,6 +17,7 @@ function validateCancelUrl(cancelUrl, allowedOrigins) {
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export default async function handler(req, res) {
   setCors(req, res);
@@ -53,6 +54,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Dates invalides" });
   }
 
+  if ((startTime && !TIME_RE.test(startTime)) || (endTime && !TIME_RE.test(endTime))) {
+    return res.status(400).json({ error: "Heures invalides" });
+  }
+
   // S1: validate cancelUrl to prevent open redirects via Stripe's cancel flow.
   if (!validateCancelUrl(cancelUrl, ALLOWED_ORIGINS)) {
     return res.status(400).json({ error: "cancelUrl non autorisée" });
@@ -77,7 +82,7 @@ export default async function handler(req, res) {
     throw err;
   }
 
-  const nbJours = calcNbJours(startDate, endDate);
+  const nbJours = calcNbJours(startDate, endDate, startTime, endTime);
   const amount = nbJours * vehicle.prix;
   const vehicleLabel = `${vehicle.marque} ${vehicle.modele}`;
 
