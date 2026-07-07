@@ -466,6 +466,16 @@
               </div>
             </div>
 
+            <div class="field-row">
+              <div class="field">
+                <label for="lieu">{{ t("backoffice.locationLabel") }}</label>
+                <select id="lieu" v-model="form.lieu" required>
+                  <option value="" disabled>{{ t("backoffice.locationSelectPlaceholder") }}</option>
+                  <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+                </select>
+              </div>
+            </div>
+
             <p v-if="vehicleFormError" class="form-error" role="alert">{{ vehicleFormError }}</p>
 
             <div class="form-actions">
@@ -544,6 +554,7 @@
                   <th>{{ t("backoffice.colFuel") }}</th>
                   <th>{{ t("backoffice.colSeats") }}</th>
                   <th>{{ t("backoffice.colPriceDay") }}</th>
+                  <th>{{ t("backoffice.locationLabel") }}</th>
                   <th>{{ t("backoffice.colAvailability") }}</th>
                   <th>{{ t("backoffice.colActions") }}</th>
                 </tr>
@@ -588,6 +599,7 @@
                   <td>
                     <strong>{{ v.prix ?? "—" }}€</strong>
                   </td>
+                  <td>{{ v.lieu ?? "—" }}</td>
                   <td class="td-center">
                     <button
                       :class="[
@@ -709,6 +721,7 @@ import { formatDate } from "../composables/useFormatDate.js";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
+import { PICKUP_LOCATIONS } from "../constants/locations.js";
 
 const FullCalendar = shallowRef(null);
 const dayGridPlugin = shallowRef(null);
@@ -751,6 +764,7 @@ const emptyForm = () => ({
   carburant: "",
   places: "",
   prix: "",
+  lieu: "",
   photoURL: "",
 });
 const form = reactive(emptyForm());
@@ -810,6 +824,7 @@ function editVehicle(vehicle) {
     carburant: vehicle.carburant,
     places: vehicle.places,
     prix: vehicle.prix ?? "",
+    lieu: vehicle.lieu ?? "",
     photoURL: vehicle.photoURL,
   });
   photoFile.value = null;

@@ -177,7 +177,10 @@ const unavailableVehicleIds = computed(() => {
 
 const availableVehicles = computed(() =>
   vehicleStore.vehicles.filter(
-    (v) => v.disponible && !unavailableVehicleIds.value.has(v.id),
+    (v) =>
+      v.disponible &&
+      !unavailableVehicleIds.value.has(v.id) &&
+      (!searchStore.location || v.lieu === searchStore.location),
   ),
 );
 

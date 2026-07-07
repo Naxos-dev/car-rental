@@ -40,6 +40,7 @@ export const vehicleStore = reactive({
       carburant: data.carburant,
       places: data.places,
       prix: data.prix ?? 0,
+      lieu: data.lieu,
       photoURL,
       disponible: true,
       createdAt: serverTimestamp(),
@@ -57,6 +58,7 @@ export const vehicleStore = reactive({
       carburant: data.carburant,
       places: data.places,
       prix: data.prix ?? 0,
+      lieu: data.lieu,
       photoURL,
     });
   },
