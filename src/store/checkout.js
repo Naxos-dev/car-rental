@@ -1,4 +1,5 @@
 import { reactive, watch } from "vue";
+import { calculateTotal, calcNbJours } from "../utils/pricing.js";
 
 const STORAGE_KEY = "autoloc_checkout";
 
@@ -13,9 +14,6 @@ function loadPersisted() {
 
 const persisted = loadPersisted();
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const GRACE_MS = 60 * 60 * 1000;
-
 export const checkoutStore = reactive({
   vehicle: persisted?.vehicle ?? null,
   nom: persisted?.nom ?? "",
@@ -28,18 +26,12 @@ export const checkoutStore = reactive({
   endTime: persisted?.endTime ?? "",
 
   get nbJours() {
-    if (!this.startDate || !this.endDate) return 1;
-    const start = new Date(`${this.startDate}T${this.startTime || "00:00"}`);
-    const end = new Date(`${this.endDate}T${this.endTime || "00:00"}`);
-    const diff = end - start;
-    if (diff <= 0) return 1;
-    const wholeDays = Math.floor(diff / DAY_MS);
-    const remainder = diff - wholeDays * DAY_MS;
-    return Math.max(1, wholeDays + (remainder > GRACE_MS ? 1 : 0));
+    return calcNbJours(this.startDate, this.endDate, this.startTime, this.endTime);
   },
 
   get total() {
-    return this.vehicle ? Math.round(this.nbJours * (this.vehicle.prix ?? 0)) : 0;
+    if (!this.vehicle || !this.startDate) return 0;
+    return calculateTotal(this.vehicle, this.startDate, this.nbJours);
   },
 
   clear() {

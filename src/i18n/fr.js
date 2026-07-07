@@ -66,7 +66,11 @@ export default {
     alreadyReserved: "Déjà réservé",
     book: "Réserver",
     seats: "places",
-    perDay: " €/jour",
+    perDay: "€/jour",
+    startingFrom: "à partir de",
+    day: "jour",
+    days: "jours",
+    totalForStay: "soit {total} € pour {n} {unit}",
   },
 
   fuel: {
@@ -86,7 +90,8 @@ export default {
     loading: "Chargement des véhicules...",
     empty: "Aucun véhicule disponible pour les dates sélectionnées.",
     emptyFiltered: "Aucun véhicule ne correspond à vos filtres.",
-    redirectedNotice: "Veuillez d'abord sélectionner un véhicule pour accéder au paiement.",
+    redirectedNotice:
+      "Veuillez d'abord sélectionner un véhicule pour accéder au paiement.",
     available: "Disponible",
     book: "Réserver",
     filters: {
@@ -121,7 +126,8 @@ export default {
     startTime: "Heure de début",
     endTime: "Heure de fin",
     search: "Voir les véhicules disponibles",
-    selectDatesError: "Veuillez sélectionner une date de début et une date de fin.",
+    selectDatesError:
+      "Veuillez sélectionner une date de début et une date de fin.",
   },
 
   form: {
@@ -157,9 +163,12 @@ export default {
     reservedDatesLegend: "Dates déjà réservées",
     vehicleConflict: "Ce véhicule est déjà réservé sur ces dates.",
     selectBothDates: "Veuillez sélectionner une date de début et de fin.",
-    bookingSuccess: "Réservation enregistrée ! Un admin vous contactera pour confirmer.",
-    datesConflictNotice: "Les dates sélectionnées sont déjà réservées pour ce véhicule. Veuillez choisir d'autres dates.",
-    description: "Formulaire de réservation en ligne pour le véhicule sélectionné.",
+    bookingSuccess:
+      "Réservation enregistrée ! Un admin vous contactera pour confirmer.",
+    datesConflictNotice:
+      "Les dates sélectionnées sont déjà réservées pour ce véhicule. Veuillez choisir d'autres dates.",
+    description:
+      "Formulaire de réservation en ligne pour le véhicule sélectionné.",
     stepAnnounce: "Étape {n} sur 2",
   },
 
@@ -208,8 +217,10 @@ export default {
     of: "sur",
     prev: "Précédent",
     next: "Suivant",
-    deleteConfirm: "Confirmer la suppression de {label} ? Cette action est irréversible.",
-    archiveDone: "{count} réservation(s) passée(s) archivée(s) automatiquement.",
+    deleteConfirm:
+      "Confirmer la suppression de {label} ? Cette action est irréversible.",
+    archiveDone:
+      "{count} réservation(s) passée(s) archivée(s) automatiquement.",
     noVehiclesAvailable: "Aucun véhicule disponible sur cette période.",
     vehicleSelectPlaceholder: "Sélectionner un véhicule...",
     clientName: "Nom du client",
@@ -234,14 +245,30 @@ export default {
     colAvailability: "Disponibilité",
     colActions: "Actions",
     photoTooLarge: "L'image ne doit pas dépasser 10 Mo.",
-    saveError: "Erreur lors de la sauvegarde. Vérifiez votre connexion et réessayez.",
+    saveError:
+      "Erreur lors de la sauvegarde. Vérifiez votre connexion et réessayez.",
     vehicleUnavailable: "Ce véhicule n'est plus disponible sur cette période.",
-    agencyBookingError: "Erreur lors de la réservation. Vérifiez votre connexion et réessayez.",
+    agencyBookingError:
+      "Erreur lors de la réservation. Vérifiez votre connexion et réessayez.",
+    seasonalPricingLabel: "Tarifs saisonniers",
+    seasonalPricingHint:
+      "Définissez des prix par période (ex: haute saison). En dehors de ces périodes, le prix par défaut ci-dessus s'applique.",
+    addPeriod: "Ajouter une période",
+    periodStart: "Date de début",
+    periodEnd: "Date de fin",
+    periodPrice: "Prix (€/jour)",
+    removePeriod: "Supprimer cette période",
+    tarifsRangeError:
+      "Chaque période doit avoir une date de début antérieure ou égale à sa date de fin.",
+    tarifsOverlapError:
+      "Deux périodes tarifaires ne peuvent pas se chevaucher.",
+    seasonalPricingCount: "{count} tarif(s) saisonnier(s)",
   },
 
   searchBanner: {
     cancel: "Annuler",
     update: "Mettre à jour",
+    location: "Lieu de prise en charge",
     dateRange: "Période de location",
     selectDates: "Sélectionner les dates",
     startTime: "Heure de début",
@@ -273,16 +300,19 @@ export default {
     loginError: "Erreur de connexion.",
     registerError: "Erreur lors de la création du compte.",
     passwordMismatch: "Les mots de passe ne correspondent pas.",
-    passwordRequirementsError: "Le mot de passe doit contenir au moins 6 caractères, une majuscule et un chiffre.",
+    passwordRequirementsError:
+      "Le mot de passe doit contenir au moins 6 caractères, une majuscule et un chiffre.",
     or: "ou",
     loginWithGoogle: "Se connecter avec Google",
     continueWithGoogle: "Continuer avec Google",
     forgotPassword: "Mot de passe oublié ?",
     forgotTitle: "Réinitialiser le mot de passe",
-    forgotDesc: "Saisissez votre adresse email et nous vous enverrons un lien de réinitialisation.",
+    forgotDesc:
+      "Saisissez votre adresse email et nous vous enverrons un lien de réinitialisation.",
     sendReset: "Envoyer le lien",
     sending: "Envoi en cours...",
-    resetSent: "Consultez votre boite mail ! Un lien de réinitialisation a été envoyé.",
+    resetSent:
+      "Consultez votre boite mail ! Un lien de réinitialisation a été envoyé.",
     backToLogin: "Retour à la connexion",
     passwordStrengthLabel: "Force :",
     passwordStrength: {
@@ -302,7 +332,8 @@ export default {
       weakPassword: "Le mot de passe doit contenir au moins 6 caractères.",
       tooManyRequests: "Trop de tentatives. Réessayez plus tard.",
       invalidCredential: "Identifiants incorrects.",
-      requiresRecentLogin: "Veuillez vous reconnecter pour effectuer cette action.",
+      requiresRecentLogin:
+        "Veuillez vous reconnecter pour effectuer cette action.",
       default: "Une erreur est survenue. Réessayez.",
     },
   },
@@ -338,7 +369,8 @@ export default {
     profileLastName: "Nom",
     saveProfile: "Enregistrer",
     saving: "Enregistrement...",
-    emailVerificationSent: "Un lien de vérification a été envoyé à votre nouvel email. L'adresse sera mise à jour après confirmation.",
+    emailVerificationSent:
+      "Un lien de vérification a été envoyé à votre nouvel email. L'adresse sera mise à jour après confirmation.",
     updateError: "Erreur lors de la mise à jour.",
     passwordChanged: "Mot de passe changé avec succès.",
     changeError: "Erreur lors du changement.",
@@ -363,7 +395,8 @@ export default {
     pay: "Payer {total}€ avec Stripe",
     paying: "Redirection en cours...",
     payError: "Erreur de paiement",
-    paymentFailed: "Une erreur est survenue lors du paiement. Veuillez réessayer.",
+    paymentFailed:
+      "Une erreur est survenue lors du paiement. Veuillez réessayer.",
     secure: "Paiement 100% sécurisé par Stripe",
     back: "Modifier la réservation",
   },
@@ -376,9 +409,12 @@ export default {
     fallbackEmail: "votre adresse email",
     verifying: "Vérification du paiement en cours…",
     errorTitle: "Impossible de confirmer le paiement",
-    errorDesc: "Nous n'avons pas pu vérifier votre paiement. Si vous avez été débité, contactez notre support.",
-    doubleBooking: "Votre paiement a bien été encaissé, mais ce véhicule vient d'être réservé par quelqu'un d'autre sur les mêmes dates. Contactez notre support en indiquant votre identifiant de session.",
-    writeWarning: "Votre paiement a bien été encaissé, mais nous n'avons pas pu enregistrer votre réservation automatiquement. Contactez notre support en indiquant votre identifiant de session Stripe.",
+    errorDesc:
+      "Nous n'avons pas pu vérifier votre paiement. Si vous avez été débité, contactez notre support.",
+    doubleBooking:
+      "Votre paiement a bien été encaissé, mais ce véhicule vient d'être réservé par quelqu'un d'autre sur les mêmes dates. Contactez notre support en indiquant votre identifiant de session.",
+    writeWarning:
+      "Votre paiement a bien été encaissé, mais nous n'avons pas pu enregistrer votre réservation automatiquement. Contactez notre support en indiquant votre identifiant de session Stripe.",
   },
 
   footer: {

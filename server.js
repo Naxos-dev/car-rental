@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import {
   fetchVehicle,
   calcNbJours,
+  calculateAmount,
   checkVehicleAvailability,
   checkRateLimit,
   getVehicleReservedRanges,
@@ -113,7 +114,7 @@ app.post("/create-checkout-session", rateLimit({ max: 10, windowMs: 60_000 }), a
   }
 
   const nbJours = calcNbJours(startDate, endDate, startTime, endTime);
-  const amount = nbJours * vehicle.prix;
+  const amount = calculateAmount(vehicle, startDate, nbJours);
   const vehicleLabel = `${vehicle.marque} ${vehicle.modele}`;
 
   try {

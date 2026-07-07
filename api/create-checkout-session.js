@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { fetchVehicle, calcNbJours, checkVehicleAvailability, checkRateLimit, setCors, ALLOWED_ORIGINS } from "./_stripe-helpers.js";
+import { fetchVehicle, calcNbJours, calculateAmount, checkVehicleAvailability, checkRateLimit, setCors, ALLOWED_ORIGINS } from "./_stripe-helpers.js";
 
 // Instantiated once at module scope to reuse the HTTP connection pool.
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
   }
 
   const nbJours = calcNbJours(startDate, endDate, startTime, endTime);
-  const amount = nbJours * vehicle.prix;
+  const amount = calculateAmount(vehicle, startDate, nbJours);
   const vehicleLabel = `${vehicle.marque} ${vehicle.modele}`;
 
   // S5: build successUrl from the configured origin, not from the request's Origin header

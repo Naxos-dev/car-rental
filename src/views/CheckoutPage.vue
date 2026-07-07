@@ -83,12 +83,12 @@
         <!-- ── Colonne droite : paiement ── -->
         <div class="checkout-payment">
           <div class="price-box">
-            <div class="price-row">
+            <div class="price-row" v-for="(segment, i) in priceBreakdown" :key="i">
               <span
-                >{{ vehicle.prix }}€ × {{ nbJours }}
-                {{ nbJours > 1 ? t("checkout.days") : t("checkout.day") }}</span
+                >{{ segment.prix }}€ × {{ segment.jours }}
+                {{ segment.jours > 1 ? t("checkout.days") : t("checkout.day") }}</span
               >
-              <span>{{ store.total }}€</span>
+              <span>{{ segment.prix * segment.jours }}€</span>
             </div>
             <div class="price-total">
               <span>{{ t("checkout.total") }}</span>
@@ -142,6 +142,7 @@ import { checkoutStore } from "../store/checkout.js";
 import { authStore as userAuthStore } from "../store/auth.js";
 import { formatDate } from "../composables/useFormatDate.js";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+import { getPriceBreakdown } from "../utils/pricing.js";
 
 const { t, tm } = useI18n();
 const fuelMap = computed(() => tm("fuel"));
@@ -160,6 +161,9 @@ const vehicleLabel = computed(
   () => `${vehicle.value.marque} ${vehicle.value.modele}`,
 );
 const nbJours = computed(() => store.nbJours);
+const priceBreakdown = computed(() =>
+  getPriceBreakdown(vehicle.value, store.startDate, nbJours.value),
+);
 
 const paying = ref(false);
 const payError = ref("");

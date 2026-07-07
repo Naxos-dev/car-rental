@@ -131,6 +131,7 @@ import { vehicleStore } from "../store/vehicles.js";
 import { searchStore } from "../store/search.js";
 import { authStore as userAuthStore } from "../store/auth.js";
 import { useReservedRanges } from "../composables/useReservedRanges.js";
+import { getEffectivePricePerDay } from "../utils/pricing.js";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -188,6 +189,16 @@ const selectedFuel = ref("all");
 const selectedSeats = ref("all");
 const selectedMaxPrice = ref(0);
 
+function effectivePrice(vehicle) {
+  return getEffectivePricePerDay(
+    vehicle,
+    searchStore.startDate,
+    searchStore.endDate,
+    searchStore.startTime,
+    searchStore.endTime,
+  );
+}
+
 const fuelOptions = computed(() =>
   [
     ...new Set(availableVehicles.value.map((v) => v.carburant).filter(Boolean)),
@@ -203,7 +214,7 @@ const seatOptions = computed(() =>
 );
 
 const highestPrice = computed(() =>
-  Math.max(0, ...availableVehicles.value.map((v) => Number(v.prix) || 0)),
+  Math.max(0, ...availableVehicles.value.map((v) => effectivePrice(v))),
 );
 
 watch(
@@ -218,7 +229,7 @@ watch(
 
 const filteredVehicles = computed(() =>
   availableVehicles.value.filter((vehicle) => {
-    const price = Number(vehicle.prix) || 0;
+    const price = effectivePrice(vehicle);
     const seats = Number(vehicle.places) || 0;
 
     if (

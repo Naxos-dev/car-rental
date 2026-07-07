@@ -6,7 +6,10 @@
         class="vehicle-img-skeleton"
         aria-hidden="true"
       ></div>
-      <span v-if="vehicle.photoURL && !imgFailed && !imgLoaded" class="sr-only">{{ vehicle.marque }} {{ vehicle.modele }} — {{ t('fleet.loading') }}</span>
+      <span v-if="vehicle.photoURL && !imgFailed && !imgLoaded" class="sr-only"
+        >{{ vehicle.marque }} {{ vehicle.modele }} —
+        {{ t("fleet.loading") }}</span
+      >
       <img
         v-if="vehicle.photoURL && !imgFailed"
         :src="cloudinaryThumb(vehicle.photoURL, 480, 360)"
@@ -16,11 +19,24 @@
         @error="imgFailed = true"
         @load="imgLoaded = true"
       />
-      <div v-if="!vehicle.photoURL || imgFailed" class="vehicle-img-placeholder" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"/>
-          <circle cx="7" cy="17" r="2"/>
-          <circle cx="17" cy="17" r="2"/>
+      <div
+        v-if="!vehicle.photoURL || imgFailed"
+        class="vehicle-img-placeholder"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.5-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.1 1 13v3c0 .6.4 1 1 1h2"
+          />
+          <circle cx="7" cy="17" r="2" />
+          <circle cx="17" cy="17" r="2" />
         </svg>
       </div>
       <span :class="['dispo-badge', badgeClass]">{{ badgeLabel }}</span>
@@ -40,7 +56,11 @@
           >
             <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
           </svg>
-          {{ vehicle.carburant in fuelMap ? fuelMap[vehicle.carburant] : vehicle.carburant }}
+          {{
+            vehicle.carburant in fuelMap
+              ? fuelMap[vehicle.carburant]
+              : vehicle.carburant
+          }}
         </span>
         <span class="tag">
           <svg
@@ -59,7 +79,21 @@
           </svg>
           {{ vehicle.places }} {{ t("fleet.seats") }}
         </span>
-        <span class="tag tag--price">{{ vehicle.prix }}{{ t('fleet.perDay') }}</span>
+      </div>
+      <div class="price-line">
+        <span class="tag tag--price"
+          ><template v-if="!hasDates">{{ t("fleet.startingFrom") }}</template>
+          {{ displayPrice }} {{ t("fleet.perDay") }}</span
+        >
+        <span v-if="hasDates" class="price-total">
+          {{
+            t("fleet.totalForStay", {
+              total: totalPrice,
+              n: nbJours,
+              unit: nbJours > 1 ? t("fleet.days") : t("fleet.day"),
+            })
+          }}
+        </span>
       </div>
       <button
         class="btn-reserve"
@@ -67,9 +101,18 @@
         @click="$emit('reserve', vehicle)"
       >
         {{ btnLabel }}
-        <svg v-if="!isDisabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
+        <svg
+          v-if="!isDisabled"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="btn-icon"
+        >
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
         </svg>
       </button>
     </div>
@@ -80,6 +123,8 @@
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+import { searchStore } from "../store/search.js";
+import { getEffectivePricePerDay, calcNbJours, calculateTotal } from "../utils/pricing.js";
 
 const props = defineProps({
   vehicle: { type: Object, required: true },
@@ -92,12 +137,39 @@ const { t, tm } = useI18n();
 const imgFailed = ref(false);
 const imgLoaded = ref(false);
 
-watch(() => props.vehicle?.photoURL, () => {
-  imgLoaded.value = false;
-  imgFailed.value = false;
-});
+watch(
+  () => props.vehicle?.photoURL,
+  () => {
+    imgLoaded.value = false;
+    imgFailed.value = false;
+  },
+);
 
-const fuelMap = computed(() => tm('fuel'));
+const fuelMap = computed(() => tm("fuel"));
+
+const hasDates = computed(
+  () => !!(searchStore.startDate && searchStore.endDate),
+);
+const displayPrice = computed(() =>
+  getEffectivePricePerDay(
+    props.vehicle,
+    searchStore.startDate,
+    searchStore.endDate,
+    searchStore.startTime,
+    searchStore.endTime,
+  ),
+);
+const nbJours = computed(() =>
+  calcNbJours(
+    searchStore.startDate,
+    searchStore.endDate,
+    searchStore.startTime,
+    searchStore.endTime,
+  ),
+);
+const totalPrice = computed(() =>
+  calculateTotal(props.vehicle, searchStore.startDate, nbJours.value),
+);
 
 const isDisabled = computed(() => !props.vehicle.disponible || props.isBlocked);
 
@@ -153,7 +225,9 @@ const btnLabel = computed(() => {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.3s, opacity 0.25s;
+  transition:
+    transform 0.3s,
+    opacity 0.25s;
   opacity: 0;
 }
 .vehicle-img--loaded {
@@ -167,8 +241,12 @@ const btnLabel = computed(() => {
   animation: skeleton-shimmer 1.4s infinite;
 }
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 .vehicle-img-placeholder {
   width: 100%;
@@ -219,7 +297,18 @@ const btnLabel = computed(() => {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+.price-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   margin-bottom: 1rem;
+}
+.price-total {
+  font-size: 0.8rem;
+  color: #9aa0ac;
 }
 .tag {
   background: #f0f4ff;
