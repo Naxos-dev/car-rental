@@ -276,6 +276,24 @@
                     {{ t(`auth.passwordStrength.${newPasswordStrength || 1}`) }}
                   </span>
                 </div>
+                <ul v-if="passwordForm.new.length >= 1" class="password-reqs" aria-live="polite">
+                  <li :class="['req-item', { 'req-item--ok': passwordForm.new.length >= 6 }]">
+                    <svg v-if="passwordForm.new.length >= 6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+                    {{ t('auth.reqLength') }}
+                  </li>
+                  <li :class="['req-item', { 'req-item--ok': /[A-Z]/.test(passwordForm.new) }]">
+                    <svg v-if="/[A-Z]/.test(passwordForm.new)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+                    {{ t('auth.reqUppercase') }}
+                  </li>
+                  <li :class="['req-item', { 'req-item--ok': /[0-9]/.test(passwordForm.new) }]">
+                    <svg v-if="/[0-9]/.test(passwordForm.new)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="req-icon req-icon--check" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="req-icon" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+                    {{ t('auth.reqNumber') }}
+                  </li>
+                </ul>
+                <p v-if="passwordFieldError" class="field-error">{{ passwordFieldError }}</p>
               </div>
               <div class="field">
                 <label for="acc-confirm-password">{{ t("account.confirmPassword") }}</label>
@@ -298,6 +316,7 @@
                     </svg>
                   </button>
                 </div>
+                <p v-if="confirmFieldError" class="field-error">{{ confirmFieldError }}</p>
               </div>
               <p
                 v-if="passwordMsg.text"
@@ -332,6 +351,7 @@ import { authStore as userAuthStore } from "../store/auth.js";
 import { reservationStore } from "../store/reservations.js";
 import { useToast } from "../composables/useToast.js";
 import { formatDate } from "../composables/useFormatDate.js";
+import { isPasswordValid, passwordStrength } from "../composables/usePasswordValidation.js";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -408,16 +428,16 @@ async function handleUpdateEmail() {
 // — Changer le mot de passe
 const passwordForm = reactive({ current: "", new: "", confirm: "" });
 
-const newPasswordStrength = computed(() => {
-  const p = passwordForm.new;
-  if (!p) return 0;
-  let score = 0;
-  if (p.length >= 6) score++;
-  if (p.length >= 10) score++;
-  if (/[A-Z]/.test(p)) score++;
-  if (/[0-9]/.test(p)) score++;
-  if (/[^a-zA-Z0-9]/.test(p)) score++;
-  return Math.min(score, 4);
+const newPasswordStrength = computed(() => passwordStrength(passwordForm.new));
+
+const passwordAttempted = ref(false);
+const passwordFieldError = computed(() => {
+  if (!passwordAttempted.value || isPasswordValid(passwordForm.new)) return "";
+  return t("auth.passwordRequirementsError");
+});
+const confirmFieldError = computed(() => {
+  if (!passwordAttempted.value || passwordForm.new === passwordForm.confirm) return "";
+  return t("auth.passwordMismatch");
 });
 
 function handleTabKeydown(e, current) {
@@ -435,9 +455,8 @@ const passwordLoading = ref(false);
 const passwordMsg = reactive({ text: "", ok: false });
 
 async function handleUpdatePassword() {
-  if (passwordForm.new !== passwordForm.confirm) {
-    passwordMsg.ok = false;
-    passwordMsg.text = t("auth.passwordMismatch");
+  passwordAttempted.value = true;
+  if (!isPasswordValid(passwordForm.new) || passwordForm.new !== passwordForm.confirm) {
     return;
   }
   passwordLoading.value = true;
@@ -451,6 +470,7 @@ async function handleUpdatePassword() {
     passwordMsg.text = t("account.passwordChanged");
     showToast(t("account.passwordChanged"));
     Object.assign(passwordForm, { current: "", new: "", confirm: "" });
+    passwordAttempted.value = false;
   } catch {
     passwordMsg.ok = false;
     passwordMsg.text = userAuthStore.error || t("account.changeError");
@@ -795,6 +815,11 @@ async function handleUpdatePassword() {
   background: #fce4ec;
   color: #c62828;
 }
+.field-error {
+  color: #c62828;
+  font-size: 0.8rem;
+  margin: 0.3rem 0 0;
+}
 .btn-save {
   padding: 0.7rem;
   background: var(--color-primary);
@@ -841,6 +866,34 @@ async function handleUpdatePassword() {
   font-size: 0.75rem;
   color: #888;
   white-space: nowrap;
+}
+
+.password-reqs {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #aaa;
+  transition: color 0.2s;
+}
+.req-item--ok {
+  color: #16a34a;
+}
+.req-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+.req-icon--check {
+  color: #16a34a;
 }
 
 /* Skeleton loader */
