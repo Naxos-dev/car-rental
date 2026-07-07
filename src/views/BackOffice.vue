@@ -476,6 +476,49 @@
               </div>
             </div>
 
+            <div class="field tarifs-field">
+              <div class="tarifs-header">
+                <label>{{ t("backoffice.seasonalPricingLabel") }}</label>
+                <button type="button" class="btn-add-tarif" @click="addTarifRow">
+                  + {{ t("backoffice.addPeriod") }}
+                </button>
+              </div>
+              <p class="tarifs-hint">{{ t("backoffice.seasonalPricingHint") }}</p>
+              <div v-for="(tarif, i) in form.tarifs" :key="i" class="tarif-row">
+                <input
+                  type="date"
+                  v-model="tarif.debut"
+                  :aria-label="t('backoffice.periodStart')"
+                  required
+                />
+                <span class="tarif-sep">→</span>
+                <input
+                  type="date"
+                  v-model="tarif.fin"
+                  :aria-label="t('backoffice.periodEnd')"
+                  required
+                />
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  v-model.number="tarif.prix"
+                  :placeholder="t('backoffice.pricePlaceholder')"
+                  :aria-label="t('backoffice.periodPrice')"
+                  required
+                />
+                <span class="tarif-currency">€</span>
+                <button
+                  type="button"
+                  class="btn-remove-tarif"
+                  @click="removeTarifRow(i)"
+                  :aria-label="t('backoffice.removePeriod')"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
             <p v-if="vehicleFormError" class="form-error" role="alert">{{ vehicleFormError }}</p>
 
             <div class="form-actions">
@@ -598,6 +641,10 @@
                   </td>
                   <td>
                     <strong>{{ v.prix ?? "—" }}€</strong>
+                    <br v-if="v.tarifs?.length" />
+                    <span v-if="v.tarifs?.length" class="tarifs-badge">
+                      {{ t("backoffice.seasonalPricingCount", { count: v.tarifs.length }) }}
+                    </span>
                   </td>
                   <td>{{ v.lieu ?? "—" }}</td>
                   <td class="td-center">
@@ -719,6 +766,7 @@ import { reservationStore } from "../store/reservations.js";
 import { authStore } from "../store/auth.js";
 import { formatDate } from "../composables/useFormatDate.js";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
+import { hasOverlappingTarifs } from "../utils/pricing.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
 import { PICKUP_LOCATIONS } from "../constants/locations.js";
@@ -765,9 +813,17 @@ const emptyForm = () => ({
   places: "",
   prix: "",
   lieu: "",
+  tarifs: [],
   photoURL: "",
 });
 const form = reactive(emptyForm());
+
+function addTarifRow() {
+  form.tarifs.push({ debut: "", fin: "", prix: "" });
+}
+function removeTarifRow(index) {
+  form.tarifs.splice(index, 1);
+}
 
 const objectUrl = ref("");
 
@@ -799,8 +855,19 @@ function onFileChange(e) {
 }
 
 async function handleSubmit() {
-  saving.value = true;
   vehicleFormError.value = "";
+  const invalidRange = form.tarifs.some(
+    (t) => t.debut && t.fin && t.debut > t.fin,
+  );
+  if (invalidRange) {
+    vehicleFormError.value = t("backoffice.tarifsRangeError");
+    return;
+  }
+  if (hasOverlappingTarifs(form.tarifs)) {
+    vehicleFormError.value = t("backoffice.tarifsOverlapError");
+    return;
+  }
+  saving.value = true;
   try {
     if (editingId.value) {
       await vehicleStore.updateVehicle(editingId.value, { ...form }, photoFile.value);
@@ -825,6 +892,7 @@ function editVehicle(vehicle) {
     places: vehicle.places,
     prix: vehicle.prix ?? "",
     lieu: vehicle.lieu ?? "",
+    tarifs: (vehicle.tarifs || []).map((t) => ({ ...t })),
     photoURL: vehicle.photoURL,
   });
   photoFile.value = null;
@@ -1208,6 +1276,78 @@ select:focus {
   width: 100%;
   max-height: 200px;
   object-fit: cover;
+}
+
+.tarifs-field {
+  gap: 0.6rem;
+}
+.tarifs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tarifs-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin: -0.2rem 0 0.2rem;
+}
+.btn-add-tarif {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-add-tarif:hover {
+  background: #bbdefb;
+}
+.tarif-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tarif-row input[type="date"] {
+  flex: 1;
+}
+.tarif-row input[type="number"] {
+  width: 100px;
+  flex: none;
+}
+.tarif-sep {
+  color: #aaa;
+  flex-shrink: 0;
+}
+.tarif-currency {
+  color: #666;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.btn-remove-tarif {
+  background: #fce4ec;
+  color: #c62828;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-remove-tarif:hover {
+  background: #f8bbd0;
+}
+.tarifs-badge {
+  font-size: 0.75rem;
+  color: #1565c0;
+  background: #e3f2fd;
+  border-radius: 10px;
+  padding: 0.1rem 0.5rem;
+  display: inline-block;
+  margin-top: 0.2rem;
 }
 
 .form-error {

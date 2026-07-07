@@ -66,7 +66,11 @@ export default {
     alreadyReserved: "Already reserved",
     book: "Book",
     seats: "seats",
-    perDay: " €/day",
+    perDay: "€/day",
+    startingFrom: "from",
+    day: "day",
+    days: "days",
+    totalForStay: "{total} € for {n} {unit}",
   },
 
   fuel: {
@@ -157,8 +161,10 @@ export default {
     reservedDatesLegend: "Already booked dates",
     vehicleConflict: "This vehicle is already booked for these dates.",
     selectBothDates: "Please select a start and end date.",
-    bookingSuccess: "Reservation recorded! An admin will contact you to confirm.",
-    datesConflictNotice: "The selected dates are already booked for this vehicle. Please choose different dates.",
+    bookingSuccess:
+      "Reservation recorded! An admin will contact you to confirm.",
+    datesConflictNotice:
+      "The selected dates are already booked for this vehicle. Please choose different dates.",
     description: "Online booking form for the selected vehicle.",
     stepAnnounce: "Step {n} of 2",
   },
@@ -235,13 +241,27 @@ export default {
     colActions: "Actions",
     photoTooLarge: "Image must not exceed 10 MB.",
     saveError: "Save failed. Check your connection and try again.",
-    vehicleUnavailable: "This vehicle is no longer available for the selected period.",
+    vehicleUnavailable:
+      "This vehicle is no longer available for the selected period.",
     agencyBookingError: "Booking failed. Check your connection and try again.",
+    seasonalPricingLabel: "Seasonal pricing",
+    seasonalPricingHint:
+      "Set prices for specific periods (e.g. high season). Outside these periods, the default price above applies.",
+    addPeriod: "Add a period",
+    periodStart: "Start date",
+    periodEnd: "End date",
+    periodPrice: "Price (€/day)",
+    removePeriod: "Remove this period",
+    tarifsRangeError:
+      "Each period's start date must be on or before its end date.",
+    tarifsOverlapError: "Seasonal pricing periods cannot overlap.",
+    seasonalPricingCount: "{count} seasonal rate(s)",
   },
 
   searchBanner: {
     cancel: "Cancel",
     update: "Update",
+    location: "Pick-up location",
     dateRange: "Rental period",
     selectDates: "Select dates",
     startTime: "Start time",
@@ -273,13 +293,15 @@ export default {
     loginError: "Login error.",
     registerError: "Error creating account.",
     passwordMismatch: "Passwords do not match.",
-    passwordRequirementsError: "Password must be at least 6 characters, with one uppercase letter and one number.",
+    passwordRequirementsError:
+      "Password must be at least 6 characters, with one uppercase letter and one number.",
     or: "or",
     loginWithGoogle: "Sign in with Google",
     continueWithGoogle: "Continue with Google",
     forgotPassword: "Forgot password?",
     forgotTitle: "Reset password",
-    forgotDesc: "Enter your email address and we'll send you a link to reset your password.",
+    forgotDesc:
+      "Enter your email address and we'll send you a link to reset your password.",
     sendReset: "Send reset link",
     sending: "Sending...",
     resetSent: "Check your inbox! A reset link has been sent to your address.",
@@ -338,7 +360,8 @@ export default {
     profileLastName: "Last name",
     saveProfile: "Save",
     saving: "Saving...",
-    emailVerificationSent: "A verification link has been sent to your new email. The address will be updated after confirmation.",
+    emailVerificationSent:
+      "A verification link has been sent to your new email. The address will be updated after confirmation.",
     updateError: "Error updating information.",
     passwordChanged: "Password changed successfully.",
     changeError: "Error changing password.",
@@ -376,9 +399,12 @@ export default {
     fallbackEmail: "your email address",
     verifying: "Verifying payment…",
     errorTitle: "Unable to confirm payment",
-    errorDesc: "We could not verify your payment. If you were charged, please contact our support team.",
-    doubleBooking: "Your payment was collected, but this vehicle was just booked by someone else for the same dates. Please contact our support team with your session ID.",
-    writeWarning: "Your payment was collected, but we could not automatically record your reservation. Please contact our support team with your Stripe session ID.",
+    errorDesc:
+      "We could not verify your payment. If you were charged, please contact our support team.",
+    doubleBooking:
+      "Your payment was collected, but this vehicle was just booked by someone else for the same dates. Please contact our support team with your session ID.",
+    writeWarning:
+      "Your payment was collected, but we could not automatically record your reservation. Please contact our support team with your Stripe session ID.",
   },
 
   footer: {

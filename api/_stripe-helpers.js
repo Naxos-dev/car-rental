@@ -65,6 +65,19 @@ export function checkRateLimit(req, { max, windowMs }) {
   return entry.count > max;
 }
 
+// Parse le tableau tarifs (arrayValue de mapValue) au format Firestore REST.
+function parseTarifs(f) {
+  const values = f.tarifs?.arrayValue?.values || [];
+  return values.map((v) => {
+    const mf = v.mapValue?.fields || {};
+    return {
+      debut: mf.debut?.stringValue || "",
+      fin: mf.fin?.stringValue || "",
+      prix: Number(mf.prix?.integerValue ?? mf.prix?.doubleValue ?? 0),
+    };
+  });
+}
+
 export async function fetchVehicle(vehicleId) {
   // Prevent path traversal in the Firestore REST URL (S2).
   if (!/^[\w-]{1,128}$/.test(vehicleId)) throw new Error("vehicleId invalide");
@@ -81,9 +94,39 @@ export async function fetchVehicle(vehicleId) {
   const modele = f.modele?.stringValue || "";
   const photoURL = f.photoURL?.stringValue || "";
   const disponible = f.disponible?.booleanValue ?? true;
+  const tarifs = parseTarifs(f);
   if (!prix) throw new Error("Prix du véhicule introuvable");
   if (!disponible) throw new Error("Véhicule non disponible");
-  return { prix, marque, modele, photoURL };
+  return { prix, marque, modele, photoURL, tarifs };
+}
+
+function addDaysToISODate(iso, days) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + days);
+  const yyyy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  const dd = String(dt.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function getPriceForDate(vehicle, dateStr) {
+  const match = (vehicle.tarifs || []).find(
+    (t) => t.debut && t.fin && t.debut <= dateStr && dateStr <= t.fin,
+  );
+  return match ? match.prix : vehicle.prix;
+}
+
+// Mirrors src/utils/pricing.js::calculateTotal — sums the applicable seasonal
+// or default price for each billed day. This is the authoritative amount
+// charged via Stripe, so it must never trust a client-computed total.
+export function calculateAmount(vehicle, startDate, nbJours) {
+  let total = 0;
+  for (let i = 0; i < nbJours; i++) {
+    const dateStr = i === 0 ? startDate : addDaysToISODate(startDate, i);
+    total += getPriceForDate(vehicle, dateStr);
+  }
+  return Math.round(total);
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
