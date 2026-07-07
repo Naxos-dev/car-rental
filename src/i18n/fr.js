@@ -271,6 +271,7 @@ export default {
     loginError: "Erreur de connexion.",
     registerError: "Erreur lors de la création du compte.",
     passwordMismatch: "Les mots de passe ne correspondent pas.",
+    passwordRequirementsError: "Le mot de passe doit contenir au moins 6 caractères, une majuscule et un chiffre.",
     or: "ou",
     loginWithGoogle: "Se connecter avec Google",
     continueWithGoogle: "Continuer avec Google",

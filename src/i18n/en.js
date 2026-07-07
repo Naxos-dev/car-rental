@@ -271,6 +271,7 @@ export default {
     loginError: "Login error.",
     registerError: "Error creating account.",
     passwordMismatch: "Passwords do not match.",
+    passwordRequirementsError: "Password must be at least 6 characters, with one uppercase letter and one number.",
     or: "or",
     loginWithGoogle: "Sign in with Google",
     continueWithGoogle: "Continue with Google",

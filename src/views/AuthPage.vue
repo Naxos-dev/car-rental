@@ -256,13 +256,13 @@
             <div class="strength-bar">
               <div
                 class="strength-fill"
-                :class="`strength--${passwordStrength}`"
-                :style="{ width: (passwordStrength / 4 * 100) + '%' }"
+                :class="`strength--${passwordStrengthScore}`"
+                :style="{ width: (passwordStrengthScore / 4 * 100) + '%' }"
               ></div>
             </div>
             <span class="strength-label">
               {{ t("auth.passwordStrengthLabel") }}
-              {{ t(`auth.passwordStrength.${passwordStrength || 1}`) }}
+              {{ t(`auth.passwordStrength.${passwordStrengthScore || 1}`) }}
             </span>
           </div>
           <ul v-if="registerForm.password.length >= 1" class="password-reqs" aria-live="polite">
@@ -282,6 +282,7 @@
               {{ t('auth.reqNumber') }}
             </li>
           </ul>
+          <p v-if="passwordFieldError" class="field-error">{{ passwordFieldError }}</p>
         </div>
         <div class="field">
           <label for="reg-confirm">{{ t("auth.passwordConfirm") }}</label>
@@ -332,6 +333,7 @@
               </svg>
             </button>
           </div>
+          <p v-if="confirmFieldError" class="field-error">{{ confirmFieldError }}</p>
         </div>
         <p v-if="errorMsg" class="error-msg">
           <svg
@@ -413,6 +415,7 @@ import { reactive, ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { authStore as userAuthStore } from "../store/auth.js";
+import { isPasswordValid, passwordStrength } from "../composables/usePasswordValidation.js";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -440,16 +443,16 @@ const forgotEmail = ref("");
 const forgotLoading = ref(false);
 const forgotMsg = reactive({ text: "", ok: false });
 
-const passwordStrength = computed(() => {
-  const p = registerForm.password;
-  if (!p) return 0;
-  let score = 0;
-  if (p.length >= 6) score++;
-  if (p.length >= 10) score++;
-  if (/[A-Z]/.test(p)) score++;
-  if (/[0-9]/.test(p)) score++;
-  if (/[^a-zA-Z0-9]/.test(p)) score++;
-  return Math.min(score, 4);
+const passwordStrengthScore = computed(() => passwordStrength(registerForm.password));
+
+const registerAttempted = ref(false);
+const passwordFieldError = computed(() => {
+  if (!registerAttempted.value || isPasswordValid(registerForm.password)) return "";
+  return t("auth.passwordRequirementsError");
+});
+const confirmFieldError = computed(() => {
+  if (!registerAttempted.value || registerForm.password === registerForm.confirm) return "";
+  return t("auth.passwordMismatch");
 });
 
 function handleTabKeydown(e, current) {
@@ -475,6 +478,7 @@ onMounted(() => {
 function switchTab(newTab) {
   tab.value = newTab;
   errorMsg.value = "";
+  registerAttempted.value = false;
 }
 
 async function handleLogin() {
@@ -518,8 +522,8 @@ async function handleGoogleLogin() {
 }
 
 async function handleRegister() {
-  if (registerForm.password !== registerForm.confirm) {
-    errorMsg.value = t("auth.passwordMismatch");
+  registerAttempted.value = true;
+  if (!isPasswordValid(registerForm.password) || registerForm.password !== registerForm.confirm) {
     return;
   }
   loading.value = true;
@@ -712,6 +716,12 @@ async function handleReset() {
   width: 15px;
   height: 15px;
   flex-shrink: 0;
+}
+
+.field-error {
+  color: #c62828;
+  font-size: 0.8rem;
+  margin: 0.3rem 0 0;
 }
 
 .btn-auth {
