@@ -195,6 +195,8 @@ export default {
     fuelLabel: "Fuel type",
     placesLabel: "Number of seats",
     priceLabel: "Price per day (€)",
+    locationLabel: "Pickup location",
+    locationSelectPlaceholder: "Select a location...",
     available: "Available",
     editBtn: "Edit",
     deleteBtn: "Delete",

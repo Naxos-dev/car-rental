@@ -195,6 +195,8 @@ export default {
     fuelLabel: "Type de carburant",
     placesLabel: "Nombre de places",
     priceLabel: "Prix par jour (€)",
+    locationLabel: "Lieu de prise en charge",
+    locationSelectPlaceholder: "Sélectionner un lieu...",
     available: "Disponible",
     editBtn: "Modifier",
     deleteBtn: "Supprimer",

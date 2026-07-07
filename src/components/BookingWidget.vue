@@ -20,13 +20,14 @@
           </svg>
           {{ t("booking.location") }}
         </span>
-        <div
-          class="location-display"
-          role="status"
-          :aria-label="t('booking.location') + ': ' + searchStore.location"
+        <select
+          id="location"
+          v-model="localLocation"
+          class="location-select"
+          :aria-label="t('booking.location')"
         >
-          {{ searchStore.location }}
-        </div>
+          <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+        </select>
       </div>
 
       <!-- Période de location -->
@@ -89,11 +90,13 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
+import { PICKUP_LOCATIONS } from "../constants/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 
 const { t } = useI18n();
 const router = useRouter();
 
+const localLocation = ref(searchStore.location);
 const localStartDate = ref(searchStore.startDate);
 const localEndDate = ref(searchStore.endDate);
 const localStartTime = ref(searchStore.startTime);
@@ -110,6 +113,7 @@ function handleSearch() {
     searchError.value = t("searchBanner.dateError");
     return;
   }
+  searchStore.location = localLocation.value;
   searchStore.startDate = localStartDate.value;
   searchStore.endDate = localEndDate.value;
   searchStore.startTime = localStartTime.value;
@@ -171,10 +175,7 @@ label svg,
   flex-shrink: 0;
 }
 
-.location-display {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.location-select {
   padding: 0.6rem 0.8rem;
   background: #f0f4ff;
   border: 1.5px solid #e8ecf5;
@@ -182,8 +183,9 @@ label svg,
   font-size: 0.95rem;
   color: #555;
   font-weight: 500;
-  cursor: default;
-  user-select: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 .location-pin {
   width: 14px;

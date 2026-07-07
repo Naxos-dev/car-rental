@@ -50,6 +50,14 @@
     <transition name="slide-down">
       <div v-if="editOpen" class="edit-panel" aria-live="polite" :aria-label="t('searchBanner.editSearch')">
         <form class="edit-form" @submit.prevent="applyChanges">
+          <!-- Lieu -->
+          <div class="edit-field edit-field--full">
+            <label for="sb-location">{{ t("searchBanner.location") }}</label>
+            <select id="sb-location" v-model="draft.location">
+              <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+            </select>
+          </div>
+
           <!-- Période -->
           <div class="edit-field edit-field--full">
             <label>{{ t("searchBanner.dateRange") }}</label>
@@ -96,6 +104,7 @@
 import { ref, reactive, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
+import { PICKUP_LOCATIONS } from "../constants/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 import { formatDate } from "../composables/useFormatDate.js";
 
@@ -104,6 +113,7 @@ const editOpen = ref(false);
 const dateError = ref("");
 
 const draft = reactive({
+  location: searchStore.location,
   startDate: searchStore.startDate,
   startTime: searchStore.startTime,
   endDate: searchStore.endDate,
@@ -112,6 +122,7 @@ const draft = reactive({
 
 function toggleEdit() {
   if (!editOpen.value) {
+    draft.location = searchStore.location;
     draft.startDate = searchStore.startDate;
     draft.startTime = searchStore.startTime;
     draft.endDate = searchStore.endDate;
@@ -130,6 +141,7 @@ function applyChanges() {
     nextTick(() => dateErrorRef.value?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
     return;
   }
+  searchStore.location = draft.location;
   searchStore.startDate = draft.startDate;
   searchStore.startTime = draft.startTime;
   searchStore.endDate = draft.endDate;
@@ -253,7 +265,8 @@ function fmtDate(dateStr) {
   color: #555;
 }
 
-.edit-field input {
+.edit-field input,
+.edit-field select {
   border: 1.5px solid #e0e0e0;
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
@@ -264,7 +277,8 @@ function fmtDate(dateStr) {
   width: 100%;
 }
 
-.edit-field input:focus {
+.edit-field input:focus,
+.edit-field select:focus {
   border-color: var(--color-primary);
 }
 
