@@ -212,6 +212,20 @@ input {
 input:focus {
   border-color: var(--color-primary);
 }
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  background: #fff;
+}
+input[type="time"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+input[type="time"]::-webkit-datetime-edit-text,
+input[type="time"]::-webkit-datetime-edit-hour-field,
+input[type="time"]::-webkit-datetime-edit-minute-field,
+input[type="time"]::-webkit-datetime-edit-ampm-field {
+  padding: 0;
+}
 .btn-search {
   background: var(--color-primary);
   color: #fff;
