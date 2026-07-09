@@ -1282,6 +1282,7 @@ input[type="time"] {
   -webkit-appearance: none;
   appearance: none;
   display: block;
+  color: var(--color-navy);
 }
 input[type="time"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit-fields-wrapper,

@@ -292,6 +292,7 @@ function fmtDate(dateStr) {
   appearance: none;
   display: block;
   background: #fff;
+  color: var(--color-navy);
 }
 .edit-field input[type="time"]::-webkit-datetime-edit,
 .edit-field input[type="time"]::-webkit-datetime-edit-fields-wrapper,

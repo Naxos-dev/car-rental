@@ -745,6 +745,7 @@ input[type="time"] {
   appearance: none;
   display: block;
   background: #fff;
+  color: var(--color-navy);
 }
 input[type="time"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit-fields-wrapper,
