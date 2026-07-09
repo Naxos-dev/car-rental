@@ -780,7 +780,12 @@ const FullCalendar = shallowRef(null);
 const dayGridPlugin = shallowRef(null);
 const frLocale = shallowRef(null);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+// Force un format 24h (lang="fr-FR"/"en-GB") : sur iOS, le widget natif
+// affiche sinon un format AM/PM basé sur la locale de l'appareil, plus
+// large, qui déborde du champ sur mobile.
+const timeLang = computed(() => (locale.value === "fr" ? "fr-FR" : "en-GB"));
 
 const activeTab = ref("reservations");
 const reservations = computed(() => reservationStore.reservations);
