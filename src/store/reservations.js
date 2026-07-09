@@ -46,11 +46,12 @@ export const reservationStore = reactive({
       await this._assertAvailable(data.vehicleId, data.startDate, data.endDate);
     }
     const { statut: dataStatut, ...rest } = data;
-    await addDoc(collection(db, "reservations"), {
+    const docRef = await addDoc(collection(db, "reservations"), {
       ...rest,
       statut: dataStatut ?? "confirmee",
       createdAt: serverTimestamp(),
     });
+    return docRef.id;
   },
 
   async updateStatut(id, statut) {

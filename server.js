@@ -11,7 +11,9 @@ import {
   checkRateLimit,
   getVehicleReservedRanges,
   upsertReservationFromSession,
+  alertPaymentFailed,
 } from "./api/_stripe-helpers.js";
+import { sendReservationConfirmationEmail } from "./api/_email-helpers.js";
 
 const app = express();
 const PORT = 3001;
@@ -54,6 +56,8 @@ app.post("/stripe-webhook", express.raw({ type: "application/json" }), async (re
         return res.status(500).json({ error: "Erreur d'enregistrement" });
       }
     }
+  } else if (event.type === "checkout.session.async_payment_failed") {
+    await alertPaymentFailed(event.data.object);
   }
   res.json({ received: true });
 });
@@ -188,6 +192,33 @@ app.get("/vehicle-availability", rateLimit({ max: 60, windowMs: 60_000 }), async
     console.error("Vehicle availability error:", err);
     res.status(503).json({ error: "Service temporairement indisponible. Réessayez dans quelques instants." });
   }
+});
+
+app.post("/send-reservation-email", rateLimit({ max: 10, windowMs: 60_000 }), async (req, res) => {
+  const {
+    to, reservationId = "", nom = "", vehicleLabel = "", startDate, startTime = "", endDate, endTime = "", location = "", amount,
+  } = req.body;
+
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!to || !EMAIL_RE.test(to) || !vehicleLabel || !startDate || !endDate) {
+    return res.status(400).json({ error: "Paramètres manquants ou invalides" });
+  }
+  if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate)) {
+    return res.status(400).json({ error: "Dates invalides" });
+  }
+  if ((startTime && !TIME_RE.test(startTime)) || (endTime && !TIME_RE.test(endTime))) {
+    return res.status(400).json({ error: "Heures invalides" });
+  }
+
+  await sendReservationConfirmationEmail({
+    to, reservationId, nom, vehicleLabel, startDate, startTime, endDate, endTime, location,
+    amount: typeof amount === "number" ? amount : undefined,
+  });
+
+  res.json({ sent: true });
 });
 
 app.listen(PORT, () => {
