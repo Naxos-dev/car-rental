@@ -26,7 +26,7 @@
           class="location-select"
           :aria-label="t('booking.location')"
         >
-          <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+          <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
         </select>
       </div>
 
@@ -90,7 +90,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
-import { PICKUP_LOCATIONS } from "../constants/locations.js";
+import { locationStore } from "../store/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 
 const { t, locale } = useI18n();

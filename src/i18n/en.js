@@ -14,6 +14,8 @@ export default {
   common: {
     showPassword: "Show password",
     hidePassword: "Hide password",
+    availabilityCheckFailed:
+      "Couldn't check vehicle availability. The results shown may be inaccurate — please try again shortly.",
   },
 
   hero: {
@@ -94,6 +96,9 @@ export default {
     available: "Available",
     book: "Book",
     filters: {
+      location: "Pickup location",
+      brand: "Brand",
+      anyBrand: "All brands",
       fuel: "Fuel type",
       anyFuel: "All fuel types",
       seats: "Seats",
@@ -231,7 +236,6 @@ export default {
     fuelSelectPlaceholder: "Select...",
     placesPlaceholder: "E.g.: 5",
     pricePlaceholder: "E.g.: 45",
-    pickupPlaceholder: "E.g.: Paris Centre",
     colPhoto: "Photo",
     colBrandModel: "Make / Model",
     colFuel: "Fuel type",

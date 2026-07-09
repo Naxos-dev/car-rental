@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .vercel
 CLAUDE.md
+
+# Playwright MCP debug artifacts (screenshots, console logs, page snapshots)
+.playwright-mcp/

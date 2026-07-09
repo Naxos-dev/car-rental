@@ -154,6 +154,10 @@
     </div>
     <div class="footer-bottom">
       <p>© {{ new Date().getFullYear() }} AutoLoc — {{ t("footer.rights") }}</p>
+      <p class="dev-signature">
+        Developed with ❤️ by
+        <a href="/" class="dev-signature-link">Naxos</a>
+      </p>
     </div>
   </footer>
 </template>
@@ -323,5 +327,19 @@ const { t } = useI18n();
   padding: 1rem;
   font-size: 0.85rem;
   color: #888;
+}
+.dev-signature {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+.dev-signature-link {
+  color: #888;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.dev-signature-link:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 </style>
