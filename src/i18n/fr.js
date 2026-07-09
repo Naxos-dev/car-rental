@@ -14,6 +14,8 @@ export default {
   common: {
     showPassword: "Afficher le mot de passe",
     hidePassword: "Masquer le mot de passe",
+    availabilityCheckFailed:
+      "Impossible de vérifier la disponibilité des véhicules. Les résultats affichés peuvent être inexacts — réessayez dans un instant.",
   },
 
   hero: {
