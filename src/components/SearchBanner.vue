@@ -75,11 +75,11 @@
           <div class="edit-row">
             <div class="edit-field">
               <label for="sb-startTime">{{ t("searchBanner.startTime") }}</label>
-              <input id="sb-startTime" v-model="draft.startTime" type="time" required />
+              <input id="sb-startTime" v-model="draft.startTime" type="time" required :lang="timeLang" />
             </div>
             <div class="edit-field">
               <label for="sb-endTime">{{ t("searchBanner.endTime") }}</label>
-              <input id="sb-endTime" v-model="draft.endTime" type="time" required />
+              <input id="sb-endTime" v-model="draft.endTime" type="time" required :lang="timeLang" />
             </div>
           </div>
           <p v-if="dateError" ref="dateErrorRef" class="date-error" role="alert">{{ dateError }}</p>
@@ -101,15 +101,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick } from "vue";
+import { computed, ref, reactive, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
 import { PICKUP_LOCATIONS } from "../constants/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 import { formatDate } from "../composables/useFormatDate.js";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const editOpen = ref(false);
+
+// Force un format 24h (lang="fr-FR"/"en-GB") : sur iOS, le widget natif
+// affiche sinon un format AM/PM basé sur la locale de l'appareil, plus
+// large, qui déborde du champ sur mobile.
+const timeLang = computed(() => (locale.value === "fr" ? "fr-FR" : "en-GB"));
 const dateError = ref("");
 
 const draft = reactive({

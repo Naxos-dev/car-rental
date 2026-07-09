@@ -199,6 +199,16 @@ select {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
+
+  /* iOS Safari auto-zoome sur les champs dont le font-size calculé est
+     inférieur à 16px, et ne dézoome pas automatiquement à la fermeture
+     du picker. On force 16px sur tous les champs de saisie mobiles. */
+  input,
+  select,
+  textarea,
+  .drp-input {
+    font-size: 16px !important;
+  }
 }
 
 /* Screen-reader only utility */
