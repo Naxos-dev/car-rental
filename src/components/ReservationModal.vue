@@ -711,6 +711,7 @@ async function handleSubmit() {
   flex-direction: column;
   gap: 0.25rem;
   flex: 1;
+  min-width: 0;
 }
 .field-row {
   display: flex;

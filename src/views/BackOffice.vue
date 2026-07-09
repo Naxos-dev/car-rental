@@ -111,11 +111,11 @@
               <div class="field-row">
                 <div class="field">
                   <label for="ab-start-time">{{ t("booking.startTime") }}</label>
-                  <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
+                  <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required :lang="timeLang" />
                 </div>
                 <div class="field">
                   <label for="ab-end-time">{{ t("booking.endTime") }}</label>
-                  <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
+                  <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required :lang="timeLang" />
                 </div>
               </div>
 
@@ -1246,6 +1246,7 @@ const calendarOptions = computed(() => ({
   flex-direction: column;
   gap: 0.3rem;
   flex: 1;
+  min-width: 0;
 }
 .field-row {
   display: flex;
