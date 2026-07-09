@@ -775,6 +775,7 @@ import { hasOverlappingTarifs, calculateTotal, calcNbJours } from "../utils/pric
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
 import { locationStore } from "../store/locations.js";
+import { apiUrl } from "../utils/apiUrl.js";
 
 const FullCalendar = shallowRef(null);
 const dayGridPlugin = shallowRef(null);
