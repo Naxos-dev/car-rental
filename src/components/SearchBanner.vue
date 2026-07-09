@@ -287,6 +287,21 @@ function fmtDate(dateStr) {
 .edit-field select:focus {
   border-color: var(--color-primary);
 }
+.edit-field input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  background: #fff;
+  color: var(--color-navy);
+}
+.edit-field input[type="time"]::-webkit-datetime-edit,
+.edit-field input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+.edit-field input[type="time"]::-webkit-datetime-edit-text,
+.edit-field input[type="time"]::-webkit-datetime-edit-hour-field,
+.edit-field input[type="time"]::-webkit-datetime-edit-minute-field,
+.edit-field input[type="time"]::-webkit-datetime-edit-ampm-field {
+  padding: 0;
+}
 
 .edit-actions {
   display: flex;
