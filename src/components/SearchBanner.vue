@@ -259,6 +259,7 @@ function fmtDate(dateStr) {
   flex-direction: column;
   gap: 0.3rem;
   flex: 1;
+  min-width: 0;
 }
 .edit-field--full {
   flex: none;
