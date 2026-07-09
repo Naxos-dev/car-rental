@@ -54,7 +54,7 @@
           <div class="edit-field edit-field--full">
             <label for="sb-location">{{ t("searchBanner.location") }}</label>
             <select id="sb-location" v-model="draft.location">
-              <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+              <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
             </select>
           </div>
 
@@ -104,7 +104,7 @@
 import { ref, reactive, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
-import { PICKUP_LOCATIONS } from "../constants/locations.js";
+import { locationStore } from "../store/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 import { formatDate } from "../composables/useFormatDate.js";
 

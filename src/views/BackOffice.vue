@@ -86,39 +86,48 @@
           </button>
 
           <form v-if="showAgencyBooking" id="agency-booking-form" class="vehicle-form agency-form" @submit.prevent="handleAgencyBooking">
-            <!-- Étape 1 : période -->
+            <!-- Étape 1 : lieu de prise en charge (détermine les véhicules disponibles à cet endroit) -->
             <div class="field">
-              <label>{{ t("booking.dateRange") }}</label>
-              <DateRangePicker
-                :startDate="agencyForm.startDate"
-                :endDate="agencyForm.endDate"
-                :disabledRanges="[]"
-                :placeholder="t('booking.selectDates')"
-                @update:startDate="agencyForm.startDate = $event"
-                @update:endDate="agencyForm.endDate = $event"
-              />
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="ab-start-time">{{ t("booking.startTime") }}</label>
-                <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
-              </div>
-              <div class="field">
-                <label for="ab-end-time">{{ t("booking.endTime") }}</label>
-                <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
-              </div>
+              <label for="ab-location">{{ t("booking.location") }}</label>
+              <select id="ab-location" v-model="agencyForm.location" required>
+                <option value="" disabled>{{ t("backoffice.locationSelectPlaceholder") }}</option>
+                <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
+              </select>
             </div>
 
-            <!-- Étape 2 : véhicule + lieu (affiché seulement quand les dates sont renseignées) -->
-            <template v-if="agencyForm.startDate && agencyForm.endDate">
-              <div v-if="availableVehicles.length === 0" class="no-vehicles-notice">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                {{ t("backoffice.noVehiclesAvailable") }}
+            <!-- Étape 2 : période (affichée seulement quand un lieu est choisi) -->
+            <template v-if="agencyForm.location">
+              <div class="field">
+                <label>{{ t("booking.dateRange") }}</label>
+                <DateRangePicker
+                  :startDate="agencyForm.startDate"
+                  :endDate="agencyForm.endDate"
+                  :disabledRanges="[]"
+                  :placeholder="t('booking.selectDates')"
+                  @update:startDate="agencyForm.startDate = $event"
+                  @update:endDate="agencyForm.endDate = $event"
+                />
               </div>
-              <div class="field-row" v-else>
+              <div class="field-row">
                 <div class="field">
+                  <label for="ab-start-time">{{ t("booking.startTime") }}</label>
+                  <input id="ab-start-time" v-model="agencyForm.startTime" type="time" required />
+                </div>
+                <div class="field">
+                  <label for="ab-end-time">{{ t("booking.endTime") }}</label>
+                  <input id="ab-end-time" v-model="agencyForm.endTime" type="time" required />
+                </div>
+              </div>
+
+              <!-- Étape 3 : véhicule (affiché seulement quand les dates sont renseignées ; filtré par lieu + disponibilité) -->
+              <template v-if="agencyForm.startDate && agencyForm.endDate">
+                <div v-if="availableVehicles.length === 0" class="no-vehicles-notice">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ t("backoffice.noVehiclesAvailable") }}
+                </div>
+                <div class="field" v-else>
                   <label for="ab-vehicle">{{ t("backoffice.available") }}</label>
                   <select id="ab-vehicle" v-model="agencyForm.vehicleId" required>
                     <option value="" disabled>{{ t("backoffice.vehicleSelectPlaceholder") }}</option>
@@ -127,45 +136,41 @@
                     </option>
                   </select>
                 </div>
-                <div class="field">
-                  <label for="ab-location">{{ t("booking.location") }}</label>
-                  <input id="ab-location" v-model="agencyForm.location" type="text" :placeholder="t('backoffice.pickupPlaceholder')" required />
-                </div>
-              </div>
 
-              <!-- Étape 3 : infos client (affiché seulement quand un véhicule est choisi) -->
-              <template v-if="agencyForm.vehicleId">
-                <div class="field-row">
-                  <div class="field">
-                    <label for="ab-nom">{{ t("backoffice.clientName") }}</label>
-                    <input id="ab-nom" v-model="agencyForm.nom" type="text" :placeholder="t('backoffice.clientNamePlaceholder')" required />
+                <!-- Étape 4 : infos client (affiché seulement quand un véhicule est choisi) -->
+                <template v-if="agencyForm.vehicleId">
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="ab-nom">{{ t("backoffice.clientName") }}</label>
+                      <input id="ab-nom" v-model="agencyForm.nom" type="text" :placeholder="t('backoffice.clientNamePlaceholder')" required />
+                    </div>
+                    <div class="field">
+                      <label for="ab-email">{{ t("modal.email") }}</label>
+                      <input id="ab-email" v-model="agencyForm.email" type="email" :placeholder="t('backoffice.clientEmailPlaceholder')" required />
+                    </div>
+                    <div class="field">
+                      <label for="ab-tel">{{ t("modal.phone") }}</label>
+                      <input id="ab-tel" v-model="agencyForm.telephone" type="tel" :placeholder="t('backoffice.clientPhonePlaceholder')" required />
+                    </div>
                   </div>
-                  <div class="field">
-                    <label for="ab-email">{{ t("modal.email") }}</label>
-                    <input id="ab-email" v-model="agencyForm.email" type="email" :placeholder="t('backoffice.clientEmailPlaceholder')" required />
-                  </div>
-                  <div class="field">
-                    <label for="ab-tel">{{ t("modal.phone") }}</label>
-                    <input id="ab-tel" v-model="agencyForm.telephone" type="tel" :placeholder="t('backoffice.clientPhonePlaceholder')" required />
-                  </div>
-                </div>
 
-                <p v-if="agencyBookingError" class="form-error" role="alert">{{ agencyBookingError }}</p>
+                  <p v-if="agencyBookingError" class="form-error" role="alert">{{ agencyBookingError }}</p>
 
-                <div class="form-actions">
-                  <button type="button" class="btn-cancel" @click="showAgencyBooking = false">{{ t("searchBanner.cancel") }}</button>
-                  <button type="submit" class="btn-submit" :disabled="agencyBookingSaving">
-                    <svg v-if="agencyBookingSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-spin">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M12 6v6l4 2"/>
-                    </svg>
-                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M9 11l3 3L22 4"/>
-                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                    </svg>
-                    <span>{{ agencyBookingSaving ? t("backoffice.agencySaving") : t("backoffice.agencyConfirm") }}</span>
-                  </button>
-                </div>
+                  <div class="form-actions">
+                    <button type="button" class="btn-cancel" @click="showAgencyBooking = false">{{ t("searchBanner.cancel") }}</button>
+                    <button type="submit" class="btn-submit" :disabled="agencyBookingSaving">
+                      <svg v-if="agencyBookingSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-spin">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                      </svg>
+                      <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                      </svg>
+                      <span>{{ agencyBookingSaving ? t("backoffice.agencySaving") : t("backoffice.agencyConfirm") }}</span>
+                    </button>
+                  </div>
+                </template>
               </template>
             </template>
           </form>
@@ -471,7 +476,7 @@
                 <label for="lieu">{{ t("backoffice.locationLabel") }}</label>
                 <select id="lieu" v-model="form.lieu" required>
                   <option value="" disabled>{{ t("backoffice.locationSelectPlaceholder") }}</option>
-                  <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+                  <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
                 </select>
               </div>
             </div>
@@ -769,7 +774,7 @@ import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 import { hasOverlappingTarifs } from "../utils/pricing.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
-import { PICKUP_LOCATIONS } from "../constants/locations.js";
+import { locationStore } from "../store/locations.js";
 
 const FullCalendar = shallowRef(null);
 const dayGridPlugin = shallowRef(null);
@@ -965,9 +970,9 @@ const emptyAgencyForm = () => ({
 const agencyForm = reactive(emptyAgencyForm());
 
 const availableVehicles = computed(() => {
-  if (!agencyForm.startDate || !agencyForm.endDate) return [];
+  if (!agencyForm.location || !agencyForm.startDate || !agencyForm.endDate) return [];
   return vehicles.value.filter((v) => {
-    if (!v.disponible) return false;
+    if (!v.disponible || v.lieu !== agencyForm.location) return false;
     return !reservationStore.reservations.some(
       (r) =>
         r.vehicleId === v.id &&
@@ -979,7 +984,7 @@ const availableVehicles = computed(() => {
 });
 
 watch(
-  () => [agencyForm.startDate, agencyForm.endDate],
+  () => [agencyForm.location, agencyForm.startDate, agencyForm.endDate],
   () => { agencyForm.vehicleId = ""; },
 );
 

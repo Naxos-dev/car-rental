@@ -95,6 +95,9 @@ export default {
     available: "Disponible",
     book: "Réserver",
     filters: {
+      location: "Lieu de prise en charge",
+      brand: "Marque",
+      anyBrand: "Toutes les marques",
       fuel: "Carburant",
       anyFuel: "Tous les carburants",
       seats: "Nombre de places",
@@ -236,7 +239,6 @@ export default {
     fuelSelectPlaceholder: "Sélectionner...",
     placesPlaceholder: "Ex: 5",
     pricePlaceholder: "Ex: 45",
-    pickupPlaceholder: "Ex: Paris Centre",
     colPhoto: "Photo",
     colBrandModel: "Marque / Modèle",
     colFuel: "Carburant",
