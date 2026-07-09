@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { upsertReservationFromSession } from "./_stripe-helpers.js";
+import { upsertReservationFromSession, alertPaymentFailed } from "./_stripe-helpers.js";
 
 // Signature verification needs the raw request body, so Vercel's automatic JSON parsing
 // must be disabled for this route.
@@ -42,6 +42,8 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Erreur d'enregistrement" });
       }
     }
+  } else if (event.type === "checkout.session.async_payment_failed") {
+    await alertPaymentFailed(event.data.object);
   }
 
   res.json({ received: true });

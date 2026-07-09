@@ -766,10 +766,11 @@ import { reservationStore } from "../store/reservations.js";
 import { authStore } from "../store/auth.js";
 import { formatDate } from "../composables/useFormatDate.js";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
-import { hasOverlappingTarifs } from "../utils/pricing.js";
+import { hasOverlappingTarifs, calculateTotal, calcNbJours } from "../utils/pricing.js";
 import ReservationDetailModal from "../components/ReservationDetailModal.vue";
 import DateRangePicker from "../components/DateRangePicker.vue";
 import { PICKUP_LOCATIONS } from "../constants/locations.js";
+import { apiUrl } from "../utils/apiUrl.js";
 
 const FullCalendar = shallowRef(null);
 const dayGridPlugin = shallowRef(null);
@@ -988,9 +989,13 @@ async function handleAgencyBooking() {
   agencyBookingError.value = "";
   try {
     const vehicle = vehicles.value.find((v) => v.id === agencyForm.vehicleId);
-    await reservationStore.addReservation({
+    const vehicleLabel = vehicle ? `${vehicle.marque} ${vehicle.modele}` : "";
+    const amount = vehicle
+      ? calculateTotal(vehicle, agencyForm.startDate, calcNbJours(agencyForm.startDate, agencyForm.endDate, agencyForm.startTime, agencyForm.endTime))
+      : undefined;
+    const reservationId = await reservationStore.addReservation({
       vehicleId: agencyForm.vehicleId,
-      vehicleLabel: vehicle ? `${vehicle.marque} ${vehicle.modele}` : "",
+      vehicleLabel,
       vehiclePhoto: vehicle ? vehicle.photoURL || "" : "",
       nom: agencyForm.nom,
       email: agencyForm.email,
@@ -1003,7 +1008,27 @@ async function handleAgencyBooking() {
       userId: null,
       bookingSource: "agency",
       statut: "confirmee",
+      amount,
     });
+
+    // Best-effort: a failed confirmation email must not surface as a booking failure.
+    fetch(apiUrl("send-reservation-email"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: agencyForm.email,
+        reservationId,
+        nom: agencyForm.nom,
+        vehicleLabel,
+        startDate: agencyForm.startDate,
+        startTime: agencyForm.startTime,
+        endDate: agencyForm.endDate,
+        endTime: agencyForm.endTime,
+        location: agencyForm.location,
+        amount,
+      }),
+    }).catch((err) => console.error("[BackOffice] Erreur envoi email confirmation:", err));
+
     Object.assign(agencyForm, emptyAgencyForm());
     showAgencyBooking.value = false;
   } catch (err) {

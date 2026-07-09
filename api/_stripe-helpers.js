@@ -1,33 +1,12 @@
-import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { initializeFirestore, FieldValue } from "firebase-admin/firestore";
+import { FieldValue } from "firebase-admin/firestore";
+import { getAdminDb } from "./_firebase-admin.js";
+import { sendReservationConfirmationEmail, sendAdminAlertEmail } from "./_email-helpers.js";
 
 // Comma-separated list of allowed origins, e.g. "https://myapp.com,https://myapp.vercel.app"
 // Leave unset in development to allow any origin from localhost.
 export const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
   : [];
-
-// Reservations require an authenticated Firestore read (see firestore.rules), which the
-// REST-with-API-key calls below can't provide. Admin SDK credentials bypass security rules
-// for this trusted server-side check. Lazily initialized so a missing key only breaks the
-// availability check, not the whole module.
-let _adminDb = null;
-function getAdminDb() {
-  if (_adminDb) return _adminDb;
-  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!key) throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY non configurée");
-  let app;
-  if (!getApps().length) {
-    const serviceAccount = JSON.parse(Buffer.from(key, "base64").toString("utf-8"));
-    app = initializeApp({ credential: cert(serviceAccount) });
-  } else {
-    app = getApps()[0];
-  }
-  // gRPC (the Admin SDK's default transport) can hang or fail to establish in some
-  // serverless environments (e.g. Vercel functions). REST avoids that at a small latency cost.
-  _adminDb = initializeFirestore(app, { preferRest: true });
-  return _adminDb;
-}
 
 export function setCors(req, res) {
   const origin = req.headers.origin || "";
@@ -202,24 +181,67 @@ export async function getVehicleReservedRanges(vehicleId) {
 export async function upsertReservationFromSession(session) {
   const db = getAdminDb();
   const ref = db.collection("reservations").doc(session.id);
-  if ((await ref.get()).exists) return;
-
   const m = session.metadata || {};
-  await ref.set({
-    vehicleId: m.vehicleId,
-    vehicleLabel: m.vehicleLabel,
+  const email = m.email || session.customer_email || "";
+  const amount = (session.amount_total ?? 0) / 100;
+
+  try {
+    if ((await ref.get()).exists) return;
+    await ref.set({
+      vehicleId: m.vehicleId,
+      vehicleLabel: m.vehicleLabel,
+      nom: m.nom || "",
+      email,
+      telephone: m.telephone || "",
+      location: m.location || "",
+      startDate: m.startDate,
+      startTime: m.startTime || "",
+      endDate: m.endDate,
+      endTime: m.endTime || "",
+      vehiclePhoto: m.photoURL || "",
+      userId: m.userId || null,
+      stripeSessionId: session.id,
+      amount,
+      statut: "confirmee",
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    // Money has already been captured by Stripe at this point — a write failure here means a
+    // paid booking with no reservation record, which needs a human, not just a retry (Stripe
+    // does retry the webhook automatically, but that can take minutes and may not resolve
+    // a persistent Firestore issue).
+    await sendAdminAlertEmail({
+      subject: "Paiement encaissé mais réservation non enregistrée",
+      message: `L'écriture Firestore a échoué pour la session Stripe ${session.id} : ${err.message}\n\nVéhicule: ${m.vehicleLabel}\nClient: ${m.nom || "—"} <${email}>\nDates: ${m.startDate} → ${m.endDate}\n\nLe webhook Stripe va réessayer automatiquement, mais vérifiez manuellement si le problème persiste.`,
+    });
+    throw err;
+  }
+
+  await sendReservationConfirmationEmail({
+    to: email,
+    reservationId: session.id,
     nom: m.nom || "",
-    email: m.email || session.customer_email || "",
-    telephone: m.telephone || "",
-    location: m.location || "",
+    vehicleLabel: m.vehicleLabel,
     startDate: m.startDate,
     startTime: m.startTime || "",
     endDate: m.endDate,
     endTime: m.endTime || "",
-    vehiclePhoto: m.photoURL || "",
-    userId: m.userId || null,
-    stripeSessionId: session.id,
-    statut: "confirmee",
-    createdAt: FieldValue.serverTimestamp(),
+    location: m.location || "",
+    amount,
+  });
+}
+
+// Alerts the admin when a Checkout Session's payment ultimately fails. Only fires for delayed
+// payment methods (bank transfers, SEPA debit, etc) — this store's card-only checkout normally
+// fails synchronously on the Stripe-hosted page (declined card), before a session ever reaches
+// the webhook, so today this mostly matters if another payment method is added later. Requires
+// the Stripe webhook endpoint (Dashboard → Webhooks) to be subscribed to the
+// `checkout.session.async_payment_failed` event, in addition to `checkout.session.completed`.
+export async function alertPaymentFailed(session) {
+  const m = session.metadata || {};
+  const email = m.email || session.customer_email || "";
+  await sendAdminAlertEmail({
+    subject: "Paiement échoué",
+    message: `Le paiement pour la session Stripe ${session.id} a échoué.\n\nVéhicule: ${m.vehicleLabel || "—"}\nClient: ${m.nom || "—"} <${email}>\nDates: ${m.startDate || "—"} → ${m.endDate || "—"}`,
   });
 }
