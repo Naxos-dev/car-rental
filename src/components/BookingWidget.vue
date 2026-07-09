@@ -26,7 +26,7 @@
           class="location-select"
           :aria-label="t('booking.location')"
         >
-          <option v-for="loc in PICKUP_LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+          <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
         </select>
       </div>
 
@@ -54,11 +54,11 @@
       <div class="field-group">
         <div class="field">
           <label for="startTime">{{ t("booking.startTime") }}</label>
-          <input id="startTime" v-model="localStartTime" type="time" required />
+          <input id="startTime" v-model="localStartTime" type="time" required :lang="timeLang" />
         </div>
         <div class="field">
           <label for="endTime">{{ t("booking.endTime") }}</label>
-          <input id="endTime" v-model="localEndTime" type="time" required />
+          <input id="endTime" v-model="localEndTime" type="time" required :lang="timeLang" />
         </div>
       </div>
 
@@ -86,15 +86,20 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { searchStore } from "../store/search.js";
-import { PICKUP_LOCATIONS } from "../constants/locations.js";
+import { locationStore } from "../store/locations.js";
 import DateRangePicker from "./DateRangePicker.vue";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const router = useRouter();
+
+// Force un format 24h (lang="fr-FR"/"en-GB") : sur iOS, le widget natif
+// affiche sinon un format AM/PM basé sur la locale de l'appareil, plus
+// large, qui déborde du champ sur mobile.
+const timeLang = computed(() => (locale.value === "fr" ? "fr-FR" : "en-GB"));
 
 const localLocation = ref(searchStore.location);
 const localStartDate = ref(searchStore.startDate);

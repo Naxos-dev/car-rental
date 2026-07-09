@@ -174,11 +174,11 @@
           <div class="field-row">
             <div class="field">
               <label for="modal-start-time">{{ t("modal.startTime") }}</label>
-              <input id="modal-start-time" v-model="localStartTime" type="time" required aria-required="true" />
+              <input id="modal-start-time" v-model="localStartTime" type="time" required aria-required="true" :lang="timeLang" />
             </div>
             <div class="field">
               <label for="modal-end-time">{{ t("modal.endTime") }}</label>
-              <input id="modal-end-time" v-model="localEndTime" type="time" required aria-required="true" />
+              <input id="modal-end-time" v-model="localEndTime" type="time" required aria-required="true" :lang="timeLang" />
             </div>
           </div>
 
@@ -329,8 +329,13 @@ import DateRangePicker from "./DateRangePicker.vue";
 import { cloudinaryThumb } from "../utils/cloudinaryUtils.js";
 import { apiUrl } from "../utils/apiUrl.js";
 
-const { t, tm } = useI18n();
+const { t, tm, locale } = useI18n();
 const fuelMap = computed(() => tm('fuel'));
+
+// Force un format 24h (lang="fr-FR"/"en-GB") : sur iOS, le widget natif
+// affiche sinon un format AM/PM basé sur la locale de l'appareil, plus
+// large, qui déborde du champ sur mobile.
+const timeLang = computed(() => (locale.value === "fr" ? "fr-FR" : "en-GB"));
 
 const props = defineProps({ vehicle: Object, visible: Boolean });
 const emit = defineEmits(["close"]);

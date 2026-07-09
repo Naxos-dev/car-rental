@@ -27,6 +27,23 @@
       <div class="filters-panel" v-if="!vehicleStore.loading">
         <div class="filters-grid">
           <label class="filter-field">
+            <span>{{ t("fleetPage.filters.location") }}</span>
+            <select id="filter-location" name="filter-location" v-model="searchStore.location">
+              <option v-for="loc in locationStore.locations" :key="loc.id" :value="loc.nom">{{ loc.nom }}</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>{{ t("fleetPage.filters.brand") }}</span>
+            <select id="filter-brand" name="filter-brand" v-model="selectedMarque">
+              <option value="all">{{ t("fleetPage.filters.anyBrand") }}</option>
+              <option v-for="marque in marqueOptions" :key="marque" :value="marque">
+                {{ marque }}
+              </option>
+            </select>
+          </label>
+
+          <label class="filter-field">
             <span>{{ t("fleetPage.filters.fuel") }}</span>
             <select id="filter-fuel" name="filter-fuel" v-model="selectedFuel">
               <option value="all">{{ t("fleetPage.filters.anyFuel") }}</option>
@@ -91,7 +108,8 @@
       </div>
       <div v-else-if="filteredVehicles.length === 0" class="fleet-empty">
         <p>{{ t("fleetPage.emptyFiltered") }}</p>
-        <div class="active-filters" v-if="selectedFuel !== 'all' || selectedSeats !== 'all' || selectedMaxPrice < highestPrice">
+        <div class="active-filters" v-if="selectedMarque !== 'all' || selectedFuel !== 'all' || selectedSeats !== 'all' || selectedMaxPrice < highestPrice">
+          <button v-if="selectedMarque !== 'all'" class="filter-chip" type="button" @click="selectedMarque = 'all'">{{ selectedMarque }} ✕</button>
           <button v-if="selectedFuel !== 'all'" class="filter-chip" type="button" @click="selectedFuel = 'all'">{{ t(`fuel.${selectedFuel}`) }} ✕</button>
           <button v-if="selectedSeats !== 'all'" class="filter-chip" type="button" @click="selectedSeats = 'all'">{{ t("fleetPage.filters.seatsAtLeast", { n: selectedSeats }) }} ✕</button>
           <button v-if="selectedMaxPrice < highestPrice" class="filter-chip" type="button" @click="selectedMaxPrice = highestPrice">≤ {{ selectedMaxPrice }}€ ✕</button>
@@ -129,6 +147,7 @@ import VehicleCard from "../components/VehicleCard.vue";
 import VehicleCardSkeleton from "../components/VehicleCardSkeleton.vue";
 import { vehicleStore } from "../store/vehicles.js";
 import { searchStore } from "../store/search.js";
+import { locationStore } from "../store/locations.js";
 import { authStore as userAuthStore } from "../store/auth.js";
 import { useReservedRanges } from "../composables/useReservedRanges.js";
 import { getEffectivePricePerDay } from "../utils/pricing.js";
@@ -185,6 +204,7 @@ const availableVehicles = computed(() =>
   ),
 );
 
+const selectedMarque = ref("all");
 const selectedFuel = ref("all");
 const selectedSeats = ref("all");
 const selectedMaxPrice = ref(0);
@@ -198,6 +218,12 @@ function effectivePrice(vehicle) {
     searchStore.endTime,
   );
 }
+
+const marqueOptions = computed(() =>
+  [
+    ...new Set(availableVehicles.value.map((v) => v.marque).filter(Boolean)),
+  ].sort(),
+);
 
 const fuelOptions = computed(() =>
   [
@@ -232,6 +258,9 @@ const filteredVehicles = computed(() =>
     const price = effectivePrice(vehicle);
     const seats = Number(vehicle.places) || 0;
 
+    if (selectedMarque.value !== "all" && vehicle.marque !== selectedMarque.value) {
+      return false;
+    }
     if (
       selectedFuel.value !== "all" &&
       vehicle.carburant !== selectedFuel.value
@@ -249,6 +278,7 @@ const filteredVehicles = computed(() =>
 );
 
 function resetFilters() {
+  selectedMarque.value = "all";
   selectedFuel.value = "all";
   selectedSeats.value = "all";
   selectedMaxPrice.value = highestPrice.value;
