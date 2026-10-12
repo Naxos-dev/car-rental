@@ -21,8 +21,10 @@ async function fetchRanges() {
 // at booking time either way, so this can't cause an actual double-booking — it's a display bug.
 export function useReservedRanges() {
   const ranges = ref([]);
+  const loading = ref(false);
 
   async function fetchAll() {
+    loading.value = true;
     try {
       ranges.value = await fetchRanges();
     } catch {
@@ -33,8 +35,10 @@ export function useReservedRanges() {
         const { show } = useToast();
         show(i18n.global.t("common.availabilityCheckFailed"), "error");
       }
+    } finally {
+      loading.value = false;
     }
   }
 
-  return { ranges, fetchAll };
+  return { ranges, loading, fetchAll };
 }

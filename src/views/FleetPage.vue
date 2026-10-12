@@ -24,7 +24,7 @@
         {{ t("fleetPage.redirectedNotice") }}
       </div>
 
-      <div class="filters-panel" v-if="!vehicleStore.loading">
+      <div class="filters-panel" v-if="!vehicleStore.loading && !rangesLoading">
         <div class="filters-grid">
           <label class="filter-field">
             <span>{{ t("fleetPage.filters.location") }}</span>
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <div v-if="vehicleStore.loading" class="fleet-grid">
+      <div v-if="vehicleStore.loading || rangesLoading" class="fleet-grid">
         <VehicleCardSkeleton v-for="n in 9" :key="n" />
       </div>
       <div v-else-if="availableVehicles.length === 0" class="fleet-empty">
@@ -170,7 +170,7 @@ onMounted(() => {
   }
 });
 
-const { ranges: reservedRanges, fetchAll: fetchReservedRanges } = useReservedRanges();
+const { ranges: reservedRanges, loading: rangesLoading, fetchAll: fetchReservedRanges } = useReservedRanges();
 
 watch(
   [() => searchStore.startDate, () => searchStore.endDate],

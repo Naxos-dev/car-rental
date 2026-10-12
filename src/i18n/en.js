@@ -124,6 +124,7 @@ export default {
     close: "Close",
     dateRange: "Rental period",
     selectDates: "Select dates",
+    checkingAvailability: "Checking availability…",
     vehicleConflict: "This vehicle is already booked for these dates.",
     selectBothDates: "Please select a start and end date.",
     datesConflictNotice:

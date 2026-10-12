@@ -143,7 +143,22 @@
             <div class="field-label-row">
               <label id="modal-dates-label">{{ t("modal.dateRange") }}</label>
             </div>
-            <DateRangePicker aria-labelledby="modal-dates-label"
+            <div v-if="rangesLoading" class="dates-loading" aria-live="polite">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="btn-arrow spin"
+                aria-hidden="true"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              {{ t("modal.checkingAvailability") }}
+            </div>
+            <DateRangePicker v-else aria-labelledby="modal-dates-label"
               :startDate="localStartDate"
               :endDate="localEndDate"
               :disabledRanges="disabledRanges"
@@ -402,12 +417,14 @@ const localEndTime = ref("18:00");
 // endpoint dédié (Admin SDK côté serveur) plutôt que depuis reservationStore, qui — pour un
 // client non-admin — ne contient jamais que ses propres réservations (règles Firestore).
 const reservedRanges = ref([]);
+const rangesLoading = ref(false);
 
 async function fetchReservedRanges(vehicleId) {
   if (!vehicleId) {
     reservedRanges.value = [];
     return;
   }
+  rangesLoading.value = true;
   try {
     const res = await fetch(`${apiUrl("vehicle-availability")}?vehicleId=${encodeURIComponent(vehicleId)}`);
     if (!res.ok) throw new Error("fetch failed");
@@ -416,6 +433,8 @@ async function fetchReservedRanges(vehicleId) {
   } catch (err) {
     console.error("[ReservationModal] Erreur récupération disponibilité:", err);
     reservedRanges.value = [];
+  } finally {
+    rangesLoading.value = false;
   }
 }
 
@@ -769,6 +788,16 @@ input.input--error {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+}
+.dates-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.88rem;
+  color: #888;
 }
 .reserved-hint {
   display: inline-flex;
