@@ -1,16 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { watch } from "vue";
 import LandingPage from "../views/LandingPage.vue";
-import BackOffice from "../views/BackOffice.vue";
-import CheckoutPage from "../views/CheckoutPage.vue";
-import PaymentSuccessPage from "../views/PaymentSuccessPage.vue";
-import AuthPage from "../views/AuthPage.vue";
-import AccountPage from "../views/AccountPage.vue";
-import FleetPage from "../views/FleetPage.vue";
-import LegalPage from "../views/LegalPage.vue";
-import NotFoundPage from "../views/NotFoundPage.vue";
 import { authStore } from "../store/auth.js";
 import { checkoutStore } from "../store/checkout.js";
+
+// Toutes les vues sauf la landing (premier rendu) sont chargées à la demande :
+// chaque route devient un chunk séparé, ce qui allège le bundle initial.
+const FleetPage = () => import("../views/FleetPage.vue");
+const BackOffice = () => import("../views/BackOffice.vue");
+const CheckoutPage = () => import("../views/CheckoutPage.vue");
+const PaymentSuccessPage = () => import("../views/PaymentSuccessPage.vue");
+const AuthPage = () => import("../views/AuthPage.vue");
+const AccountPage = () => import("../views/AccountPage.vue");
+const LegalPage = () => import("../views/LegalPage.vue");
+const NotFoundPage = () => import("../views/NotFoundPage.vue");
 
 const routes = [
   { path: "/", name: "Home", component: LandingPage },
