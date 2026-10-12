@@ -1022,22 +1022,18 @@ async function handleAgencyBooking() {
     });
 
     // Best-effort: a failed confirmation email must not surface as a booking failure.
-    fetch(apiUrl("send-reservation-email"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: agencyForm.email,
-        reservationId,
-        nom: agencyForm.nom,
-        vehicleLabel,
-        startDate: agencyForm.startDate,
-        startTime: agencyForm.startTime,
-        endDate: agencyForm.endDate,
-        endTime: agencyForm.endTime,
-        location: agencyForm.location,
-        amount,
-      }),
-    }).catch((err) => console.error("[BackOffice] Erreur envoi email confirmation:", err));
+    // The endpoint re-reads the reservation (recipient + content) from Firestore itself —
+    // it only needs reservationId plus an admin ID token to prove who's asking.
+    authStore.user
+      .getIdToken()
+      .then((idToken) =>
+        fetch(apiUrl("send-reservation-email"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ reservationId }),
+        }),
+      )
+      .catch((err) => console.error("[BackOffice] Erreur envoi email confirmation:", err));
 
     Object.assign(agencyForm, emptyAgencyForm());
     showAgencyBooking.value = false;
