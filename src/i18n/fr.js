@@ -126,6 +126,7 @@ export default {
     close: "Fermer",
     dateRange: "Période de location",
     selectDates: "Sélectionner les dates",
+    checkingAvailability: "Vérification des disponibilités…",
     vehicleConflict: "Ce véhicule est déjà réservé sur ces dates.",
     selectBothDates: "Veuillez sélectionner une date de début et de fin.",
     datesConflictNotice:
