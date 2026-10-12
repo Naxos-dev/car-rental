@@ -1,7 +1,14 @@
 {
-  "name": "car-rental",
+  "name": "autoloc",
   "private": true,
   "version": "0.0.0",
+  "description": "Application de location de véhicules : réservation et paiement en ligne, espace administrateur (Vue 3, Firebase, Stripe).",
+  "author": "Samy Gritli",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Naxos-dev/car-rental.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
