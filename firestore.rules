@@ -15,11 +15,20 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    // Un utilisateur ne doit jamais pouvoir écrire son propre champ `role` :
+    // isAdmin() lit users/{uid}.role, donc un create/update libre permettrait
+    // à n'importe quel compte de s'auto-promouvoir admin.
+    function roleUnchanged() {
+      return (!("role" in request.resource.data) && !("role" in resource.data))
+        || (("role" in request.resource.data) && ("role" in resource.data)
+            && request.resource.data.role == resource.data.role);
+    }
+
     // ── Users ───────────────────────────────────────────────
     match /users/{userId} {
       allow read:   if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && !("role" in request.resource.data);
+      allow update: if (isOwner(userId) && roleUnchanged()) || isAdmin();
       allow delete: if isAdmin();
     }
 
