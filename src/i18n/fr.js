@@ -24,38 +24,8 @@ export default {
     subtitle: "Des centaines de véhicules disponibles partout en France",
   },
 
-  trust: {
-    freeCancel: "Annulation gratuite",
-    assistance: "Assistance 24/7",
-    insurance: "Assurance incluse",
-    noFees: "Sans frais cachés",
-  },
-
-  stats: {
-    vehicles: "Véhicules disponibles",
-    cities: "Villes couvertes",
-    clients: "Clients satisfaits",
-    years: "Années d'expérience",
-  },
-
   features: {
     title: "Pourquoi choisir AutoLoc ?",
-    booking: {
-      title: "Réservation en ligne",
-      desc: "Réservez votre véhicule en quelques clics, 24h/24 et 7j/7.",
-    },
-    prices: {
-      title: "Meilleurs prix garantis",
-      desc: "Tarifs transparents sans frais cachés ni mauvaises surprises.",
-    },
-    fleet: {
-      title: "Large gamme de véhicules",
-      desc: "Du citadine au SUV, en passant par les utilitaires et électriques.",
-    },
-    support: {
-      title: "Support client réactif",
-      desc: "Notre équipe est disponible 7j/7 pour vous accompagner.",
-    },
   },
 
   fleet: {
@@ -89,13 +59,10 @@ export default {
     back: "← Retour",
     title: "Véhicules disponibles",
     subtitle: "Du {start} au {end} — {location}",
-    loading: "Chargement des véhicules...",
     empty: "Aucun véhicule disponible pour les dates sélectionnées.",
     emptyFiltered: "Aucun véhicule ne correspond à vos filtres.",
     redirectedNotice:
       "Veuillez d'abord sélectionner un véhicule pour accéder au paiement.",
-    available: "Disponible",
-    book: "Réserver",
     filters: {
       location: "Lieu de prise en charge",
       brand: "Marque",
@@ -145,9 +112,7 @@ export default {
     reservationDetails: "Détails de la réservation",
     clientInfo: "Vos informations",
     location: "Lieu de prise en charge",
-    startDate: "Date de début",
     startTime: "Heure de début",
-    endDate: "Date de fin",
     endTime: "Heure de fin",
     firstName: "Prénom *",
     lastName: "Nom *",
@@ -157,19 +122,12 @@ export default {
     lastNamePlaceholder: "Dupont",
     emailPlaceholder: "jean{'@'}exemple.com",
     phonePlaceholder: "06 12 34 56 78",
-    days: "{n} jour | {n} jours",
-    total: "Total estimé",
     proceed: "Procéder au paiement",
-    loginRequired: "Vous devez être connecté pour réserver.",
-    loginBtn: "Se connecter",
     close: "Fermer",
     dateRange: "Période de location",
     selectDates: "Sélectionner les dates",
-    reservedDatesLegend: "Dates déjà réservées",
     vehicleConflict: "Ce véhicule est déjà réservé sur ces dates.",
     selectBothDates: "Veuillez sélectionner une date de début et de fin.",
-    bookingSuccess:
-      "Réservation enregistrée ! Un admin vous contactera pour confirmer.",
     datesConflictNotice:
       "Les dates sélectionnées sont déjà réservées pour ce véhicule. Veuillez choisir d'autres dates.",
     description:
@@ -198,7 +156,6 @@ export default {
     statusConfirmed: "Confirmée",
     statusCancelled: "Annulée",
     viewDetail: "Voir les détails",
-    calendarLegend: "Confirmée",
     addVehicle: "Ajouter un véhicule",
     editVehicle: "Modifier le véhicule",
     photoLabel: "Photo du véhicule",
@@ -329,8 +286,6 @@ export default {
     reqUppercase: "Au moins une majuscule",
     reqNumber: "Au moins un chiffre",
     errors: {
-      userNotFound: "Aucun compte trouvé avec cet email.",
-      wrongPassword: "Mot de passe incorrect.",
       invalidEmail: "Adresse email invalide.",
       emailInUse: "Un compte existe déjà avec cet email.",
       weakPassword: "Le mot de passe doit contenir au moins 6 caractères.",
@@ -368,11 +323,6 @@ export default {
     confirmPassword: "Confirmer le mot de passe",
     confirmPasswordPlaceholder: "Identique au nouveau mot de passe",
     changePasswordBtn: "Changer le mot de passe",
-    profile: "Profil",
-    profileFirstName: "Prénom",
-    profileLastName: "Nom",
-    saveProfile: "Enregistrer",
-    saving: "Enregistrement...",
     emailVerificationSent:
       "Un lien de vérification a été envoyé à votre nouvel email. L'adresse sera mise à jour après confirmation.",
     updateError: "Erreur lors de la mise à jour.",
@@ -398,7 +348,6 @@ export default {
     total: "Total TTC",
     pay: "Payer {total}€ avec Stripe",
     paying: "Redirection en cours...",
-    payError: "Erreur de paiement",
     paymentFailed:
       "Une erreur est survenue lors du paiement. Veuillez réessayer.",
     secure: "Paiement 100% sécurisé par Stripe",
@@ -415,19 +364,12 @@ export default {
     errorTitle: "Impossible de confirmer le paiement",
     errorDesc:
       "Nous n'avons pas pu vérifier votre paiement. Si vous avez été débité, contactez notre support.",
-    doubleBooking:
-      "Votre paiement a bien été encaissé, mais ce véhicule vient d'être réservé par quelqu'un d'autre sur les mêmes dates. Contactez notre support en indiquant votre identifiant de session.",
     writeWarning:
       "Votre paiement a bien été encaissé, mais nous n'avons pas pu enregistrer votre réservation automatiquement. Contactez notre support en indiquant votre identifiant de session Stripe.",
   },
 
   footer: {
     tagline: "Votre partenaire de location de voiture depuis 2010.",
-    services: "Services",
-    shortRental: "Location courte durée",
-    longRental: "Location longue durée",
-    utility: "Véhicules utilitaires",
-    electric: "Véhicules électriques",
     info: "Informations",
     about: "À propos",
     terms: "Conditions générales",

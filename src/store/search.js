@@ -6,8 +6,4 @@ export const searchStore = reactive({
   startTime: "09:00",
   endDate: "",
   endTime: "18:00",
-
-  get isReady() {
-    return !!(this.location && this.startDate && this.endDate);
-  },
 });

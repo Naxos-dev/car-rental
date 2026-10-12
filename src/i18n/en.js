@@ -24,38 +24,8 @@ export default {
     subtitle: "Hundreds of vehicles available across France",
   },
 
-  trust: {
-    freeCancel: "Free cancellation",
-    assistance: "24/7 assistance",
-    insurance: "Insurance included",
-    noFees: "No hidden fees",
-  },
-
-  stats: {
-    vehicles: "Available vehicles",
-    cities: "Cities covered",
-    clients: "Satisfied customers",
-    years: "Years of experience",
-  },
-
   features: {
     title: "Why choose AutoLoc?",
-    booking: {
-      title: "Online booking",
-      desc: "Book your vehicle in a few clicks, 24/7.",
-    },
-    prices: {
-      title: "Best prices guaranteed",
-      desc: "Transparent pricing with no hidden fees or surprises.",
-    },
-    fleet: {
-      title: "Wide range of vehicles",
-      desc: "From city cars to SUVs, utility vehicles and electric cars.",
-    },
-    support: {
-      title: "Responsive customer support",
-      desc: "Our team is available 7 days a week to assist you.",
-    },
   },
 
   fleet: {
@@ -89,12 +59,9 @@ export default {
     back: "← Back",
     title: "Available vehicles",
     subtitle: "From {start} to {end} — {location}",
-    loading: "Loading vehicles...",
     empty: "No vehicles available for the selected dates.",
     emptyFiltered: "No vehicle matches your current filters.",
     redirectedNotice: "Please select a vehicle first to proceed to checkout.",
-    available: "Available",
-    book: "Book",
     filters: {
       location: "Pickup location",
       brand: "Brand",
@@ -143,9 +110,7 @@ export default {
     reservationDetails: "Reservation details",
     clientInfo: "Your information",
     location: "Pick-up location",
-    startDate: "Start date",
     startTime: "Start time",
-    endDate: "End date",
     endTime: "End time",
     firstName: "First name *",
     lastName: "Last name *",
@@ -155,19 +120,12 @@ export default {
     lastNamePlaceholder: "Smith",
     emailPlaceholder: "john{'@'}example.com",
     phonePlaceholder: "+X XX XX XX XX XX",
-    days: "{n} day | {n} days",
-    total: "Estimated total",
     proceed: "Proceed to payment",
-    loginRequired: "You must be logged in to book.",
-    loginBtn: "Log in",
     close: "Close",
     dateRange: "Rental period",
     selectDates: "Select dates",
-    reservedDatesLegend: "Already booked dates",
     vehicleConflict: "This vehicle is already booked for these dates.",
     selectBothDates: "Please select a start and end date.",
-    bookingSuccess:
-      "Reservation recorded! An admin will contact you to confirm.",
     datesConflictNotice:
       "The selected dates are already booked for this vehicle. Please choose different dates.",
     description: "Online booking form for the selected vehicle.",
@@ -195,7 +153,6 @@ export default {
     statusConfirmed: "Confirmed",
     statusCancelled: "Cancelled",
     viewDetail: "View details",
-    calendarLegend: "Confirmed",
     addVehicle: "Add vehicle",
     editVehicle: "Edit vehicle",
     photoLabel: "Vehicle photo",
@@ -321,8 +278,6 @@ export default {
     reqUppercase: "At least one uppercase letter",
     reqNumber: "At least one number",
     errors: {
-      userNotFound: "No account found with this email.",
-      wrongPassword: "Incorrect password.",
       invalidEmail: "Invalid email address.",
       emailInUse: "An account already exists with this email.",
       weakPassword: "Password must be at least 6 characters.",
@@ -359,11 +314,6 @@ export default {
     confirmPassword: "Confirm password",
     confirmPasswordPlaceholder: "Same as new password",
     changePasswordBtn: "Change password",
-    profile: "Profile",
-    profileFirstName: "First name",
-    profileLastName: "Last name",
-    saveProfile: "Save",
-    saving: "Saving...",
     emailVerificationSent:
       "A verification link has been sent to your new email. The address will be updated after confirmation.",
     updateError: "Error updating information.",
@@ -389,7 +339,6 @@ export default {
     total: "Total incl. tax",
     pay: "Pay {total}€ with Stripe",
     paying: "Redirecting...",
-    payError: "Payment error",
     paymentFailed: "An error occurred during payment. Please try again.",
     secure: "100% secure payment by Stripe",
     back: "Edit reservation",
@@ -405,19 +354,12 @@ export default {
     errorTitle: "Unable to confirm payment",
     errorDesc:
       "We could not verify your payment. If you were charged, please contact our support team.",
-    doubleBooking:
-      "Your payment was collected, but this vehicle was just booked by someone else for the same dates. Please contact our support team with your session ID.",
     writeWarning:
       "Your payment was collected, but we could not automatically record your reservation. Please contact our support team with your Stripe session ID.",
   },
 
   footer: {
     tagline: "Your car rental partner since 2010.",
-    services: "Services",
-    shortRental: "Short-term rental",
-    longRental: "Long-term rental",
-    utility: "Utility vehicles",
-    electric: "Electric vehicles",
     info: "Information",
     about: "About us",
     terms: "Terms & conditions",
